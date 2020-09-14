@@ -19,7 +19,7 @@ using namespace cinolib;
 
 uint closest_vertex(const vec3d & p, const Trimesh<> & m)
 {
-    std::vector<std::pair<double,uint>> closest;
+    std::vector<std::pair<float,uint>> closest;
     for(uint vid=0; vid<m.num_verts(); ++vid) closest.push_back(std::make_pair(m.vert(vid).dist(p),vid));
     std::sort(closest.begin(), closest.end());
     return closest.front().second;
