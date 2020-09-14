@@ -19,7 +19,7 @@ int main(int argc, char **argv)
     QApplication a(argc, argv);
 
     std::string s = (argc>1) ? std::string(argv[1]) : std::string(DATA_PATH) + "/T_supported.cli";
-    double hatch  = (argc>2) ? atof(argv[2]) : 0.01;
+    float hatch  = (argc>2) ? atof(argv[2]) : 0.01;
 
     std::cout << "load " << s << std::endl;
     std::cout << "hatch is: " << hatch << std::endl;
