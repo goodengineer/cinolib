@@ -1,4 +1,4 @@
-/* This sample program computes a canonical polygonal schema of a closed manifodl
+/* This sample program computes a canonical polygonal schema of a closed manifold
  * with genus g, which is basically a map to a regular polygon with 4g sides. For
  * more details refer to:
  *
@@ -33,7 +33,7 @@ int main(int argc, char **argv)
     QApplication app(argc, argv);
 
     std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/torus.obj";
-    DrawableTrimesh<> m_xyz(s.c_str());
+    DrawableTrimesh<> m_xyz(s.c_str()),m_uvw;
 
     HomotopyBasisData data;
     data.globally_shortest = false;
@@ -42,7 +42,6 @@ int main(int argc, char **argv)
     data.split_strategy = EDGE_SPLIT_STRATEGY;
     homotopy_basis(m_xyz, data);
     std::cout << data << std::endl;
-    DrawableTrimesh<> m_uvw;
     canonical_polygonal_schema(m_xyz, data, m_uvw);
 
     // set UV coordinates
@@ -53,8 +52,7 @@ int main(int argc, char **argv)
     m_xyz.vector_verts() = xyz;
 
     QWidget window;
-    GLcanvas gui_xyz;
-    GLcanvas gui_uvw;
+    GLcanvas gui_xyz,gui_uvw;
     QHBoxLayout layout;
     layout.addWidget(&gui_xyz);
     layout.addWidget(&gui_uvw);
@@ -72,10 +70,8 @@ int main(int argc, char **argv)
     window.resize(800,600);
     window.show();
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-    SurfaceMeshControlPanel<DrawableTrimesh<>> panel_xyz(&m_xyz, &gui_xyz);
-    SurfaceMeshControlPanel<DrawableTrimesh<>> panel_uvw(&m_uvw, &gui_uvw);
+    SurfaceMeshControlPanel<DrawableTrimesh<>> panel_xyz(&m_xyz, &gui_xyz),panel_uvw(&m_uvw, &gui_uvw);
+    
     QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_1), &gui_xyz), &QShortcut::activated, [&](){panel_xyz.show();});
     QApplication::connect(new QShortcut(QKeySequence(Qt::CTRL+Qt::Key_2), &gui_uvw), &QShortcut::activated, [&](){panel_uvw.show();});
 
