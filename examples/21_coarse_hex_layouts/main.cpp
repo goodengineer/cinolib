@@ -1,5 +1,5 @@
 /* This sample program computes the coarse block
- * decomposition of a given hexhedral mesh.
+ * decomposition of a given hexahedral mesh.
  *
  * Enjoy!
 */
@@ -30,10 +30,6 @@ int main(int argc, char **argv)
     profiler.pop();
     m.poly_color_wrt_label();
     m.updateGL();
-
-    //SlicerState ss;
-    //ss.Z_thresh = 0.5;
-    //m.slice(ss);
 
     GLcanvas gui;
     gui.push_obj(&m);
