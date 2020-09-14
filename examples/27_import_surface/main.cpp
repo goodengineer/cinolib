@@ -43,9 +43,7 @@ int main(int argc, char **argv)
             assert(ss >> srf_vid >> vol_vid);
             vol->vert(vol_vid) = srf.vert(srf_vid);
             if(!vol->vert_is_on_srf(vol_vid))
-            {
                 std::cerr << "WARNINNG: " << vol_vid << " is not a surface vertex!" << std::endl;
-            }
         }
     }
 
