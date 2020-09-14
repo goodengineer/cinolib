@@ -18,30 +18,31 @@
 #include <cinolib/profiler.h>
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+using namespace cinolib;
+using namespace std;
 
 int main(int argc, char **argv)
 {
-    using namespace cinolib;
-
+    
     QApplication a(argc, argv);
 
-    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/Laurana.obj";
+    string s = (argc==2) ? string(argv[1]) : string(DATA_PATH) + "/Laurana.obj";
     DrawableTrimesh<> m_xyz(s.c_str());
 
     // ordered list of boundary vertices
-    std::vector<uint> boundary = m_xyz.get_ordered_boundary_vertices();
+    vector<uint> boundary = m_xyz.get_ordered_boundary_vertices();
 
-    // create parametric space (discrete unit circle with as many point as the boundary vertices)
+    // create parametric space (discrete unit circle with as many points as the boundary vertices)
     std::vector<vec3d> uv_boundary = n_sided_polygon(vec3d(0,0,0), boundary.size(), 1.0);
 
-    // set potitional constraints for boundary vertices (map mesh boundary to the unit circle)
-    std::map<uint,vec3d> dirichlet_bcs;
+    // set positional(potential) constraints for boundary vertices (map mesh boundary to the unit circle)
+    map<uint,vec3d> dirichlet_bcs;
     for(uint i=0; i<boundary.size(); ++i) dirichlet_bcs[boundary.at(i)] = uv_boundary.at(i);
 
     // solve for the interior vertices via harmonic map
     Profiler profiler;
     profiler.push("3D Harmonic map");
-    std::vector<vec3d> uv_map = harmonic_map_3d(m_xyz, dirichlet_bcs);
+    vector<vec3d> uv_map = harmonic_map_3d(m_xyz, dirichlet_bcs);
     profiler.pop();
 
     // create a mesh of the uv parametric space (same connectivity, different embedding)
@@ -55,12 +56,15 @@ int main(int argc, char **argv)
     GLcanvas gui_xyz;
     GLcanvas gui_uvw;
     QHBoxLayout layout;
+    
     layout.addWidget(&gui_xyz);
     layout.addWidget(&gui_uvw);
     window.setLayout(&layout);
+    
     m_xyz.show_wireframe(true);
     m_xyz.show_wireframe_transparency(0.4);
     m_xyz.show_texture2D(TEXTURE_2D_ISOLINES, 3.0);
+    
     gui_xyz.push_obj(&m_xyz);
     m_uvw.show_wireframe(true);
     m_uvw.show_wireframe_transparency(0.4);
