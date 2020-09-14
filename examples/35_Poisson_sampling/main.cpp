@@ -1,5 +1,5 @@
 /* This sample program computes a Poisson sampling
- * in nD as described in the seminal paper:
+ * in nD as described in the seminar paper:
  *
  *   Fast Poisson Disk Sampling in Arbitrary Dimensions
  *   Robert Bridson
@@ -28,8 +28,7 @@ int main(int argc, char **argv)
 
     Profiler profiler;
     QWidget window;
-    GLcanvas gui_2d;
-    GLcanvas gui_3d;
+    GLcanvas gui_2d,gui_3d;
     gui_2d.setMinimumSize(400,400);
     gui_3d.setMinimumSize(400,400);
     QDoubleSpinBox sb_radius(&window);
@@ -48,8 +47,7 @@ int main(int argc, char **argv)
     window.setLayout(&layout);
     window.show();
 
-    DrawableTrimesh<> m_2d;
-    DrawableTrimesh<> m_3d;
+    DrawableTrimesh<> m_2d,m_3d;
     m_2d.show_mesh_points();
     m_3d.show_mesh_points();
     m_2d.show_wireframe_width(6);
