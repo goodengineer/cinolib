@@ -35,7 +35,7 @@ int main(int argc, char **argv)
     std::vector<uint> dummy;
     tetgen_wrap(srf_target.bbox().corners(1.5), srf_target.bbox().tris(), dummy, "qa0.00002", vol_sampling);
 
-    // HRBF computatin,  using x^3 as RBF kernel
+    // HRBF computation,  using x^3 as RBF kernel
     Profiler profiler;
     profiler.push("Make HRBF");
     Hermite_RBF<CubicRBF> HRBF(srf_target.vector_verts(), srf_target.vector_vert_normals());
