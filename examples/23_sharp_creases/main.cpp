@@ -1,19 +1,14 @@
 /* This sample program enables to compute, edit, and export the
  * network of sharp creases af a triangular meshes.
- *
  * Creases are detected by simply thresholding the dihedral angle
  * at each edge. Additionally, the user can:
- *
  *  - pad the creases. That is, refine the mesh to make sure that each
  *    triangle has at most one edge on a crease
- *
  *  - manually adjust the crease network, selecting the edges that
  *    should change status directly on the canvas (CMD+click)
- *
  *  - export both the (possibly refined) mesh, and a text file encoding
  *    the crease network. The text file contains one line per crease edge.
  *    The line contains the vertex IDs of the two edge endpoints
- *
  * Enjoy!
 */
 
@@ -65,17 +60,13 @@ int main(int argc, char **argv)
     gui.push_obj(&m);
     gui.push_marker(vec2i(10, gui.height()-20), "CMD + click to flag/unflag an edge", Color::BLACK(), 12, 0);
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
     QPushButton::connect(&but_mark_creases, &QPushButton::clicked, [&]()
     {
-        double thresh_rad = static_cast<double>(sb_crease_angle.value()) * M_PI/180.0;
+        float thresh_rad = static_cast<float>(sb_crease_angle.value())*M_PI/180.0;
         m.edge_mark_sharp_creases(thresh_rad);
         m.updateGL();
         gui.updateGL();
     });
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     QPushButton::connect(&but_pad_creases, &QPushButton::clicked, [&]()
     {
@@ -94,8 +85,6 @@ int main(int argc, char **argv)
         gui.updateGL();
     });
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
     QPushButton::connect(&but_export, &QPushButton::clicked, [&]()
     {
         std::string filename = QFileDialog::getSaveFileName(NULL, "Export mesh + features", ".", "3D Meshes (*.off *.obj *.iv);; OBJ(*.obj);; OFF(*.off);; IV(*.iv)").toStdString();
@@ -112,8 +101,6 @@ int main(int argc, char **argv)
             f.close();
         }
     });
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     gui.callback_mouse_press = [&](GLcanvas *c, QMouseEvent *e)
     {
