@@ -22,11 +22,13 @@
 #include <cinolib/gui/qt/qt_gui_tools.h>
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+using namespace cinolib;
+using namespace std;
+#define SLICING_THRESHOLD 0.5
 
 int main(int argc, char **argv)
 {
-    using namespace cinolib;
-
+    
     QApplication a(argc, argv);
 
     QWidget     window;
@@ -35,12 +37,15 @@ int main(int argc, char **argv)
     QPushButton but_tessellate("Tessellate");
     QGridLayout layout;
     GLcanvas    gui(&window);
+    
     sl_iso.setMaximum(100);
     sl_iso.setMinimum(0);
     sl_iso.setValue(50);
+    
     sl_slice.setMaximum(100);
     sl_slice.setMinimum(0);
     sl_slice.setValue(50);
+    
     layout.addWidget(&sl_iso,0,0,1,9);
     layout.addWidget(&sl_slice,1,0,1,9);
     layout.addWidget(&but_tessellate,0,9,2,1);
@@ -49,7 +54,7 @@ int main(int argc, char **argv)
     window.show();
     window.resize(600,600);
 
-    std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/sphere.mesh";
+    string s = (argc==2) ? string(argv[1]) : string(DATA_PATH) + "/sphere.mesh";
     DrawableTetmesh<> m(s.c_str());
     compute_geodesics(m, {0, 10}, COTANGENT).copy_to_mesh(m); // generate some scalar field
     m.show_in_texture1D(TEXTURE_1D_HSV_W_ISOLINES);
@@ -57,10 +62,10 @@ int main(int argc, char **argv)
     gui.push_obj(&m);
 
     SlicerState ss;
-    ss.Z_thresh = 0.5;
+    ss.Z_thresh = SLICING_THRESHOLD;
     m.slice(ss);
 
-    DrawableIsosurface<> iso(m, 0.5);
+    DrawableIsosurface<> iso(m, SLICING_THRESHOLD);
     gui.push_obj(&iso, false);
 
     Profiler profiler;
