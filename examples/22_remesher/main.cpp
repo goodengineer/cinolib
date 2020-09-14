@@ -26,8 +26,7 @@ using namespace cinolib;
 
 int main(int argc, char **argv)
 {
-    using namespace cinolib;
-
+   
     QApplication   a(argc, argv);
     QWidget        window;
     QPushButton    but_mark_color("Mark Colors", &window);
@@ -65,13 +64,11 @@ int main(int argc, char **argv)
     window.resize(800,600);
 
     std::string s = (argc==2) ? std::string(argv[1]) : std::string(DATA_PATH) + "/pyramid.off";
-    cinolib::DrawableTrimesh<> m(s.c_str());
+    DrawableTrimesh<> m(s.c_str());
     m.show_marked_edge(true);
     m.show_wireframe(true);
     m.show_mesh_flat();
     gui.push_obj(&m);
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     QPushButton::connect(&but_mark_color, &QPushButton::clicked, [&]()
     {
@@ -80,8 +77,6 @@ int main(int argc, char **argv)
         gui.updateGL();
     });
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
     QPushButton::connect(&but_mark_boundary, &QPushButton::clicked, [&]()
     {
         m.edge_mark_boundaries();
@@ -89,23 +84,17 @@ int main(int argc, char **argv)
         gui.updateGL();
     });
 
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
     QPushButton::connect(&but_mark_creases, &QPushButton::clicked, [&]()
     {
-        double thresh_rad = static_cast<double>(sb_crease_angle.value()) * M_PI/180.0;
+        float thresh_rad = static_cast<float>(sb_crease_angle.value()) * M_PI/180.0;
         for(uint eid=0; eid<m.num_edges(); ++eid)
         {
             if(m.edge_dihedral_angle(eid) > thresh_rad)
-            {
                 m.edge_data(eid).flags[MARKED] = true;
-            }
         }
         m.updateGL();
         gui.updateGL();
     });
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     QPushButton::connect(&but_unmark_all, &QPushButton::clicked, [&]()
     {
@@ -113,8 +102,6 @@ int main(int argc, char **argv)
         m.updateGL();
         gui.updateGL();
     });
-
-    //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
     QPushButton::connect(&but_remesh, &QPushButton::clicked, [&]()
     {
