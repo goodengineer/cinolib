@@ -47,24 +47,24 @@ template<class Mesh>
 CINO_INLINE
 ScalarField compute_geodesics(      Mesh              & m,
                               const std::vector<uint> & heat_charges,
-                              const int                 laplacian_mode,
+                              const short                 laplacian_mode,
                               const float               time_scalar,
                               const bool                hard_constrain_charges)
 {
     // optimize position and scale to get better numerical precision
-    double d = m.bbox().diag();
+    float d = m.bbox().diag();
     vec3d  c = m.bbox().center();
     m.translate(-c);
     m.scale(1.0/d);
 
     // use the squared avg edge length as time step, as suggested in the original paper
-    double time = m.edge_avg_length();
+    float time = m.edge_avg_length();
     time *= time;
     time *= time_scalar;
 
-    Eigen::SparseMatrix<double> L   = laplacian(m, laplacian_mode);
-    Eigen::SparseMatrix<double> MM  = mass_matrix(m);
-    Eigen::SparseMatrix<double> G   = gradient_matrix(m);
+    Eigen::SparseMatrix<float> L   = laplacian(m, laplacian_mode);
+    Eigen::SparseMatrix<float> MM  = mass_matrix(m);
+    Eigen::SparseMatrix<float> G   = gradient_matrix(m);
     Eigen::VectorXd             rhs = Eigen::VectorXd::Zero(m.num_verts());
 
     for(uint vid : heat_charges) rhs[vid] = 1.0;
@@ -81,15 +81,13 @@ ScalarField compute_geodesics(      Mesh              & m,
     // as the matrix changes every time
     if(hard_constrain_charges)
     {
-        std::map<uint,double> bcs;
+        std::map<uint,float> bcs;
         for(uint vid : heat_charges) bcs[vid] = 1.0;
         solve_square_system_with_bc(-L, G.transpose() * grad, geodesics, bcs, SIMPLICIAL_LDLT);
     }
     else
-    {
         solve_square_system(-L, G.transpose() * grad, geodesics, SIMPLICIAL_LDLT);
-    }
-
+    
     // restore original scale and position
     m.scale(d);
     m.translate(c);
@@ -105,31 +103,31 @@ CINO_INLINE
 ScalarField compute_geodesics_amortized(      Mesh              & m,
                                               GeodesicsCache    & cache,
                                         const std::vector<uint> & heat_charges,
-                                        const int                 laplacian_mode,
+                                        const short                 laplacian_mode,
                                         const float               time_scalar)
 {
     // first call, heavy solve (matrix factorization + gradient matrix)
     if (cache.heat_flow_cache == NULL)
     {
         // optimize position and scale to get better numerical precision
-        double d = m.bbox().diag();
+        float d = m.bbox().diag();
         vec3d  c = m.bbox().center();
         m.translate(-c);
         m.scale(1.0/d);
 
         // use the squared avg edge length as time step, as suggested in the original paper
-        double time = m.edge_avg_length();
+        float time = m.edge_avg_length();
         time *= time;
         time *= time_scalar;
 
-        Eigen::SparseMatrix<double> L   = laplacian(m, laplacian_mode);
-        Eigen::SparseMatrix<double> MM  = mass_matrix(m);
-        Eigen::VectorXd             rhs = Eigen::VectorXd::Zero(m.num_verts());
+        Eigen::SparseMatrix<float> L   = laplacian(m, laplacian_mode);
+        Eigen::SparseMatrix<float> MM  = mass_matrix(m);
+        Eigen::VectorXd            rhs = Eigen::VectorXd::Zero(m.num_verts());
 
         for(uint vid : heat_charges) rhs[vid] = 1.0;
 
         ScalarField heat(m.num_verts());
-        cache.heat_flow_cache = new Eigen::SimplicialLLT<Eigen::SparseMatrix<double>>(MM - time * L);
+        cache.heat_flow_cache = new Eigen::SimplicialLLT<Eigen::SparseMatrix<float>>(MM - time * L);
         assert(cache.heat_flow_cache->info() == Eigen::Success);
         heat = cache.heat_flow_cache->solve(rhs).eval();
 
@@ -138,7 +136,7 @@ ScalarField compute_geodesics_amortized(      Mesh              & m,
         grad.normalize();
 
         ScalarField geodesics(m.num_verts());
-        cache.integration_cache = new Eigen::SimplicialLDLT<Eigen::SparseMatrix<double>>(-L);
+        cache.integration_cache = new Eigen::SimplicialLDLT<Eigen::SparseMatrix<float>>(-L);
         assert(cache.integration_cache->info() == Eigen::Success);
         geodesics = cache.integration_cache->solve(cache.gradient_matrix.transpose() * grad).eval();
         geodesics.normalize_in_01();
