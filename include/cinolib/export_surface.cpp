@@ -82,7 +82,6 @@ void export_surface(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
                 if (query == m2srf_vmap.end())
                 {
                     verts.push_back(m.vert(vid));
-
                     m2srf_vmap[vid] = vsrf;
                     srf2m_vmap[vsrf] = vid;
                 }
