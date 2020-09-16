@@ -91,13 +91,11 @@ void export_surface(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
                     vsrf = query->second;
                     --fresh_id;
                 }
-
                 p.push_back(vsrf);
             }
             polys.push_back(p);
         }
     }
-
     switch (m.mesh_type())
     {
         case TETMESH        : srf = Trimesh<M,V,E,F>(verts, polys);     break;
@@ -106,7 +104,5 @@ void export_surface(const AbstractPolyhedralMesh<M,V,E,F,P> & m,
         default             : assert(false);
     }
 }
-
-
 }
 
