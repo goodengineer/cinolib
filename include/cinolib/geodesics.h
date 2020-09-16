@@ -73,7 +73,7 @@ template<class Mesh>
 CINO_INLINE
 ScalarField compute_geodesics(      Mesh              & m,
                               const std::vector<uint> & heat_charges,
-                              const int                 laplacian_mode = COTANGENT,
+                              const short               laplacian_mode = COTANGENT,
                               const float               time_scalar = 1.0,
                               const bool                hard_constrain_charges = false);
 
@@ -81,9 +81,9 @@ ScalarField compute_geodesics(      Mesh              & m,
 
 typedef struct
 {
-    Eigen::SimplicialLLT<Eigen::SparseMatrix<double>>  *heat_flow_cache   = NULL;
-    Eigen::SimplicialLDLT<Eigen::SparseMatrix<double>> *integration_cache = NULL;
-    Eigen::SparseMatrix<double>                         gradient_matrix;
+    Eigen::SimplicialLLT<Eigen::SparseMatrix<float>>  *heat_flow_cache   = NULL;
+    Eigen::SimplicialLDLT<Eigen::SparseMatrix<float>> *integration_cache = NULL;
+    Eigen::SparseMatrix<float>                         gradient_matrix;
 }
 GeodesicsCache;
 
@@ -94,8 +94,8 @@ CINO_INLINE
 ScalarField compute_geodesics_amortized(      Mesh              & m,
                                               GeodesicsCache    & cache,
                                         const std::vector<uint> & heat_charges,
-                                        const int                 laplacian_mode = COTANGENT,
-                                        const float               time_scalar = 1.0);
+                                        const short                 laplacian_mode = COTANGENT,
+                                        const float                 time_scalar = 1.0);
 }
 
 #ifndef  CINO_STATIC_LIB
