@@ -44,11 +44,9 @@
 
 namespace cinolib
 {
-
 template<class M, class V, class E, class P>
 CINO_INLINE
 void extrude_mesh(AbstractPolygonMesh<M,V,E,P> & m, const vec3d & dir); // encode amount of extrusion in dir magnitude
-
 }
 
 #ifndef  CINO_STATIC_LIB
