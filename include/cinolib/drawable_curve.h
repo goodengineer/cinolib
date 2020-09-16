@@ -52,7 +52,7 @@ class DrawableCurve : public Curve, public DrawableObject
 
         explicit DrawableCurve();
         explicit DrawableCurve(const std::vector<vec3d> & samples);
-        explicit DrawableCurve(const Skel & skel, const int bone);
+        explicit DrawableCurve(const Skel & skel, const short bone);
 
         ~DrawableCurve(){}
 
