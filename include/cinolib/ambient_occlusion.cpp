@@ -41,8 +41,8 @@ namespace cinolib
 
 template<class Mesh>
 AO_srf<Mesh>::AO_srf(const Mesh & m,
-                     const int    buffer_size,
-                     const int    n_dirs) : QGLPixelBuffer(buffer_size,buffer_size)
+                     const short    buffer_size,
+                     const short    n_dirs) : QGLPixelBuffer(buffer_size,buffer_size)
 {
     ao = ScalarField(m.num_polys());
 
