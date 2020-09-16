@@ -117,6 +117,5 @@ void export_hexahedra(const Polyhedralmesh<M,V,E,F,P>   m_in,
     std::unordered_map<uint,uint> v_map;
     export_hexahedra(m_in, m_out, v_map);
 }
-
 }
 
