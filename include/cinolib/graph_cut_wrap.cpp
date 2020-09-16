@@ -44,7 +44,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 std::vector<int> graph_cut_wrap(const AbstractMesh<M,V,E,P>             & m,
                                 const int                                 n_labels,
-                                const std::vector<double>               & data_term,
+                                const std::vector<float>               & data_term,
                                       GCoptimization::SmoothCostFnExtra   smooth_term,
                                       void                              * smooth_data)
 {
@@ -69,7 +69,7 @@ std::vector<int> graph_cut_wrap(const AbstractMesh<M,V,E,P>             & m,
         }
 
         gc.setSmoothCost(smooth_term, smooth_data);
-        double energy = gc.swap(-1);
+        float energy = gc.swap(-1);
 
         std::cout << "graph cut energy: " << energy << std::endl;
 
@@ -94,7 +94,7 @@ CINO_INLINE
 std::vector<int> graph_cut_wrap(const AbstractMesh<M,V,E,P>             & m,
                                 const int                                 n_labels,
                                 const std::vector<std::vector<uint>>    & feasible_region,
-                                const std::vector<std::vector<double>>  & data_term,
+                                const std::vector<std::vector<float>>  & data_term,
                                       GCoptimization::SmoothCostFnExtra   smooth_term,
                                       void                              * smooth_data)
 {
@@ -131,7 +131,7 @@ std::vector<int> graph_cut_wrap(const AbstractMesh<M,V,E,P>             & m,
         }
 
         gc.setSmoothCost(smooth_term, smooth_data);
-        double energy = gc.swap(-1);
+        float energy = gc.swap(-1);
 
         std::cout << "graph cut energy: " << energy << std::endl;
 
@@ -145,7 +145,6 @@ std::vector<int> graph_cut_wrap(const AbstractMesh<M,V,E,P>             & m,
         std::cout << "\n\n!!!GRAPH-CUT EXCEPTION!!!\nCheck logfile\n\n" << std::endl;
         e.Report();
     }
-
     return labels;
 }
 
@@ -155,7 +154,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 std::vector<int> graph_cut_wrap(const AbstractMesh<M,V,E,P>             &,
                                 const int                                ,
-                                const std::vector<double>               &,
+                                const std::vector<float>               &,
                                       GCoptimization::SmoothCostFnExtra  ,
                                       void                              *)
 {
@@ -170,7 +169,7 @@ CINO_INLINE
 std::vector<int> graph_cut_wrap(const AbstractMesh<M,V,E,P>             &,
                                 const int                                ,
                                 const std::vector<std::vector<uint>>    &,
-                                const std::vector<std::vector<double>>  &,
+                                const std::vector<std::vector<float>>  &,
                                       GCoptimization::SmoothCostFnExtra  ,
                                       void                              *)
 {
@@ -178,5 +177,4 @@ std::vector<int> graph_cut_wrap(const AbstractMesh<M,V,E,P>             &,
     exit(-1);
 }
 #endif
-
 }
