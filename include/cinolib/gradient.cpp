@@ -46,38 +46,35 @@
 namespace cinolib
 {
 
-typedef Eigen::Triplet<double> Entry;
+typedef Eigen::Triplet<float> Entry;
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class P>
 CINO_INLINE
-Eigen::SparseMatrix<double> gradient_matrix(const AbstractPolygonMesh<M,V,E,P> & m, const bool per_poly)
+Eigen::SparseMatrix<float> gradient_matrix(const AbstractPolygonMesh<M,V,E,P> & m, const bool per_poly)
 {
     if(per_poly)
     {
-        Eigen::SparseMatrix<double> G(m.num_polys()*3, m.num_verts());
+        Eigen::SparseMatrix<float> G(m.num_polys()*3, m.num_verts());
         std::vector<Entry> entries;
 
         for(uint pid=0; pid<m.num_polys(); ++pid)
         {
-            double area = std::max(m.poly_area(pid), 1e-5) * 2.0; // (2 is the average term : two verts for each edge)
+            float area = std::max(m.poly_area(pid), 1e-5) * 2.0; // (2 is the average term : two verts for each edge)
             vec3d n     = m.poly_data(pid).normal;
 
             for(uint off=0; off<m.verts_per_poly(pid); ++off)
             {
-                uint  prev = m.poly_vert_id(pid,off);
-                uint  curr = m.poly_vert_id(pid,(off+1)%m.verts_per_poly(pid));
-                uint  next = m.poly_vert_id(pid,(off+2)%m.verts_per_poly(pid));
-                vec3d u    = m.vert(next) - m.vert(curr);
-                vec3d v    = m.vert(curr) - m.vert(prev);
-                vec3d u_90 = u.cross(n); u_90.normalize();
-                vec3d v_90 = v.cross(n); v_90.normalize();
+                uint  prev = m.poly_vert_id(pid,off),curr = m.poly_vert_id(pid,(off+1)%m.verts_per_poly(pid)),next = m.poly_vert_id(pid,(off+2)%m.verts_per_poly(pid)),row=3*pid;
+               
+                vec3d u=m.vert(next)-m.vert(curr),v=m.vert(curr) - m.vert(prev),u_90 = u.cross(n),v_90=v.cross(n);
+                u_90.normalize();
+                v_90.normalize();
 
                 vec3d per_vert_sum_over_edge_normals = u_90 * u.length() + v_90 * v.length();
                 per_vert_sum_over_edge_normals /= area;
 
-                uint row = 3 * pid;
                 entries.push_back(Entry(row, curr, per_vert_sum_over_edge_normals.x())); ++row;
                 entries.push_back(Entry(row, curr, per_vert_sum_over_edge_normals.y())); ++row;
                 entries.push_back(Entry(row, curr, per_vert_sum_over_edge_normals.z()));
@@ -89,13 +86,13 @@ Eigen::SparseMatrix<double> gradient_matrix(const AbstractPolygonMesh<M,V,E,P> &
     }
     else // per vertex
     {
-        Eigen::SparseMatrix<double> G(m.num_verts()*3, m.num_verts());
+        Eigen::SparseMatrix<float> G(m.num_verts()*3, m.num_verts());
         std::vector<Entry> entries;
 
         for(uint vid=0; vid<m.num_verts(); ++vid)
         {
             std::vector<std::pair<uint,vec3d>> vert_contr;
-            double area=0.f;
+            float area=0.f;
             for(uint pid : m.adj_v2p(vid))
             {
                 area   += std::max(m.poly_area(pid), 1e-5) * 2.0;
@@ -103,13 +100,11 @@ Eigen::SparseMatrix<double> gradient_matrix(const AbstractPolygonMesh<M,V,E,P> &
 
                 for(uint off=0; off<m.verts_per_poly(pid); ++off)
                 {
-                    uint  prev = m.poly_vert_id(pid,off);
-                    uint  curr = m.poly_vert_id(pid,(off+1)%m.verts_per_poly(pid));
-                    uint  next = m.poly_vert_id(pid,(off+2)%m.verts_per_poly(pid));
-                    vec3d u    = m.vert(next) - m.vert(curr);
-                    vec3d v    = m.vert(curr) - m.vert(prev);
-                    vec3d u_90 = u.cross(n); u_90.normalize();
-                    vec3d v_90 = v.cross(n); v_90.normalize();
+                    uint  prev = m.poly_vert_id(pid,off),curr = m.poly_vert_id(pid,(off+1)%m.verts_per_poly(pid)),next = m.poly_vert_id(pid,(off+2)%m.verts_per_poly(pid));
+                   
+                    vec3d u=m.vert(next)-m.vert(curr),v=m.vert(curr)-m.vert(prev),u_90 = u.cross(n),v_90 = v.cross(n);
+                    u_90.normalize();
+                    v_90.normalize();
 
                     // note: Eigen::setFromTriplets will take care of summing contributs w.r.t. multiple polys
                     vert_contr.push_back(std::make_pair(curr, u_90*u.length()+v_90*v.length()));
@@ -123,7 +118,6 @@ Eigen::SparseMatrix<double> gradient_matrix(const AbstractPolygonMesh<M,V,E,P> &
                 entries.push_back(Entry(row+2, c.first, c.second.z()/area));
             }
         }
-
         G.setFromTriplets(entries.begin(), entries.end());
         return G;
     }
@@ -133,16 +127,16 @@ Eigen::SparseMatrix<double> gradient_matrix(const AbstractPolygonMesh<M,V,E,P> &
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
-Eigen::SparseMatrix<double> gradient_matrix(const AbstractPolyhedralMesh<M,V,E,F,P> & m, const bool per_poly)
+Eigen::SparseMatrix<float> gradient_matrix(const AbstractPolyhedralMesh<M,V,E,F,P> & m, const bool per_poly)
 {
     if(per_poly)
     {
-        Eigen::SparseMatrix<double> G(m.num_polys()*3, m.num_verts());
+        Eigen::SparseMatrix<float> G(m.num_polys()*3, m.num_verts());
         std::vector<Entry> entries;
 
         for(uint pid=0; pid<m.num_polys(); ++pid)
         {
-            double vol = std::max(m.poly_volume(pid), 1e-5);
+            float vol = std::max(m.poly_volume(pid), 1e-5);
 
             for(uint vid : m.adj_p2v(pid))
             {
@@ -152,8 +146,8 @@ Eigen::SparseMatrix<double> gradient_matrix(const AbstractPolyhedralMesh<M,V,E,F
                     if (m.face_contains_vert(fid,vid))
                     {
                         vec3d  n   = m.poly_face_normal(pid,fid);
-                        double a   = m.face_area(fid);
-                        double avg = static_cast<double>(m.verts_per_face(fid));
+                        float a   = m.face_area(fid);
+                        float avg = static_cast<float>(m.verts_per_face(fid));
                         per_vert_sum_over_f_normals += (n*a)/avg;
                     }
                 }
@@ -164,18 +158,17 @@ Eigen::SparseMatrix<double> gradient_matrix(const AbstractPolyhedralMesh<M,V,E,F
                 entries.push_back(Entry(row, vid, per_vert_sum_over_f_normals.z()));
             }
         }
-
         G.setFromTriplets(entries.begin(), entries.end());
         return G;
     }
     else // per vert
     {
-        Eigen::SparseMatrix<double> G(m.num_polys()*3, m.num_verts());
+        Eigen::SparseMatrix<float> G(m.num_polys()*3, m.num_verts());
         std::vector<Entry> entries;
 
         for(uint pid=0; pid<m.num_polys(); ++pid)
         {
-            double vol = std::max(m.poly_volume(pid), 1e-5);
+            float vol = std::max(m.poly_volume(pid), 1e-5);
 
             for(uint vid : m.adj_p2v(pid))
             {
@@ -185,8 +178,8 @@ Eigen::SparseMatrix<double> gradient_matrix(const AbstractPolyhedralMesh<M,V,E,F
                     if (m.face_contains_vert(fid,vid))
                     {
                         vec3d  n   = m.poly_face_normal(pid,fid);
-                        double a   = m.face_area(fid);
-                        double avg = static_cast<double>(m.verts_per_face(fid));
+                        float a   = m.face_area(fid);
+                        float avg = static_cast<float>(m.verts_per_face(fid));
                         per_vert_sum_over_f_normals += (n*a)/avg;
                     }
                 }
@@ -199,16 +192,15 @@ Eigen::SparseMatrix<double> gradient_matrix(const AbstractPolyhedralMesh<M,V,E,F
         }
         G.setFromTriplets(entries.begin(), entries.end());
 
-        Eigen::SparseMatrix<double> A(m.num_verts()*3, m.num_polys()*3);
+        Eigen::SparseMatrix<float> A(m.num_verts()*3, m.num_polys()*3);
         entries.clear();
 
         for(uint vid=0;vid<m.num_verts();++vid)
         {
-            double total_volume=0;
+            float total_volume=0;
             for(uint pid : m.adj_v2p(vid))
-            {
                 total_volume += m.poly_volume(pid);
-            }
+      
             uint row = 3*vid;
             for(uint pid : m.adj_v2p(vid))
             {
@@ -222,5 +214,4 @@ Eigen::SparseMatrix<double> gradient_matrix(const AbstractPolyhedralMesh<M,V,E,F
         return A*G;
     }
 }
-
 }
