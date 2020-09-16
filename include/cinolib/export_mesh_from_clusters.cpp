@@ -101,17 +101,18 @@ void export_mesh_from_clusters(const AbstractPolygonMesh<M,V,E,P> & m,
             {
                 verts.push_back(m.vert(vid));
                 v_map[vid] = fresh_id;
-                vid = fresh_id;
-                ++fresh_id;
+                vid = fresh_id++;
             }
             else vid = query->second;
         }
 
-        // TODO: fix winding
-        polys.push_back(poly);
+        // TODO: fix winding: 1. find and extract windings from m, they are in std::vector<uint> poly; find winding order conflicts and flip.d.s., 2. get some clues from other files of this project: 3... 4...
+        //https://trimsh.org/trimesh.repair.html#trimesh.repair.fix_normals
+        //http://www.dillonbhuff.com/?p=30
+        //winding order can be also construed from normals direction(?);
+      
+      polys.push_back(poly);
     }
-
     m_out = Polygonmesh<M,V,E,P>(verts,polys);
 }
-
 }
