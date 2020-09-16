@@ -42,7 +42,7 @@
 namespace cinolib
 {
 
-/* Implementation of Iteratively Reweighted Least Squares (IRLS in short)
+/* Implementation of Iteratively Reweighted Least Squares (IRLS for short)
  * to minimize energies subject to a p-norm
  *
  * arg min E = || Ax - b ||p
@@ -57,12 +57,12 @@ namespace cinolib
 */
 
 CINO_INLINE
-void solve_IRLS(const Eigen::SparseMatrix<double> & A,
+void solve_IRLS(const Eigen::SparseMatrix<float> & A,
                 const Eigen::VectorXd             & b,
                       Eigen::VectorXd             & x,
-                const double p,
+                const float p,
                 const int    max_iter = 100,     // -1 to have unlimited iterations
-                const double conv_thresh = 1e-6, // res difference across subsequent iterations
+                const float conv_thresh = 1e-6, // res difference across subsequent iterations
                 const int    solver = SIMPLICIAL_LLT);
 }
 
