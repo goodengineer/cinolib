@@ -39,7 +39,7 @@
 namespace cinolib
 {
 
-/* Implementation of Iteratively Reweighted Least Squares (IRLS in short)
+/* Implementation of Iteratively Reweighted Least Squares (IRLS for short)
  * to minimize energies subject to a p-norm
  *
  * arg min E = || Ax - b ||p
@@ -54,19 +54,19 @@ namespace cinolib
 */
 
 CINO_INLINE
-void solve_IRLS(const Eigen::SparseMatrix<double> & A,
+void solve_IRLS(const Eigen::SparseMatrix<float> & A,
                 const Eigen::VectorXd             & b,
                       Eigen::VectorXd             & x,
-                const double p,
+                const float p,
                 const int    max_iter,
-                const double conv_thresh,
+                const float conv_thresh,
                 const int    solver)
 {
     Eigen::VectorXd w(A.rows());
-    for(int i=0; i<A.rows(); ++i) w[i] = 1.0;
+    for(short i=0; i<A.rows(); ++i) w[i] = 1.0;
 
-    double res      = 0;
-    double prev_res = 0;
+    float res      = 0;
+    float prev_res = 0;
     int    iter     = 0;
     do
     {
@@ -76,9 +76,9 @@ void solve_IRLS(const Eigen::SparseMatrix<double> & A,
         solve_weighted_least_squares(A, w, b, x, solver);
 
         // update weights
-        for(int i=0; i<A.rows(); ++i)
+        for(short i=0; i<A.rows(); ++i)
         {
-            double e = std::fabs(b[i] - A.row(i)*x);
+            float e = std::fabs(b[i] - A.row(i)*x);
             w[i] = std::min(std::pow(e, p-2.0), 1000.0);
         }
         w.normalize();
