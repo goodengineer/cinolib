@@ -46,15 +46,12 @@ void polycube(Trimesh<M,V,E,P> & pc, const uint genus)
 {
     pc = Trimesh<M,V,E,P>();
 
-    uint nrows = 3;
-    uint ncols = 1 + 2*genus;
-
+    uint nrows = 3,ncols = 1 + 2*genus;
+   
     for(uint r=0; r<=nrows; ++r)
     for(uint c=0; c<=ncols; ++c)
-    {
-        pc.vert_add(vec3d(c,r,0));
-    }
-
+        pc.vert_add(vec3f(c,r,0));
+  
     for(uint r=0; r<=nrows; ++r)
     for(uint c=0; c<=ncols; ++c)
     {
@@ -71,8 +68,6 @@ void polycube(Trimesh<M,V,E,P> & pc, const uint genus)
                          serialize_2D_index(r+1, c,   ncols+1)});
         }
     }
-
-    extrude_mesh(pc, vec3d(0,0,1));
+    extrude_mesh(pc, vec3f(0,0,1));
 }
-
 }
