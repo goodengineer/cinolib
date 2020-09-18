@@ -41,19 +41,15 @@
 namespace cinolib
 {
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
 Isosurface<M,V,E,F,P>::Isosurface(const Tetmesh<M,V,E,F,P> & m,
-                                  const double               iso_value,
+                                  const float               iso_value,
                                   const bool                 run_marching_tets)
     : iso_value(iso_value)
 {
     if(run_marching_tets) marching_tets(m, iso_value, verts, tris, norms);
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
@@ -62,23 +58,20 @@ Trimesh<M,V,E,F> Isosurface<M,V,E,F,P>::export_as_trimesh() const
     return Trimesh<M,V,E,F>(verts, tris);
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
 std::vector<uint> Isosurface<M,V,E,F,P>::tessellate(Tetmesh<M,V,E,F,P> & m) const
 {
-    typedef std::pair<uint,double> split_data;
+    typedef std::pair<uint,float> split_data;
     std::set<split_data,std::greater<split_data>> edges_to_split; // from highest to lowest id
 
     for(uint eid=0; eid<m.num_edges(); ++eid)
     {
-        double f0 = m.vert_data(m.edge_vert_id(eid,0)).uvw[0];
-        double f1 = m.vert_data(m.edge_vert_id(eid,1)).uvw[0];
-
-        if (is_into_interval<double>(iso_value, f0, f1))
+        float f0 = m.vert_data(m.edge_vert_id(eid,0)).uvw[0],f1 = m.vert_data(m.edge_vert_id(eid,1)).uvw[0];
+        
+        if (is_into_interval<float>(iso_value, f0, f1))
         {
-            double alpha = std::fabs(iso_value - f0)/fabs(f1 - f0);
+            float alpha = std::fabs(iso_value - f0)/fabs(f1 - f0);
             edges_to_split.insert(std::make_pair(eid,alpha));
         }
     }
@@ -93,5 +86,4 @@ std::vector<uint> Isosurface<M,V,E,F,P>::tessellate(Tetmesh<M,V,E,F,P> & m) cons
 
     return new_vids;
 }
-
 }
