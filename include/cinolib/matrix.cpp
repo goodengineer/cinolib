@@ -42,96 +42,86 @@ namespace cinolib
 // http://www.math.harvard.edu/archive/21b_fall_04/exhibits/2dmatrices/index.html
 //
 CINO_INLINE
-void eigen_decomposition_2x2(const double   a00,
-                             const double   a01,
-                             const double   a10,
-                             const double   a11,
-                                   vec2d  & v_min, // eigenvectors
-                                   vec2d  & v_max,
-                                   double & min,   // eigenvalues
-                                   double & max)
+void eigen_decomposition_2x2(const float   a00,
+                             const float   a01,
+                             const float   a10,
+                             const float   a11,
+                                   vec2f  & v_min, // eigenvectors
+                                   vec2f  & v_max,
+                                   float & min,   // eigenvalues
+                                   float & max)
 {
     eigenvalues_2x2(a00,a01,a10,a11,min,max);
 
     if(std::fabs(a10)>1e-5)
     {
-        v_max = vec2d(max-a11,a10);
-        v_min = vec2d(min-a11,a10);
+        v_max = vec2f(max-a11,a10);
+        v_min = vec2f(min-a11,a10);
     }
     else if(std::fabs(a01)>1e-5)
     {
-        v_max = vec2d(a01,max-a00);
-        v_min = vec2d(a01,min-a00);
+        v_max = vec2f(a01,max-a00);
+        v_min = vec2f(a01,min-a00);
     }
     else
     {
-        v_max = (a00>=a11) ? vec2d(1,0) : vec2d(0,1);
-        v_min = (a00>=a11) ? vec2d(0,1) : vec2d(1,0);
+        v_max = (a00>=a11) ? vec2f(1,0) : vec2f(0,1);
+        v_min = (a00>=a11) ? vec2f(0,1) : vec2f(1,0);
     }
 
     v_max.normalize();
     v_min.normalize();
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 // http://www.math.harvard.edu/archive/21b_fall_04/exhibits/2dmatrices/index.html
 //
 CINO_INLINE
-void eigenvalues_2x2(const double   a00,
-                     const double   a01,
-                     const double   a10,
-                     const double   a11,
-                           double & min,
-                           double & max)
+void eigenvalues_2x2(const float   a00,
+                     const float   a01,
+                     const float   a10,
+                     const float   a11,
+                           float & min,
+                           float & max)
 {
-    double T = a00 + a11; // trace
-    double D = determinant_2x2(a00,a01,a10,a11);
+    float T = a00 + a11; // trace
+    float D = determinant_2x2(a00,a01,a10,a11);
 
     min = T/2.0 - sqrt(T*T/4.0-D);
     max = T/2.0 + sqrt(T*T/4.0-D);
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
-void eigenvectors_2x2(const double   a00,
-                      const double   a01,
-                      const double   a10,
-                      const double   a11,
-                            vec2d  & v_min,
-                            vec2d  & v_max)
+void eigenvectors_2x2(const float   a00,
+                      const float   a01,
+                      const float   a10,
+                      const float   a11,
+                            vec2f  & v_min,
+                            vec2f  & v_max)
 {
-    double min, max;
+    float min, max;
     eigen_decomposition_2x2(a00, a01, a10, a11, v_min, v_max, min, max);
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
-double determinant_2x2(const double a00, const double a01, const double a10, const double a11)
+float determinant_2x2(const float a00, const float a01, const float a10, const float a11)
 {
     return ((a00*a11) - (a10*a01));
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
-double determinant_2x2(const vec2d a0, const vec2d a1)
+float determinant_2x2(const vec2f a0, const vec2f a1)
 {
     return determinant_2x2(a0[0], a0[1], a1[0], a1[1]);
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
-void eigen_decomposition_3x3(const double   a[3][3],
-                                   vec3d  & v_min, // eigenvectors
-                                   vec3d  & v_mid,
-                                   vec3d  & v_max,
-                                   double & min,   // eigenvalues
-                                   double & mid,
-                                   double & max)
+void eigen_decomposition_3x3(const float   a[3][3],
+                                   vec3f  & v_min, // eigenvectors
+                                   vec3f  & v_mid,
+                                   vec3f  & v_max,
+                                   float & min,   // eigenvalues
+                                   float & mid,
+                                   float & max)
 {
     eigen_decomposition_3x3(a[0][0], a[0][1], a[0][2],
                             a[1][0], a[1][1], a[1][2],
@@ -140,24 +130,22 @@ void eigen_decomposition_3x3(const double   a[3][3],
                             min, mid, max);
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
-void eigen_decomposition_3x3(const double   a00,
-                             const double   a01,
-                             const double   a02,
-                             const double   a10,
-                             const double   a11,
-                             const double   a12,
-                             const double   a20,
-                             const double   a21,
-                             const double   a22,
-                                   vec3d  & v_min, // eigenvectors
-                                   vec3d  & v_mid,
-                                   vec3d  & v_max,
-                                   double & min,   // eigenvalues
-                                   double & mid,
-                                   double & max)
+void eigen_decomposition_3x3(const float   a00,
+                             const float   a01,
+                             const float   a02,
+                             const float   a10,
+                             const float   a11,
+                             const float   a12,
+                             const float   a20,
+                             const float   a21,
+                             const float   a22,
+                                   vec3f  & v_min, // eigenvectors
+                                   vec3f  & v_mid,
+                                   vec3f  & v_max,
+                                   float & min,   // eigenvalues
+                                   float & mid,
+                                   float & max)
 {
     Eigen::Matrix3d m;
     m << a00, a01, a02,
@@ -172,9 +160,9 @@ void eigen_decomposition_3x3(const double   a00,
         Eigen::SelfAdjointEigenSolver<Eigen::Matrix3d> eig(m);
         assert(eig.info() == Eigen::Success);
 
-        v_min = vec3d(eig.eigenvectors()(0,0), eig.eigenvectors()(1,0), eig.eigenvectors()(2,0));
-        v_mid = vec3d(eig.eigenvectors()(0,1), eig.eigenvectors()(1,1), eig.eigenvectors()(2,1));
-        v_max = vec3d(eig.eigenvectors()(0,2), eig.eigenvectors()(1,2), eig.eigenvectors()(2,2));
+        v_min = vec3f(eig.eigenvectors()(0,0), eig.eigenvectors()(1,0), eig.eigenvectors()(2,0));
+        v_mid = vec3f(eig.eigenvectors()(0,1), eig.eigenvectors()(1,1), eig.eigenvectors()(2,1));
+        v_max = vec3f(eig.eigenvectors()(0,2), eig.eigenvectors()(1,2), eig.eigenvectors()(2,2));
 
         min = eig.eigenvalues()[0];
         mid = eig.eigenvalues()[1];
@@ -187,9 +175,9 @@ void eigen_decomposition_3x3(const double   a00,
         assert(eig.info() == Eigen::Success);
 
         // WARNING: I am taking only the real part!
-        v_min = vec3d(eig.eigenvectors()(0,0).real(), eig.eigenvectors()(1,0).real(), eig.eigenvectors()(2,0).real());
-        v_mid = vec3d(eig.eigenvectors()(0,1).real(), eig.eigenvectors()(1,1).real(), eig.eigenvectors()(2,1).real());
-        v_max = vec3d(eig.eigenvectors()(0,2).real(), eig.eigenvectors()(1,2).real(), eig.eigenvectors()(2,2).real());
+        v_min = vec3f(eig.eigenvectors()(0,0).real(), eig.eigenvectors()(1,0).real(), eig.eigenvectors()(2,0).real());
+        v_mid = vec3f(eig.eigenvectors()(0,1).real(), eig.eigenvectors()(1,1).real(), eig.eigenvectors()(2,1).real());
+        v_max = vec3f(eig.eigenvectors()(0,2).real(), eig.eigenvectors()(1,2).real(), eig.eigenvectors()(2,2).real());
 
         // WARNING: I am taking only the real part!
         min = eig.eigenvalues()[0].real();
@@ -198,76 +186,65 @@ void eigen_decomposition_3x3(const double   a00,
     }
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
-void eigenvalues_3x3(const double   a00,
-                     const double   a01,
-                     const double   a02,
-                     const double   a10,
-                     const double   a11,
-                     const double   a12,
-                     const double   a20,
-                     const double   a21,
-                     const double   a22,
-                           double & min,
-                           double & mid,
-                           double & max)
+void eigenvalues_3x3(const float   a00,
+                     const float   a01,
+                     const float   a02,
+                     const float   a10,
+                     const float   a11,
+                     const float   a12,
+                     const float   a20,
+                     const float   a21,
+                     const float   a22,
+                           float & min,
+                           float & mid,
+                           float & max)
 {
-    vec3d v_min, v_mid, v_max;
+    vec3f v_min, v_mid, v_max;
     eigen_decomposition_3x3(a00, a01, a02, a10, a11, a12, a20, a21, a22, v_min, v_mid, v_max, min, mid, max);
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
-void eigenvectors_3x3(const double   a00,
-                      const double   a01,
-                      const double   a02,
-                      const double   a10,
-                      const double   a11,
-                      const double   a12,
-                      const double   a20,
-                      const double   a21,
-                      const double   a22,
-                            vec3d  & v_min,
-                            vec3d  & v_mid,
-                            vec3d  & v_max)
+void eigenvectors_3x3(const float   a00,
+                      const float   a01,
+                      const float   a02,
+                      const float   a10,
+                      const float   a11,
+                      const float   a12,
+                      const float   a20,
+                      const float   a21,
+                      const float   a22,
+                            vec3f  & v_min,
+                            vec3f  & v_mid,
+                            vec3f  & v_max)
 {
-    double min, mid, max;
+    float min, mid, max;
     eigen_decomposition_3x3(a00, a01, a02, a10, a11, a12, a20, a21, a22, v_min, v_mid, v_max, min, mid, max);
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
-double determinant_3x3(const double a00, const double a01, const double a02,
-                       const double a10, const double a11, const double a12,
-                       const double a20, const double a21, const double a22)
+float determinant_3x3(const float a00, const float a01, const float a02,
+                       const float a10, const float a11, const float a12,
+                       const float a20, const float a21, const float a22)
 {
     return a00 * determinant_2x2(a11, a12, a21, a22) -
            a01 * determinant_2x2(a10, a12, a20, a22) +
            a02 * determinant_2x2(a10, a11, a20, a21);
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
-void from_std_3x3_to_Eigen_3x3(const double stdM[3][3], Eigen::Matrix3d & eigenM)
+void from_std_3x3_to_Eigen_3x3(const float stdM[3][3], Eigen::Matrix3d & eigenM)
 {
     eigenM.coeffRef(0,0) = stdM[0][0];  eigenM.coeffRef(0,1) = stdM[0][1];  eigenM.coeffRef(0,2) = stdM[0][2];
     eigenM.coeffRef(1,0) = stdM[1][0];  eigenM.coeffRef(1,1) = stdM[1][1];  eigenM.coeffRef(1,2) = stdM[1][2];
     eigenM.coeffRef(2,0) = stdM[2][0];  eigenM.coeffRef(2,1) = stdM[2][1];  eigenM.coeffRef(2,2) = stdM[2][2];
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
-void from_eigen_3x3_to_std_3x3(const Eigen::Matrix3d & eigenM, double stdM[3][3])
+void from_eigen_3x3_to_std_3x3(const Eigen::Matrix3d & eigenM, float stdM[3][3])
 {
     stdM[0][0] = eigenM.coeffRef(0,0);  stdM[0][1] = eigenM.coeffRef(0,1);  stdM[0][2] = eigenM.coeffRef(0,2);
     stdM[1][0] = eigenM.coeffRef(1,0);  stdM[1][1] = eigenM.coeffRef(1,1);  stdM[1][2] = eigenM.coeffRef(1,2);
     stdM[2][0] = eigenM.coeffRef(2,0);  stdM[2][1] = eigenM.coeffRef(2,1);  stdM[2][2] = eigenM.coeffRef(2,2);
 }
-
 }
