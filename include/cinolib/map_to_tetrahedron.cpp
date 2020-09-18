@@ -48,19 +48,17 @@ void map_to_tetrahedron(const Trimesh<M,V,E,P> & m,
                               Trimesh<M,V,E,P> & m_out)
 {
     m_out = m;
-    std::vector<vec3d> verts;
+    std::vector<vec3f> verts;
     map_to_tetrahedron(m, verts);
     for(uint vid=0; vid<m_out.num_verts(); ++vid) m_out.vert(vid) = verts.at(vid);
     m_out.update_bbox();
     m_out.update_normals();
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class M, class V, class E, class P>
 CINO_INLINE
 void map_to_tetrahedron(const Trimesh<M,V,E,P>   & m,
-                              std::vector<vec3d> & verts) // verts mapped to tet
+                              std::vector<vec3f> & verts) // verts mapped to tet
 {
     assert(m.genus()==0);
     // try all triangles until you find a suitable one....
@@ -69,12 +67,11 @@ void map_to_tetrahedron(const Trimesh<M,V,E,P>   & m,
         // try all tri edges until you find a suitable one....
         for(uint eid : m.adj_p2e(pid))
         {
-            uint e0   = m.edge_vert_id(eid,0);
-            uint e1   = m.edge_vert_id(eid,1);
-             int topp = m.poly_opposite_to(eid,pid);
-            uint opp0 = m.vert_opposite_to(pid,e0,e1);
-            uint opp1 = m.vert_opposite_to(topp,e0,e1);
-
+            uint e0=m.edge_vert_id(eid,0),e1=m.edge_vert_id(eid,1);
+        
+            int topp = m.poly_opposite_to(eid,pid);
+            uint opp0 = m.vert_opposite_to(pid,e0,e1),opp1 = m.vert_opposite_to(topp,e0,e1);
+            
             // if they form a tet with positive volume, use them to initialize the map
             if(orient3d(m.poly_vert(pid,0), m.poly_vert(pid,2), m.poly_vert(pid,1), m.vert(opp1))>0)
             {
@@ -86,7 +83,7 @@ void map_to_tetrahedron(const Trimesh<M,V,E,P>   & m,
                 dijkstra(m, opp0, opp1, mask, path);
 
                 // assign canonical tet corners
-                std::map<uint,vec3d> bcs;
+                std::map<uint,vec3f> bcs;
                 bcs[m.poly_vert_id(pid,0)] = REFERENCE_TET_VERTS[0];
                 bcs[m.poly_vert_id(pid,2)] = REFERENCE_TET_VERTS[1];
                 bcs[m.poly_vert_id(pid,1)] = REFERENCE_TET_VERTS[2];
@@ -95,14 +92,12 @@ void map_to_tetrahedron(const Trimesh<M,V,E,P>   & m,
                 if(path.size()>2)
                 {
                     // linearly interpolate the points along the path connecting opp0 and opp1
-                    vec3d  dir  = bcs.at(opp1) - bcs.at(opp0);
-                    double step = dir.length()/(path.size()-1.0);
+                    vec3f  dir  = bcs.at(opp1) - bcs.at(opp0);
+                    float step = dir.length()/(path.size()-1.0);
                     dir.normalize();
                     dir *= step;
                     for(uint i=1; i<path.size()-1; ++i)
-                    {
                         bcs[path.at(i)] = bcs.at(opp0) + i*dir;
-                    }
                 }
 
                 // map the rest of the vertices
@@ -113,5 +108,4 @@ void map_to_tetrahedron(const Trimesh<M,V,E,P>   & m,
     }
     assert(false && "This is not supposed to happen!");
 }
-
 }
