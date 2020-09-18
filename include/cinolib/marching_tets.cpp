@@ -68,29 +68,25 @@ enum // Look-up Table
     C_0000 = 0x0
 };
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void make_triangle(const Tetmesh<M,V,E,F,P> & m,
-                   const double               isovalue,
+                   const float               isovalue,
                    const uint                 vids[],
-                   const double               func[],
+                   const float               func[],
                    const std::array<uint,3> & e,
                    std::map<ipair,uint>     & e2v_map,
-                   std::vector<vec3d>       & verts,
+                   std::vector<vec3f>       & verts,
                    std::vector<uint>        & tris,
-                   std::vector<vec3d>       & norms);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+                   std::vector<vec3f>       & norms);
 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void marching_tets(const Tetmesh<M,V,E,F,P> & m,
-                   const double               isovalue,
-                   std::vector<vec3d>       & verts,
+                   const float               isovalue,
+                   std::vector<vec3f>       & verts,
                    std::vector<uint>        & tris,
-                   std::vector<vec3d>       & norms)
+                   std::vector<vec3f>       & norms)
 {
     /* FIXME: for all configurations where two verts >= isoval
      * and the other two are < isoval, this method will try to
@@ -108,7 +104,7 @@ void marching_tets(const Tetmesh<M,V,E,F,P> & m,
 
     for(uint pid=0; pid<m.num_polys(); ++pid)
     {
-        double func[] =
+        float func[] =
         {
             m.vert_data(m.poly_vert_id(pid,0)).uvw[0],
             m.vert_data(m.poly_vert_id(pid,1)).uvw[0],
@@ -126,7 +122,7 @@ void marching_tets(const Tetmesh<M,V,E,F,P> & m,
          * inverting to "<=".
          *
          * This does not happen if the isosurface passes
-         * exhactly through one face. In this case one will
+         * exactly through one face. In this case one will
          * get C_1111 using ">=", and something like
          * C_0111 using "<=".
          *
@@ -163,7 +159,7 @@ void marching_tets(const Tetmesh<M,V,E,F,P> & m,
             m.poly_vert_id(pid,3)
         };
 
-        double func[] =
+        float func[] =
         {
             m.vert_data(vids[0]).uvw[0],
             m.vert_data(vids[1]).uvw[0],
@@ -193,7 +189,7 @@ void marching_tets(const Tetmesh<M,V,E,F,P> & m,
         switch (c.at(pid))
         {
             // iso-surface passes on a face : make sure only one tet (MUST BE the one with higher id) triggers triangle generation...
-            // Notice that if the adjacent tet is collapsed (C_1111), then it make sense to use the current one regardless the tid order
+            // Notice that if the adjacent tet is collapsed (C_1111), then it makes sense to use the current one regardless the tid order
             case C_1110 : if (v_on_iso[0] && v_on_iso[1] && v_on_iso[2] && (int)pid < adj_tet[0] && c.at(adj_tet[0]) != C_1111) c.at(pid) = C_0000; break;
             case C_1101 : if (v_on_iso[0] && v_on_iso[1] && v_on_iso[3] && (int)pid < adj_tet[1] && c.at(adj_tet[1]) != C_1111) c.at(pid) = C_0000; break;
             case C_1011 : if (v_on_iso[0] && v_on_iso[2] && v_on_iso[3] && (int)pid < adj_tet[2] && c.at(adj_tet[2]) != C_1111) c.at(pid) = C_0000; break;
@@ -252,31 +248,28 @@ void marching_tets(const Tetmesh<M,V,E,F,P> & m,
     }
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void make_triangle(const Tetmesh<M,V,E,F,P> & m,
-                   const double               isovalue,
+                   const float               isovalue,
                    const uint                 vids[],
-                   const double               func[],
+                   const float               func[],
                    const std::array<uint,3> & e,
                    std::map<ipair,uint>     & e2v_map,
-                   std::vector<vec3d>       & verts,
+                   std::vector<vec3f>       & verts,
                    std::vector<uint>        & tris,
-                   std::vector<vec3d>       & norms)
+                   std::vector<vec3f>       & norms)
 {
     assert(isovalue >= *std::min_element(func, func+4));
     assert(isovalue <= *std::max_element(func, func+4));
 
-    vec3d tri_verts[3];
+    vec3f tri_verts[3];
     uint  fresh_vid = verts.size();
 
-    for(uint i=0; i<3; ++i)
+    for(short i=0; i<3; ++i)
     {
-        uint v_a = vids[TET_EDGES[e[i]][0]];
-        uint v_b = vids[TET_EDGES[e[i]][1]];
-
+        uint v_a = vids[TET_EDGES[e[i]][0]],v_b = vids[TET_EDGES[e[i]][1]];
+        
         // avoid duplicated vertices. If an edge has already
         // been visited retrieve its id and coordinates
         //
@@ -291,16 +284,15 @@ void make_triangle(const Tetmesh<M,V,E,F,P> & m,
         }
         else
         {
-            double f_a = func[TET_EDGES[e[i]][0]];
-            double f_b = func[TET_EDGES[e[i]][1]];
-
+            float f_a = func[TET_EDGES[e[i]][0]],f_b = func[TET_EDGES[e[i]][1]];
+            
             if (f_a < f_b)
             {
                 std::swap(v_a, v_b);
                 std::swap(f_a, f_b);
             }
 
-            double alpha = (isovalue - f_a) / (f_b - f_a);
+            float alpha = (isovalue - f_a) / (f_b - f_a);
 
             tri_verts[i] = (1.0 - alpha) * m.vert(v_a) + alpha * m.vert(v_b);
 
@@ -311,11 +303,8 @@ void make_triangle(const Tetmesh<M,V,E,F,P> & m,
         }
     }
 
-    vec3d u  = tri_verts[1] - tri_verts[0]; u.normalize();
-    vec3d w  = tri_verts[2] - tri_verts[0]; w.normalize();
-    vec3d n = u.cross(w);
-    n.normalize();
+    vec3f u  = (tri_verts[1] - tri_verts[0]).normalize(),w  = (tri_verts[2] - tri_verts[0]).normalize();
+    vec3f n = u.cross(w).normalize();
     norms.push_back(n);
 }
-
 }
