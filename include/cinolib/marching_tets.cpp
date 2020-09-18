@@ -96,7 +96,7 @@ void marching_tets(const Tetmesh<M,V,E,F,P> & m,
      * one of the two triangles will be degenerate.
      * To avoid confusion and excessive code specialization for corner
      * cases, maybe it is better to have three possible states for a
-     * vertex (<,>,=). In this case each configuration will be 100% correct
+     * vertex (<,>,=). Once clarified how the vertext states are coded(encoded) and appropriately upcoded each configuration will be 100% correct
     */
 
     std::vector<unsigned char> c(m.num_polys(),0x0);
