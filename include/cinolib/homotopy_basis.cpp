@@ -41,8 +41,6 @@
 namespace cinolib
 {
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 std::ostream & operator<<(std::ostream & in, const HomotopyBasisData & data)
 {
@@ -61,8 +59,6 @@ std::ostream & operator<<(std::ostream & in, const HomotopyBasisData & data)
     return in;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 std::ostream & operator<<(std::ostream & in, const RefinementStats & stats)
 {
@@ -77,8 +73,6 @@ std::ostream & operator<<(std::ostream & in, const RefinementStats & stats)
     in << "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n";
     return in;
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class P>
 CINO_INLINE
@@ -112,9 +106,8 @@ double homotopy_basis(AbstractPolygonMesh<M,V,E,P>   & m,
     // Find the edges neither in tree, nor in cotree
     std::vector<uint> generators;
     for(uint eid=0; eid<m.num_edges(); ++eid)
-    {
         if(!tree.at(eid) && !cotree.at(eid)) generators.push_back(eid);
-    }
+   
     assert(m.genus()*2 == (int)generators.size());
 
     // Start from each such edge, and close a loop with its two endpoints
@@ -133,8 +126,6 @@ double homotopy_basis(AbstractPolygonMesh<M,V,E,P>   & m,
     }
     return length;
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class P>
 CINO_INLINE
@@ -179,8 +170,6 @@ void homotopy_basis(AbstractPolygonMesh<M,V,E,P> & m,
     if(data.detach_loops) detach_loops(dynamic_cast<Trimesh<M,V,E,P>&>(m), data);
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 // globally detaches loops in the homotopy basis
 template<class M, class V, class E, class P>
 CINO_INLINE
@@ -196,8 +185,8 @@ void detach_loops(Trimesh<M,V,E,P>  & m,
     for(uint vid=0; vid<m.num_verts(); ++vid)
     {
         if(vid == data.root) continue;
-        uint val_1 = 0;
-        uint val_2 = 0; // 2 or more
+        uint val_1 = 0,val_2=0;// 2 or more
+       
         for(uint eid : m.adj_v2e(vid))
         {
             switch(m.edge_data(eid).label)
@@ -215,11 +204,10 @@ void detach_loops(Trimesh<M,V,E,P>  & m,
     m.vert_data(data.root).flags[MARKED] = true;
     while(!q.empty())
     {
-        uint vid = q.front();
         q.pop();
 
-        m.vert_data(vid).flags[MARKED] = false;
-        uint next = detach_loops(m, data, vid);
+        m.vert_data(q.front()).flags[MARKED] = false;
+        uint next = detach_loops(m, data, q.front());
 
         if(!m.vert_data(next).flags[MARKED])
         {
@@ -234,8 +222,6 @@ void detach_loops(Trimesh<M,V,E,P>  & m,
 
     detach_loops_postproc(m, data);
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // locally detaches loops in the homotopy basis around vertex vid
 template<class M, class V, class E, class P>
@@ -305,14 +291,11 @@ uint detach_loops(Trimesh<M,V,E,P>  & m,
             // otherwise try vert split
             vec3d new_pos;
             if(polys_are_planar(m, edges_cw, data.coplanarity_thresh) && find_position_within_fan(m, edges_cw, vid, new_pos))
-            {
                 return detach_loops_by_vert_split(m, data, *k, *i, new_pos);
-            }
+     
             if(polys_are_planar(m, edges_ccw, data.coplanarity_thresh) && find_position_within_fan(m, edges_ccw, vid, new_pos))
-            {
                 return detach_loops_by_vert_split(m, data, *j, *i, new_pos);
-            }
-
+           
             // at the very least, do edge split along the smallest triangle fan
             if(edges_ccw.size()>edges_cw.size())  return detach_loops_by_edge_split(m, data, edges_cw);
             return detach_loops_by_edge_split(m, data, edges_ccw);
@@ -321,8 +304,6 @@ uint detach_loops(Trimesh<M,V,E,P>  & m,
         default : assert(false && "unknown split strategy");
     }
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // locally detaches loops in the homotopy basis around vertex vid using a vertex split
 template<class M, class V, class E, class P>
@@ -337,11 +318,9 @@ uint detach_loops_by_vert_split(Trimesh<M,V,E,P>  & m,
     ++data.refinement_stats.splits_vert;
 
     uint v_mid  = m.vert_shared(e_out, e_in);
-    uint v_in   = m.vert_opposite_to(e_in, v_mid);
-    uint v_out  = m.vert_opposite_to(e_out, v_mid);
+    uint v_in   = m.vert_opposite_to(e_in, v_mid),v_out  = m.vert_opposite_to(e_out, v_mid),star_size = m.vert_valence(v_mid);
     int  val_in = m.edge_data(e_in).label;
 
-    uint star_size = m.vert_valence(v_mid);
     data.refinement_stats.vert_val_max  = std::max(data.refinement_stats.vert_val_max, star_size);
     data.refinement_stats.vert_val_avg += star_size;
 
@@ -350,8 +329,7 @@ uint detach_loops_by_vert_split(Trimesh<M,V,E,P>  & m,
     for(uint eid : m.adj_v2e(v_mid))
     {
         if(eid==e_in || eid==e_out) continue;
-        int val = m.edge_data(eid).label;
-        if(val>0) others.push_back(std::make_pair(m.vert_opposite_to(eid,v_mid),val));
+        if(m.edge_data(eid).label>0) others.push_back(std::make_pair(m.vert_opposite_to(eid,v_mid),m.edge_data(eid).label));
     }
 
     vec3d og_pos = m.vert(v_mid);
@@ -363,8 +341,7 @@ uint detach_loops_by_vert_split(Trimesh<M,V,E,P>  & m,
     for(uint eid : m.adj_v2e(v_mid)) m.edge_data(eid).label = 0;
     for(uint eid : m.adj_v2e(v_new)) m.edge_data(eid).label = 0;
 
-    int e_in_new  = m.edge_id(v_in,  v_new);
-    int e_out_new = m.edge_id(v_out, v_new);
+    int e_in_new  = m.edge_id(v_in,  v_new),e_out_new = m.edge_id(v_out, v_new);
     assert(e_in_new>=0);
     assert(e_out_new>=0);
 
@@ -372,10 +349,8 @@ uint detach_loops_by_vert_split(Trimesh<M,V,E,P>  & m,
     for(auto obj : others)
     {
         uint vid   = obj.first;
-        int  val   = obj.second;
-        int  e_old = m.edge_id(vid, v_mid);
-        int  e_new = m.edge_id(vid, v_new);
-
+        int  val   = obj.second,e_old = m.edge_id(vid, v_mid),e_new = m.edge_id(vid, v_new);
+       
         if(e_old>=0)
         {
             assert(e_new==-1);
@@ -436,8 +411,6 @@ uint detach_loops_by_vert_split(Trimesh<M,V,E,P>  & m,
     return v_out;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 // locally detaches loops in the homotopy basis around vertex vid using a sequence of edge splits
 template<class M, class V, class E, class P>
 CINO_INLINE
@@ -450,13 +423,10 @@ uint detach_loops_by_edge_split(Trimesh<M,V,E,P>        & m,
 
     assert(edge_fan.size()>2 || "there's detach_loops_by_poly_split() otherwise");
 
-    uint e_in    = edge_fan.back();
-    uint e_out   = edge_fan.front();
-    uint v_mid   = m.vert_shared(e_in, e_out);
-    uint v_in    = m.vert_opposite_to(e_in, v_mid);
-    uint v_out   = m.vert_opposite_to(e_out, v_mid);
-    int  val_in  = m.edge_data(e_in).label;
-    int  val_out = m.edge_data(e_out).label;
+    uint e_in    = edge_fan.back(),e_out=edge_fan.front();
+    uint v_mid   = m.vert_shared(e_in, e_out),v_in=m.vert_opposite_to(e_in, v_mid),v_out=m.vert_opposite_to(e_out, v_mid);
+    int  val_in  = m.edge_data(e_in).label,val_out = m.edge_data(e_out).label;
+  
     assert(val_in>0);
     assert(val_out > val_in);
 
@@ -470,8 +440,7 @@ uint detach_loops_by_edge_split(Trimesh<M,V,E,P>        & m,
         uint eid = edge_fan.at(i);
         assert(m.edge_data(eid).label==0);
         // optimally place newly inserted vertex according to the valence balance between the two disjoint paths
-        vec3d A = m.vert(v_mid);
-        vec3d B = m.vert(m.vert_opposite_to(eid, v_mid));
+        vec3d A = m.vert(v_mid),B = m.vert(m.vert_opposite_to(eid, v_mid));
         float t = static_cast<float>(val_out - val_in)/static_cast<float>(val_out);
         vec3d C = A*(1.f-t) + B*t;
         assert(t>0.f && t<1.f);
@@ -505,8 +474,6 @@ uint detach_loops_by_edge_split(Trimesh<M,V,E,P>        & m,
     return v_out;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 // locally detaches loops in the homotopy basis around vertex vid using a triangle split
 template<class M, class V, class E, class P>
 CINO_INLINE
@@ -524,7 +491,7 @@ uint detach_loops_by_poly_split(Trimesh<M,V,E,P>  & /*m*/,
     //
     //        |v_in - v_mid| + |v_mid - v_out| >= | v_in - v_out|
     //
-    // should always hold. Hence the loops should have traverse the perimeter
+    // should always hold. Hence the loops should have being traversing the perimeter
     // of the umbrella, never entering into it.
 
     // For this reason THE CODE BELOW WAS NEVER TESTED!!!!
@@ -535,12 +502,11 @@ uint detach_loops_by_poly_split(Trimesh<M,V,E,P>  & /*m*/,
     //++data.refinement_stats.splits_poly;
 
     //uint v_mid     = m.vert_shared(e_out, e_in);
-    //uint v_in      = m.vert_opposite_to(e_in, v_mid);
-    //uint v_out     = m.vert_opposite_to(e_out, v_mid);
+    //uint v_in      = m.vert_opposite_to(e_in, v_mid),v_out     = m.vert_opposite_to(e_out, v_mid);
     // int pid       = m.poly_id(e_in, e_out);     assert(pid>=0);
     // int val_in    = m.edge_data(e_in).label;    assert(val_in>0);
     // int val_out   = m.edge_data(e_out).label;   assert(val_out>val_in);
-    //uint v_new     = m.poly_split(pid);
+    // uint v_new     = m.poly_split(pid);
     // int e_in_new  = m.edge_id(v_in, v_new);     assert(e_in_new>=0);
     // int e_out_new = m.edge_id(v_out, v_new);    assert(e_out_new>=0);
     // int e_dummy   = m.edge_id(v_mid, v_new);    assert(e_dummy>=0);
@@ -562,8 +528,6 @@ uint detach_loops_by_poly_split(Trimesh<M,V,E,P>  & /*m*/,
     //return v_out;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class M, class V, class E, class P>
 CINO_INLINE
 void detach_loops_preproc(Trimesh<M,V,E,P>  & m,
@@ -576,16 +540,13 @@ void detach_loops_preproc(Trimesh<M,V,E,P>  & m,
     {
         for(uint i=0; i<loop.size(); ++i)
         {
-            uint v0  = loop.at(i);
-            uint v1  = loop.at((i+1)%loop.size());
-             int eid = m.edge_id(v0, v1);
+            uint v0  = loop.at(i),v1  = loop.at((i+1)%loop.size());
+            int eid = m.edge_id(v0, v1);
             m.edge_data(eid).label++;
             m.edge_data(eid).flags[MARKED] = true;
         }
     }
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class P>
 CINO_INLINE
@@ -608,7 +569,7 @@ void detach_loops_postproc(Trimesh<M,V,E,P>  & m,
             uint curr = loop.back();
             do
             {
-                int next = -1;
+                short next = -1;
                 for(uint eid : m.adj_v2e(curr))
                 {
                     if(m.edge_data(eid).label>0 && !m.edge_data(eid).flags[MARKED])
@@ -619,7 +580,7 @@ void detach_loops_postproc(Trimesh<M,V,E,P>  & m,
                     }
                 }
                 assert(next>=0);
-                if((uint)next != data.root) loop.push_back(next);
+                if((uint)abs(next) != data.root) loop.push_back(next);
                 curr = next;
             }
             while(curr != data.root);
@@ -628,8 +589,6 @@ void detach_loops_postproc(Trimesh<M,V,E,P>  & m,
     }
     assert((int)data.loops.size() == m.genus()*2);
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // planarity test for the vert split operator
 template<class M, class V, class E, class P>
@@ -660,8 +619,6 @@ bool polys_are_planar(const Trimesh<M,V,E,P>  & m,
     return true;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 // point positioning for the vert split operator
 template<class M, class V, class E, class P>
 CINO_INLINE
@@ -682,8 +639,7 @@ bool find_position_within_fan(const Trimesh<M,V,E,P>  & m,
     uint eid = edge_fan.at(edge_fan.size()*0.5);
     uint v_opp = m.vert_opposite_to(eid, v_mid);
 
-    vec3d A = m.vert(v_opp);
-    vec3d B = m.vert(v_mid);
+    vec3d A = m.vert(v_opp),B = m.vert(v_mid);
     uint  i = 0;
     float t = 0.75;
     pos = t*A + (1-t)*B;
@@ -708,29 +664,26 @@ bool find_position_within_fan(const Trimesh<M,V,E,P>  & m,
         // test first newly generated triangle
         if(!reject)
         {
-            uint v_tmp = m.vert_opposite_to(*(edge_fan.begin()+1), v_mid);
-            uint pid = poly_fan.front();
+            uint v_tmp = m.vert_opposite_to(*(edge_fan.begin()+1), v_mid),pid = poly_fan.front();
+            
             auto v = m.poly_verts(pid);
             if(m.poly_vert_id(pid,0)==v_tmp) v.at(0) = pos; else
             if(m.poly_vert_id(pid,1)==v_tmp) v.at(1) = pos; else
             if(m.poly_vert_id(pid,2)==v_tmp) v.at(2) = pos; else
             assert(false);
-            vec3d n1 = m.poly_data(pid).normal;
-            vec3d n2 = triangle_normal(v.at(0), v.at(1), v.at(2));
+            vec3d n1 = m.poly_data(pid).normal,n2 = triangle_normal(v.at(0), v.at(1), v.at(2));
             if(n2.is_degenerate() || n1.dot(n2) <= 0) reject = true;
         }
         // test second newly generated triangle
         if(!reject)
         {
-            uint v_tmp = m.vert_opposite_to(*(edge_fan.rbegin()+1), v_mid);
-            uint pid = poly_fan.back();
+            uint v_tmp = m.vert_opposite_to(*(edge_fan.rbegin()+1), v_mid),pid = poly_fan.back();
             auto v = m.poly_verts(pid);
             if(m.poly_vert_id(pid,0)==v_tmp) v.at(0) = pos; else
             if(m.poly_vert_id(pid,1)==v_tmp) v.at(1) = pos; else
             if(m.poly_vert_id(pid,2)==v_tmp) v.at(2) = pos; else
             assert(false);
-            vec3d n1 = m.poly_data(pid).normal;
-            vec3d n2 = triangle_normal(v.at(0), v.at(1), v.at(2));
+            vec3d n1 = m.poly_data(pid).normal,n2 = triangle_normal(v.at(0), v.at(1), v.at(2));
             if(n2.is_degenerate() || n1.dot(n2) <= 0) reject = true;
         }
         if(!reject) return true;
@@ -740,5 +693,4 @@ bool find_position_within_fan(const Trimesh<M,V,E,P>  & m,
     }
     assert(false); // you should never end up executing this line
 }
-
 }
