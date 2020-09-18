@@ -45,26 +45,22 @@ namespace cinolib
 
 typedef Eigen::Triplet<double> Entry;
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class M, class V, class E, class P>
 CINO_INLINE
-Eigen::SparseMatrix<double> laplacian(const AbstractMesh<M,V,E,P> & m,
-                                      const int mode,   // modes: UNIFORM | COTANGENT
-                                      const int n = 1); // diagonally replicate laplacian matrix n times:
+Eigen::SparseMatrix<float> laplacian(const AbstractMesh<M,V,E,P> & m,
+                                      const short mode,   // modes: UNIFORM | COTANGENT
+                                      const short n = 1); // diagonally replicate laplacian matrix n times:
                                                         //
                                                         //  n=1      n=2        n=3
                                                         //  | L |   | L 0 |   | L 0 0 |
                                                         //          | 0 L |   | 0 L 0 |
                                                         //                    | 0 0 L |
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class M, class V, class E, class P>
 CINO_INLINE
-std::vector<Eigen::Triplet<double>> laplacian_matrix_entries(const AbstractMesh<M,V,E,P> & m,
-                                                             const int mode,
-                                                             const int n);
+std::vector<Eigen::Triplet<float>> laplacian_matrix_entries(const AbstractMesh<M,V,E,P> & m,
+                                                             const short mode,
+                                                             const short n);
 }
 
 #ifndef  CINO_STATIC_LIB
