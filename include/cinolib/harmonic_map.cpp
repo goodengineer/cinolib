@@ -43,10 +43,10 @@ namespace cinolib
 template<class M, class V, class E, class P>
 CINO_INLINE
 ScalarField harmonic_map(const AbstractMesh<M,V,E,P> & m,
-                         const std::map<uint,double> & bc,
+                         const std::map<uint,float> & bc,
                          const uint                    n,
-                         const int                     laplacian_mode,
-                         const int                     solver)
+                         const short                     laplacian_mode,
+                         const short                     solver)
 {
     assert(n > 0);
     assert(bc.size() > 0);
@@ -55,11 +55,11 @@ ScalarField harmonic_map(const AbstractMesh<M,V,E,P> & m,
 
     ScalarField f(m.num_verts());
 
-    Eigen::SparseMatrix<double> L   = laplacian(m, laplacian_mode);
-    Eigen::SparseMatrix<double> Ln = -L;
-    Eigen::VectorXd             rhs = Eigen::VectorXd::Zero(m.num_verts());
+    Eigen::SparseMatrix<float> L   = laplacian(m, laplacian_mode);
+    Eigen::SparseMatrix<float> Ln = -L;
+    Eigen::VectorXd            rhs = Eigen::VectorXd::Zero(m.num_verts());
 
-    for(uint i=1; i<n; ++i) Ln  = Ln * (-L); // keep it PSD
+    for(uint i=1; i<n; ++i) Ln=Ln*(-L); // keep it PSD
 
     solve_square_system_with_bc(Ln, rhs, f, bc, solver);
 
@@ -74,8 +74,8 @@ CINO_INLINE
 std::vector<vec3d> harmonic_map_3d(const AbstractMesh<M,V,E,P> & m,
                                    const std::map<uint,vec3d>  & bc,
                                    const uint                    n,
-                                   const int                     laplacian_mode,
-                                   const int                     solver)
+                                   const short                     laplacian_mode,
+                                   const short                     solver)
 {
     assert(n > 0);
     assert(bc.size() > 0);
@@ -84,33 +84,29 @@ std::vector<vec3d> harmonic_map_3d(const AbstractMesh<M,V,E,P> & m,
 
     ScalarField f(3*m.num_verts());
 
-    Eigen::SparseMatrix<double> L   = laplacian(m, laplacian_mode, 3);
-    Eigen::SparseMatrix<double> Ln = -L;
+    Eigen::SparseMatrix<float> L   = laplacian(m, laplacian_mode, 3);
+    Eigen::SparseMatrix<float> Ln = -L;
     Eigen::VectorXd             rhs = Eigen::VectorXd::Zero(3*m.num_verts());
 
     for(uint i=1; i<n; ++i) Ln  = Ln * (-L); // keep it PSD
 
     uint y_off = m.num_verts();
     uint z_off = m.num_verts() + y_off;
-    std::map<uint,double> bc_1d;
+    std::map<uint,float> bc_1d;
     for(auto obj : bc)
     {
-        uint  vid = obj.first;
         vec3d pos = obj.second;
-        bc_1d[      vid] = pos.x();
-        bc_1d[y_off+vid] = pos.y();
-        bc_1d[z_off+vid] = pos.z();
+        bc_1d[obj.first] = pos.x();
+        bc_1d[y_off+obj.first] = pos.y();
+        bc_1d[z_off+obj.first] = pos.z();
     }
 
     solve_square_system_with_bc(Ln, rhs, f, bc_1d, solver);
 
     std::vector<vec3d> res(m.num_verts());
     for(uint vid=0; vid<m.num_verts(); ++vid)
-    {
         res.at(vid) = vec3d(f[vid], f[y_off+vid], f[z_off+vid]);
-    }
 
     return res;
 }
-
 }
