@@ -40,7 +40,6 @@
 
 namespace cinolib
 {
-
 #ifndef M_PI
 #define M_PI 3.1415926535897932384626433832795
 #endif
@@ -48,7 +47,6 @@ namespace cinolib
 #ifndef M_PI_2
 #define M_PI_2 1.57079632679489661923
 #endif
-
 }
 
 #endif // CINO_PI_H
