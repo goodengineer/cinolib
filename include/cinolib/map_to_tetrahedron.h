@@ -49,7 +49,7 @@ namespace cinolib
 template<class M, class V, class E, class P>
 CINO_INLINE
 void map_to_tetrahedron(const Trimesh<M,V,E,P>   & m,
-                              std::vector<vec3d> & verts); // verts mapped to tet
+                              std::vector<vec3f> & verts); // verts mapped to tet
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
