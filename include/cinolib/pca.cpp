@@ -46,12 +46,12 @@ namespace cinolib
 */
 
 CINO_INLINE
-void PCA(const std::vector<vec3d> & points, vec3d & e_min, vec3d & e_mid, vec3d & e_max)
+void PCA(const std::vector<vec3f> & points, vec3f & e_min, vec3f & e_mid, vec3f & e_max)
 {
-    double cov[3][3];
+    float cov[3][3];
     covariance_matrix(points, cov);
 
-    double min, mid, max;
+    float min, mid, max;
     eigen_decomposition_3x3(cov, e_min, e_mid, e_max, min, mid, max);
 
     // rescale vectors according to eigenvalues
@@ -59,5 +59,4 @@ void PCA(const std::vector<vec3d> & points, vec3d & e_min, vec3d & e_mid, vec3d 
     e_mid *= mid;
     e_max *= max;
 }
-
 }
