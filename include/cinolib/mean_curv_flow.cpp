@@ -46,7 +46,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void MCF(AbstractPolygonMesh<M,V,E,P> & m,
          const uint                     n_iters,
-         const double                   time_scalar,
+         const float                    time_scalar,
          const bool                     conformalized)
 {
     // use the squared avg edge length as time step, as suggested in:
@@ -54,12 +54,10 @@ void MCF(AbstractPolygonMesh<M,V,E,P> & m,
     // K.Crane, C.Weischedel, M.Wardetzky
     // SIGGRAPH 2013
     double time = m.edge_avg_length();
-    time *= time;
-    time *= time_scalar;
-
-    Eigen::SparseMatrix<double> L  = laplacian(m, COTANGENT);
-    Eigen::SparseMatrix<double> MM = mass_matrix(m);
-
+    time *= time*time_scalar;
+   
+    Eigen::SparseMatrix<float> L=laplacian(m, COTANGENT),MM=mass_matrix(m);
+    
     for(uint i=1; i<=n_iters; ++i)
     {
         // optimize position and scale to get better numerical precision
@@ -67,16 +65,14 @@ void MCF(AbstractPolygonMesh<M,V,E,P> & m,
         m.center_bbox();        
 
         // backward euler time integration of heat flow equation
-        Eigen::SimplicialLLT<Eigen::SparseMatrix<double>> LLT(MM - time_scalar * L);
+        Eigen::SimplicialLLT<Eigen::SparseMatrix<float>> LLT(MM - time_scalar * L);
 
         uint nv = m.num_verts();
-        Eigen::VectorXd x(nv);
-        Eigen::VectorXd y(nv);
-        Eigen::VectorXd z(nv);
-
+        Eigen::VectorXd x(nv),y(nv),z(nv);
+        
         for(uint vid=0; vid<nv; ++vid)
         {
-            vec3d pos = m.vert(vid);
+            vec3f pos = m.vert(vid);
             x[vid] = pos.x();
             y[vid] = pos.y();
             z[vid] = pos.z();
@@ -86,10 +82,10 @@ void MCF(AbstractPolygonMesh<M,V,E,P> & m,
         y = LLT.solve(MM * y);
         z = LLT.solve(MM * z);
 
-        double residual = 0.0;
+        float residual = 0.0;
         for(uint vid=0; vid<m.num_verts(); ++vid)
         {
-            vec3d new_pos(x[vid], y[vid], z[vid]);
+            vec3f new_pos(x[vid], y[vid], z[vid]);
             residual += (m.vert(vid) - new_pos).length();
             m.vert(vid) = new_pos;
         }
@@ -105,5 +101,4 @@ void MCF(AbstractPolygonMesh<M,V,E,P> & m,
 
     m.update_bbox();
 }
-
 }
