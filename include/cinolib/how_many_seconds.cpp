@@ -39,11 +39,11 @@ namespace cinolib
 {
 
 CINO_INLINE
-double how_many_seconds(const std::chrono::high_resolution_clock::time_point & t0,
+float how_many_seconds(const std::chrono::high_resolution_clock::time_point & t0,
                         const std::chrono::high_resolution_clock::time_point & t1)
 {
     using namespace std::chrono;
-    duration<double> delta = duration_cast<duration<double>>(t1 - t0);
+    duration<float> delta = duration_cast<duration<float>>(t1 - t0);
     return delta.count();
 }
 
