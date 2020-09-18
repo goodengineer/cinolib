@@ -93,5 +93,4 @@ void MST_on_dual_mask_on_edges(const AbstractPolygonMesh<M,V,E,P> & m,
         }
     }
 }
-
 }
