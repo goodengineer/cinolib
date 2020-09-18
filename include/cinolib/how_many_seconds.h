@@ -43,7 +43,7 @@ namespace cinolib
 {
 
 CINO_INLINE
-double how_many_seconds(const std::chrono::high_resolution_clock::time_point & t0,
+float how_many_seconds(const std::chrono::high_resolution_clock::time_point & t0,
                         const std::chrono::high_resolution_clock::time_point & t1);
 
 }
