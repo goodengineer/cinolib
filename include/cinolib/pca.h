@@ -47,7 +47,7 @@ namespace cinolib
 */
 
 CINO_INLINE
-void PCA(const std::vector<vec3d> & points, vec3d & e_min, vec3d & e_mid, vec3d & e_max);
+void PCA(const std::vector<vec3f> & points, vec3f & e_min, vec3f & e_mid, vec3f & e_max);
 
 }
 
