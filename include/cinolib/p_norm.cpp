@@ -40,13 +40,12 @@ namespace cinolib
 
 template<class Vec>
 CINO_INLINE
-double p_norm(const Vec & v, const uint size, const float p)
+float p_norm(const Vec & v, const uint size, const float p)
 {
-    double norm = 0.0;
+    float norm = 0.0;
     for(uint i=0; i<size; ++i)
-    {
         norm += std::pow(std::fabs(v[i]),p);
-    }
+   
     norm = std::pow(norm,1.0/p);
     return norm;
 }
