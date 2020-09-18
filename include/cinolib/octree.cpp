@@ -46,10 +46,8 @@ OctreeNode::~OctreeNode()
     // "in a tree's node destructor, you only need to destroy the children pointers that are manually
     //  allocated by you. You don't need to worry about the deallocation of the node itself."
     //  https://stackoverflow.com/questions/34170164/destructor-for-binary-search-tree
-    for(int i=0; i<8; ++i) delete children[i];
+    for(short i=0; i<8; ++i) delete children[i];
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 Octree::Octree(const uint max_depth,
@@ -57,8 +55,6 @@ Octree::Octree(const uint max_depth,
 : max_depth(max_depth)
 , items_per_leaf(items_per_leaf)
 {}
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 Octree::~Octree()
@@ -73,8 +69,6 @@ Octree::~Octree()
         items.pop_back();
     }
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void Octree::build()
@@ -101,7 +95,7 @@ void Octree::build()
     }
 
     Time::time_point t1 = Time::now();
-    double t = how_many_seconds(t0,t1);
+    float t = how_many_seconds(t0,t1);
 
     std::cout << ":::::::::::::::::::::::::::::::::::::::::::::::::::" << std::endl;
     std::cout << "Octree created (" << t << "s)                      " << std::endl;
@@ -114,8 +108,6 @@ void Octree::build()
     std::cout << ":::::::::::::::::::::::::::::::::::::::::::::::::::" << std::endl;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 void Octree::build_item(const uint id, OctreeNode * node, const uint depth)
 {
@@ -124,7 +116,7 @@ void Octree::build_item(const uint id, OctreeNode * node, const uint depth)
     if(node->is_inner)
     {
         assert(node->item_indices.empty());
-        for(int i=0; i<8; ++i)
+        for(short i=0; i<8; ++i)
         {
             assert(node->children[i]!=nullptr);
             if(node->children[i]->bbox.intersects_box(aabbs.at(id)))
@@ -151,9 +143,8 @@ void Octree::build_item(const uint id, OctreeNode * node, const uint depth)
             node->item_indices.clear();
 
             // create children octants
-            vec3d min = node->bbox.min;
-            vec3d max = node->bbox.max;
-            vec3d avg = node->bbox.center();
+            vec3f min = node->bbox.min,max = node->bbox.max,avg = node->bbox.center();
+           
             node->children[0] = new OctreeNode(node, AABB(vec3d(min[0], min[1], min[2]), vec3d(avg[0], avg[1], avg[2])));
             node->children[1] = new OctreeNode(node, AABB(vec3d(avg[0], min[1], min[2]), vec3d(max[0], avg[1], avg[2])));
             node->children[2] = new OctreeNode(node, AABB(vec3d(avg[0], avg[1], min[2]), vec3d(max[0], max[1], avg[2])));
@@ -169,7 +160,7 @@ void Octree::build_item(const uint id, OctreeNode * node, const uint depth)
             for(uint item : items_to_move_down)
             {
                 bool found_octant = false;
-                for(int i=0; i<8; ++i)
+                for(short i=0; i<8; ++i)
                 {
                     assert(node->children[i]!=nullptr);
                     if(node->children[i]->bbox.intersects_box(aabbs.at(item)))
@@ -188,31 +179,23 @@ void Octree::build_item(const uint id, OctreeNode * node, const uint depth)
     }
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
-void Octree::add_segment(const uint id, const std::vector<vec3d> & v)
+void Octree::add_segment(const uint id, const std::vector<vec3f> & v)
 {
     items.push_back(new Segment(id,v.data()));
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
-void Octree::add_triangle(const uint id, const std::vector<vec3d> & v)
+void Octree::add_triangle(const uint id, const std::vector<vec3f> & v)
 {
     items.push_back(new Triangle(id,v.data()));
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
-void Octree::add_tetrahedron(const uint id, const std::vector<vec3d> & v)
+void Octree::add_tetrahedron(const uint id, const std::vector<vec3f> & v)
 {
     items.push_back(new Tetrahedron(id,v.data()));
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 uint Octree::max_items_per_leaf() const
@@ -220,30 +203,22 @@ uint Octree::max_items_per_leaf() const
     return max_items_per_leaf(root, 0);
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 uint Octree::max_items_per_leaf(const OctreeNode * node, const uint max) const
 {
     if(node==nullptr)
-    {
         return 0;
-    }
     else if(node->is_inner)
     {
         uint tmp[8];
-        for(int i=0; i<8; ++i)
-        {
+        for(short i=0; i<8; ++i)
             tmp[i] = max_items_per_leaf(node->children[i], max);
-        }
+
         return *std::max_element(tmp, tmp+8);
     }
     else
-    {
         return std::max((uint)node->item_indices.size(), max);
-    }
 }
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void Octree::debug_mode(const bool b)
@@ -251,11 +226,9 @@ void Octree::debug_mode(const bool b)
     print_debug_info = b;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 void Octree::print_query_info(const std::string & s,
-                                 const double        t,
+                                 const float         t,
                                  const uint          aabb_queries,
                                  const uint          item_queries) const
 {
@@ -264,26 +237,22 @@ void Octree::print_query_info(const std::string & s,
               << item_queries << " item queries" << std::endl;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
-vec3d Octree::closest_point(const vec3d & p) const
+vec3d Octree::closest_point(const vec3f & p) const
 {
     uint   id;
     vec3d  pos;
-    double dist;
+    float dist;
     closest_point(p, id, pos, dist);
     return pos;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 // https://stackoverflow.com/questions/41306122/nearest-neighbor-search-in-octree
 CINO_INLINE
-void Octree::closest_point(const vec3d  & p,          // query point
+void Octree::closest_point(const vec3f  & p,          // query point
                                  uint   & id,         // id of the item T closest to p
-                                 vec3d  & pos,        // point in T closest to p
-                                 double & dist) const // distance between pos and p
+                                 vec3f  & pos,        // point in T closest to p
+                                 float & dist) const  // distance between pos and p
 {
     assert(root != nullptr);
 
@@ -297,15 +266,14 @@ void Octree::closest_point(const vec3d  & p,          // query point
     PrioQueue q;
     q.push(obj);
 
-    uint aabb_queries = 1;
-    uint item_queries = 0;
-
+    uint aabb_queries = 1,item_queries = 0;
+   
     while(q.top().node->is_inner)
     {
         Obj obj = q.top();
         q.pop();
 
-        for(int i=0; i<8; ++i)
+        for(short i=0; i<8; ++i)
         {
             OctreeNode *child = obj.node->children[i];
             if(child->is_inner)
@@ -344,18 +312,15 @@ void Octree::closest_point(const vec3d  & p,          // query point
     dist = q.top().dist;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 // this query becomes exact if CINOLIB_USES_EXACT_PREDICATES is defined
 CINO_INLINE
-bool Octree::contains(const vec3d & p, const bool strict, uint & id) const
+bool Octree::contains(const vec3f & p, const bool strict, uint & id) const
 {
     typedef std::chrono::high_resolution_clock Time;
     Time::time_point t0 = Time::now();
 
-    uint aabb_queries = 0;
-    uint item_queries = 0;
-
+    uint aabb_queries = 0,item_queries = 0;
+    
     std::stack<OctreeNode*> lifo;
     lifo.push(root);
 
@@ -367,10 +332,8 @@ bool Octree::contains(const vec3d & p, const bool strict, uint & id) const
 
         if(node->is_inner)
         {
-            for(int i=0; i<8; ++i)
-            {
+            for(short i=0; i<8; ++i)
                 if(node->children[i]->bbox.contains(p,strict)) lifo.push(node->children[i]);
-            }
             if(print_debug_info) aabb_queries+=8;
         }
         else
@@ -391,22 +354,18 @@ bool Octree::contains(const vec3d & p, const bool strict, uint & id) const
             }
         }
     }
-
     return false;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 // this query becomes exact if CINOLIB_USES_EXACT_PREDICATES is defined
 CINO_INLINE
-bool Octree::contains(const vec3d & p, const bool strict, std::unordered_set<uint> & ids) const
+bool Octree::contains(const vec3f & p, const bool strict, std::unordered_set<uint> & ids) const
 {
     typedef std::chrono::high_resolution_clock Time;
     Time::time_point t0 = Time::now();
 
-    uint aabb_queries = 0;
-    uint item_queries = 0;
-
+    uint aabb_queries = 0,item_queries = 0;
+    
     ids.clear();
 
     std::stack<OctreeNode*> lifo;
@@ -420,10 +379,8 @@ bool Octree::contains(const vec3d & p, const bool strict, std::unordered_set<uin
 
         if(node->is_inner)
         {
-            for(int i=0; i<8; ++i)
-            {
+            for(short i=0; i<8; ++i)
                 if(node->children[i]->bbox.contains(p,strict)) lifo.push(node->children[i]);
-            }
             if(print_debug_info) aabb_queries+=8;
         }
         else
@@ -431,9 +388,7 @@ bool Octree::contains(const vec3d & p, const bool strict, std::unordered_set<uin
             for(uint i : node->item_indices)
             {
                 if(items.at(i)->contains(p,strict))
-                {
                     ids.insert(items.at(i)->id);
-                }
             }
             if(print_debug_info) item_queries+=node->item_indices.size();
         }
@@ -444,20 +399,17 @@ bool Octree::contains(const vec3d & p, const bool strict, std::unordered_set<uin
         Time::time_point t1 = Time::now();
         print_query_info("Contains query (all items)", how_many_seconds(t0,t1), aabb_queries, item_queries);
     }
-
     return !ids.empty();
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
-bool Octree::intersects_ray(const vec3d & p, const vec3d & dir, double & min_t, uint & id) const
+bool Octree::intersects_ray(const vec3f & p, const vec3f & dir, float & min_t, uint & id) const
 {
     typedef std::chrono::high_resolution_clock Time;
     Time::time_point t0 = Time::now();
 
-    vec3d  pos;
-    double t;
+    vec3f  pos;
+    float t;
     if(!root->bbox.intersects_ray(p, dir, t, pos)) return false;
     Obj obj;
     obj.node = root;
@@ -466,15 +418,14 @@ bool Octree::intersects_ray(const vec3d & p, const vec3d & dir, double & min_t, 
     PrioQueue q;
     q.push(obj);
 
-    uint aabb_queries = 1;
-    uint item_queries = 0;
-
+    uint aabb_queries = 1,item_queries = 0;
+    
     while(!q.empty() && q.top().node->is_inner)
     {
         Obj obj = q.top();
         q.pop();
 
-        for(int i=0; i<8; ++i)
+        for(short i=0; i<8; ++i)
         {
             OctreeNode *child = obj.node->children[i];
             if(child->bbox.intersects_ray(p, dir, t, pos))
@@ -519,16 +470,14 @@ bool Octree::intersects_ray(const vec3d & p, const vec3d & dir, double & min_t, 
     return true;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
-bool Octree::intersects_ray(const vec3d & p, const vec3d & dir, std::set<std::pair<double,uint>> & all_hits) const
+bool Octree::intersects_ray(const vec3f & p, const vec3f & dir, std::set<std::pair<float,uint>> & all_hits) const
 {
     typedef std::chrono::high_resolution_clock Time;
     Time::time_point t0 = Time::now();
 
-    vec3d  pos;
-    double t;
+    vec3f  pos;
+    float t;
     if(!root->bbox.intersects_ray(p, dir, t, pos)) return false;
     Obj obj;
     obj.node = root;
@@ -537,15 +486,14 @@ bool Octree::intersects_ray(const vec3d & p, const vec3d & dir, std::set<std::pa
     PrioQueue q;
     q.push(obj);
 
-    uint aabb_queries = 1;
-    uint item_queries = 0;
-
+    uint aabb_queries = 1,item_queries = 0;
+   
     while(!q.empty())
     {
         Obj obj = q.top();
         q.pop();
 
-        for(int i=0; i<8; ++i)
+        for(short i=0; i<8; ++i)
         {
             OctreeNode *child = obj.node->children[i];
             if(child->bbox.intersects_ray(p, dir, t, pos))
@@ -562,13 +510,10 @@ bool Octree::intersects_ray(const vec3d & p, const vec3d & dir, std::set<std::pa
                     for(uint i : child->item_indices)
                     {
                         if(items.at(i)->intersects_ray(p, dir, t, pos))
-                        {
                             all_hits.insert(std::make_pair(t,items.at(i)->id));
-                        }
                         if(print_debug_info) ++item_queries;
                     }
                 }
-
             }
             if(print_debug_info) ++aabb_queries;
         }
@@ -584,18 +529,15 @@ bool Octree::intersects_ray(const vec3d & p, const vec3d & dir, std::set<std::pa
     return true;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 // this query becomes exact if CINOLIB_USES_EXACT_PREDICATES is defined
 CINO_INLINE
-bool Octree::intersects_triangle(const vec3d t[], const bool ignore_if_valid_complex, std::unordered_set<uint> & ids) const
+bool Octree::intersects_triangle(const vec3f t[], const bool ignore_if_valid_complex, std::unordered_set<uint> & ids) const
 {
     typedef std::chrono::high_resolution_clock Time;
     Time::time_point t0 = Time::now();
 
-    uint aabb_queries = 0;
-    uint item_queries = 0;
-
+    uint aabb_queries = 0,item_queries = 0;
+    
     ids.clear();
 
     AABB t_box({t[0], t[1], t[2]});
@@ -611,12 +553,10 @@ bool Octree::intersects_triangle(const vec3d t[], const bool ignore_if_valid_com
 
         if(node->is_inner)
         {
-            for(int i=0; i<8; ++i)
+            for(short i=0; i<8; ++i)
             {
                 if(node->children[i]->bbox.intersects_box(t_box))
-                {
                     lifo.push(node->children[i]);
-                }
             }
             if(print_debug_info) aabb_queries+=8;
         }
@@ -625,11 +565,8 @@ bool Octree::intersects_triangle(const vec3d t[], const bool ignore_if_valid_com
             for(uint i : node->item_indices)
             {
                 // test the AABBs first, it's cheaper
-                if(items.at(i)->aabb().intersects_box(t_box) &&
-                   items.at(i)->intersects_triangle(t, ignore_if_valid_complex))
-                {
+                if(items.at(i)->aabb().intersects_box(t_box)&&items.at(i)->intersects_triangle(t, ignore_if_valid_complex))
                     ids.insert(items.at(i)->id);
-                }
             }
             if(print_debug_info) item_queries+=node->item_indices.size();
         }
@@ -640,22 +577,18 @@ bool Octree::intersects_triangle(const vec3d t[], const bool ignore_if_valid_com
         Time::time_point t1 = Time::now();
         print_query_info("Intersects Triangle (exact)", how_many_seconds(t0,t1), aabb_queries, item_queries);
     }
-
     return !ids.empty();
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 // this query becomes exact if CINOLIB_USES_EXACT_PREDICATES is defined
 CINO_INLINE
-bool Octree::intersects_segment(const vec3d s[], const bool ignore_if_valid_complex, std::unordered_set<uint> & ids) const
+bool Octree::intersects_segment(const vec3f s[], const bool ignore_if_valid_complex, std::unordered_set<uint> & ids) const
 {
     typedef std::chrono::high_resolution_clock Time;
     Time::time_point t0 = Time::now();
 
-    uint aabb_queries = 0;
-    uint item_queries = 0;
-
+    uint aabb_queries = 0,item_queries = 0;
+    
     ids.clear();
 
     AABB s_box(s[0], s[1]);
@@ -671,12 +604,10 @@ bool Octree::intersects_segment(const vec3d s[], const bool ignore_if_valid_comp
 
         if(node->is_inner)
         {
-            for(int i=0; i<8; ++i)
+            for(short i=0; i<8; ++i)
             {
                 if(node->children[i]->bbox.intersects_box(s_box))
-                {
                     lifo.push(node->children[i]);
-                }
             }
             if(print_debug_info) aabb_queries+=8;
         }
@@ -687,9 +618,7 @@ bool Octree::intersects_segment(const vec3d s[], const bool ignore_if_valid_comp
                 // test the AABBs first, it's cheaper
                 if(items.at(i)->aabb().intersects_box(s_box) &&
                    items.at(i)->intersects_segment(s, ignore_if_valid_complex))
-                {
                     ids.insert(items.at(i)->id);
-                }
             }
             if(print_debug_info) item_queries+=node->item_indices.size();
         }
@@ -703,5 +632,4 @@ bool Octree::intersects_segment(const vec3d s[], const bool ignore_if_valid_comp
 
     return !ids.empty();
 }
-
 }
