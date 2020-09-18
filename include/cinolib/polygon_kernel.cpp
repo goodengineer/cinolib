@@ -41,7 +41,7 @@
 #include <boost/geometry/geometries/point_xy.hpp>
 #include <boost/geometry.hpp>
 //
-typedef boost::geometry::model::d2::point_xy<double> BoostPoint;
+typedef boost::geometry::model::d2::point_xy<float>  BoostPoint;
 typedef boost::geometry::model::polygon<BoostPoint>  BoostPolygon;
 #endif
 
@@ -49,20 +49,19 @@ namespace cinolib
 {
 
 CINO_INLINE
-double polygon_kernel(const std::vector<vec3d> & poly,   // will discard z component
+float polygon_kernel(const std::vector<vec3d> & poly,   // will discard z component
                             std::vector<vec3d> & kernel) // z component will be zero
 {
     std::vector<vec2d> poly_2d, kernel_2d;
-    for(auto p : poly) poly_2d.push_back(vec2d(p));
+    for(auto p : poly) poly_2d.push_back(vec2f(p));
 
-    double area = polygon_kernel(poly_2d, kernel_2d);
+    float area = polygon_kernel(poly_2d, kernel_2d);
 
     if (area > 0)
     {
         kernel.clear();
-        for(auto p : kernel_2d) kernel.push_back(vec3d(p.x(), p.y(), 0));
+        for(auto p : kernel_2d) kernel.push_back(vec3f(p.x(), p.y(), 0));
     }
-
     return area;
 }
 
@@ -71,35 +70,33 @@ double polygon_kernel(const std::vector<vec3d> & poly,   // will discard z compo
 #ifdef CINOLIB_USES_BOOST
 
 CINO_INLINE
-double polygon_kernel(const std::vector<vec2d> & poly,
-                            std::vector<vec2d> & kernel)
+float polygon_kernel(const std::vector<vec2f> & poly,
+                            std::vector<vec2f> & kernel)
 {
     kernel.clear();
     if (poly.empty()) return 0;
 
     // define 2d axis aligned bbox
-    vec2d min( inf_double,  inf_double);
-    vec2d max(-inf_double, -inf_double);
-    for(const vec2d & p : poly)
+    vec2f min( inf_double,  inf_double);
+    vec2f max(-inf_double, -inf_double);
+    for(const vec2f & p : poly)
     {
         min = min.min(p);
         max = max.max(p);
     }
-    double delta = min.dist(max);
+    float delta = min.dist(max);
 
     // define half spaces
     std::vector<BoostPolygon> half_spaces;
     for(uint i=0; i<poly.size(); ++i)
     {
-        vec2d A   = poly.at(i);
-        vec2d B   = poly.at((i+1)%poly.size());
-        vec2d u = B - A; u.normalize(); // edge direction
-        vec2d v = vec2d(-u.y(), u.x()); // direction orthogonal to u (rotated CCW)
+        vec2f A   = poly.at(i),B   = poly.at((i+1)%poly.size());
+        vec2f u = (B - A).normalize();  // edge direction
+        vec2f v = vec2d(-u.y(), u.x()); // direction orthogonal to u (rotated CCW)
         A -= u * delta;
         B += u * delta;
-        vec2d C = B + v * delta;
-        vec2d D = A + v * delta;
-
+        vec2f C = B + v * delta,D = A + v * delta;
+        
         BoostPolygon p;
         boost::geometry::append(p, BoostPoint(A.x(), A.y()));
         boost::geometry::append(p, BoostPoint(B.x(), B.y()));
@@ -136,8 +133,8 @@ double polygon_kernel(const std::vector<vec2d> & poly,
 #else
 
 CINO_INLINE
-double polygon_kernel(const std::vector<vec2d> &,
-                            std::vector<vec2d> &)
+float polygon_kernel(const std::vector<vec2f> &,
+                            std::vector<vec2f> &)
 {
     std::cerr << "ERROR : Boost Polygon disabled. Recompile defining symbol CINOLIB_USES_BOOST" << std::endl;
     exit(-1);
