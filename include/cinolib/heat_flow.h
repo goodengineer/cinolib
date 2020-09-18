@@ -46,7 +46,7 @@
 namespace cinolib
 {
 
-/* Solve the heat flow problem  (M - t * L) u = u0,
+/* Solve the heat flow problem  (M-t*L) u = u0,
  * subject to certain Dirichlet boundary conditions
 */
 
@@ -54,8 +54,8 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 ScalarField heat_flow(const AbstractMesh<M,V,E,P> & m,
                       const std::vector<uint>     & heat_charges,
-                      const double                  time = 1.0,
-                      const int                     laplacian_mode = COTANGENT,
+                      const float                  time = 1.0,
+                      const short                     laplacian_mode = COTANGENT,
                       const bool                    hard_contraint_bcs = false);
 }
 
