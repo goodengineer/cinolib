@@ -44,7 +44,7 @@ namespace cinolib
 /* Compute the aspect ratio distortion of a map. Let
  * T be the affine map between A and B, such that:
  *
- *          B = T(A) = M * A + t
+ *          B = T(A) = M*A + t
  *
  * with M being a 3x3 matrix encoding the rotation/scaling
  * part of the mapping and t be a translation. The aspect
@@ -60,10 +60,9 @@ namespace cinolib
  * ACM Transactions on Graphics - SIGGRAPH - 2013
 */
 CINO_INLINE
-double aspect_ratio_distortion(const double m[3][3]);
+double aspect_ratio_distortion(const float m[3][3]);
 
 }
-
 
 #ifndef  CINO_STATIC_LIB
 #include "map_distortion.cpp"
