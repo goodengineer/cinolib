@@ -59,14 +59,14 @@ namespace cinolib
 */
 
 CINO_INLINE
-double polygon_kernel(const std::vector<vec2d> & poly,
-                            std::vector<vec2d> & kernel);
+float polygon_kernel(const std::vector<vec2f> & poly,
+                            std::vector<vec2f> & kernel);
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
-double polygon_kernel(const std::vector<vec3d> & poly,     // will discard z component
-                            std::vector<vec3d> & kernel);  // z component will be zero
+float polygon_kernel(const std::vector<vec3f> & poly,     // will discard z component
+                            std::vector<vec3f> & kernel);  // z component will be zero
 
 }
 
