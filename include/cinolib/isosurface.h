@@ -56,26 +56,20 @@ class Isosurface
 
         explicit Isosurface(){}
         explicit Isosurface(const Tetmesh<M,V,E,F,P> & m,
-                            const double               iso_value,
+                            const float                iso_value,
                             const bool                 run_marching_tets = true);
 
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
+        
         Trimesh<M,V,E,F> export_as_trimesh() const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         std::vector<uint> tessellate(Tetmesh<M,V,E,F,P> & m) const;
 
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
+       
         float              iso_value;
         std::vector<vec3d> verts;
         std::vector<uint>  tris;
         std::vector<vec3d> norms;
 };
-
-
 }
 
 #ifndef  CINO_STATIC_LIB
