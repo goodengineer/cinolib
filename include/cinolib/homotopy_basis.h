@@ -69,8 +69,6 @@ namespace cinolib
  *    IEEE Transactions on Visualization and Computer Graphics, 2008
  */
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 // Mesh refinement strategies
 enum
 {
@@ -85,8 +83,6 @@ static const std::string ref_txt[3] =
     "VERT_SPLIT_STRATEGY"  ,
     "HYBRID_SPLIT_STRATEGY",
 };
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 typedef struct
 {
@@ -106,8 +102,6 @@ RefinementStats;
 CINO_INLINE
 std::ostream & operator<<(std::ostream & in, const RefinementStats & stats);
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 typedef struct
 {
     // INPUT: SETTINGS
@@ -116,7 +110,7 @@ typedef struct
 
     // INPUT: REFINEMENT OPTIONS AND STATISTICS
     bool  detach_loops       = false;                 // refine mesh topology to detach loops traversing the same edges
-    int   split_strategy     = HYBRID_SPLIT_STRATEGY; // sets the splitting strategy
+    short   split_strategy     = HYBRID_SPLIT_STRATEGY; // sets the splitting strategy
     float coplanarity_thresh = 1;                     // sets the colpanarity threshold for the HYBRID_SPLIT_STRATEGY. Faces with dihedral angles lower than 5 degrees will be deemed coplanar and used as local support for vertex splitting
     RefinementStats refinement_stats;
 
@@ -126,22 +120,18 @@ typedef struct
 
     // OUTPUT: AUXILIARY DATA (may be useful for visual inspection/debugging)
     // note: tree and cotree reference the input mesh. If loops are detached they are useless
-    std::vector<bool> tree;   // one element per edge. True if it is part of the tree, false otherwise
-    std::vector<bool> cotree; // one element per edge. True if it is part of the cotree, false otherwise
+    std::vector<bool> tree;   // one element per edge. True if it is a part of the tree, false otherwise
+    std::vector<bool> cotree; // one element per edge. True if it is a part of the cotree, false otherwise
 }
 HomotopyBasisData;
 
 CINO_INLINE
 std::ostream & operator<<(std::ostream & in, const HomotopyBasisData & data);
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class M, class V, class E, class P>
 CINO_INLINE
 void homotopy_basis(AbstractPolygonMesh<M,V,E,P> & m,
                     HomotopyBasisData            & data);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class M, class V, class E, class P>
 CINO_INLINE
@@ -151,15 +141,11 @@ double homotopy_basis(AbstractPolygonMesh<M,V,E,P>   & m,
                       std::vector<bool>              & tree,
                       std::vector<bool>              & cotree);
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 // globally detaches loops in the homotopy basis
 template<class M, class V, class E, class P>
 CINO_INLINE
 void detach_loops(Trimesh<M,V,E,P>  & m,
                   HomotopyBasisData & data);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // locally detaches loops in the homotopy basis around vertex vid
 template<class M, class V, class E, class P>
@@ -168,21 +154,15 @@ uint detach_loops(Trimesh<M,V,E,P>  & m,
                   HomotopyBasisData & data,
                   const uint          vid);
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class M, class V, class E, class P>
 CINO_INLINE
 void detach_loops_preproc(Trimesh<M,V,E,P>  & m,
                           HomotopyBasisData & data);
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class M, class V, class E, class P>
 CINO_INLINE
 void detach_loops_postproc(Trimesh<M,V,E,P>  & m,
                            HomotopyBasisData & data);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // locally detaches loops in the homotopy basis around vertex vid using a triangle split
 template<class M, class V, class E, class P>
@@ -192,16 +172,12 @@ uint detach_loops_by_poly_split(Trimesh<M,V,E,P>  & m,
                                 const uint          e_in,
                                 const uint          e_out);
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 // locally detaches loops in the homotopy basis around vertex vid using a sequence of edge splits
 template<class M, class V, class E, class P>
 CINO_INLINE
 uint detach_loops_by_edge_split(Trimesh<M,V,E,P>        & m,
                                 HomotopyBasisData       & data,
                                 const std::vector<uint> & edge_fan);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // locally detaches loops in the homotopy basis around vertex vid using a vertex split
 template<class M, class V, class E, class P>
@@ -212,16 +188,12 @@ uint detach_loops_by_vert_split(Trimesh<M,V,E,P>  & m,
                                 const uint          e_out,
                                 const vec3d         new_pos = vec3d(inf_double, inf_double, inf_double));
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 // planarity test for the vert split operator
 template<class M, class V, class E, class P>
 CINO_INLINE
 bool polys_are_planar(const Trimesh<M,V,E,P>  & m,
                       const std::vector<uint> & edge_fan,
                       const float               coplanarity_tresh);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // point positioning for the vert split operator
 template<class M, class V, class E, class P>
