@@ -55,8 +55,6 @@ class OctreeNode
         std::vector<uint> item_indices; // index Octree::items, avoiding to store a copy of the same object multiple times in each node it appears
 };
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 /* Usage:
  *
  *  i)   Create an empty octree
@@ -74,18 +72,12 @@ class Octree
 
         virtual ~Octree();
 
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-        void add_segment    (const uint id, const std::vector<vec3d> & v);
-        void add_triangle   (const uint id, const std::vector<vec3d> & v);
-        void add_tetrahedron(const uint id, const std::vector<vec3d> & v);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        void add_segment    (const uint id, const std::vector<vec3f> & v);
+        void add_triangle   (const uint id, const std::vector<vec3f> & v);
+        void add_tetrahedron(const uint id, const std::vector<vec3f> & v);
 
         void build();
         void build_item(const uint id, OctreeNode *node, const uint depth);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         template<class M, class V, class E, class P>
         void build_from_mesh_polys(const AbstractPolygonMesh<M,V,E,P> & m)
@@ -96,16 +88,12 @@ class Octree
             {
                 for(uint i=0; i<m.poly_tessellation(pid).size()/3; ++i)
                 {
-                    vec3d v0 = m.vert(m.poly_tessellation(pid).at(3*i+0));
-                    vec3d v1 = m.vert(m.poly_tessellation(pid).at(3*i+1));
-                    vec3d v2 = m.vert(m.poly_tessellation(pid).at(3*i+2));
+                    vec3f v0 = m.vert(m.poly_tessellation(pid).at(3*i+0)),v1 = m.vert(m.poly_tessellation(pid).at(3*i+1)),v2 = m.vert(m.poly_tessellation(pid).at(3*i+2));
                     add_triangle(pid, {v0,v1,v2});
                 }
             }
             build();
         }
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         template<class M, class V, class E, class P>
         void build_from_mesh_polys(const AbstractPolyhedralMesh<M,V,E,P> & m)
@@ -123,57 +111,45 @@ class Octree
             build();
         }
 
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         template<class M, class V, class E, class P>
         void build_from_mesh_edges(const AbstractMesh<M,V,E,P> & m)
         {
             assert(items.empty());
             items.reserve(m.num_edges());
             for(uint eid=0; eid<m.num_edges(); ++eid)
-            {
                 add_segment(eid, m.edge_verts(eid));
-            }
             build();
         }
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         uint max_items_per_leaf() const;
         uint max_items_per_leaf(const OctreeNode *node, const uint max) const;
 
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         void debug_mode(const bool b);
 
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         void print_query_info(const std::string & s,
-                              const double        t,
+                              const float        t,
                               const uint          aabb_queries,
                               const uint          item_queries) const;
 
         // QUERIES :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         // returns pos, id and distance of the item that is closest to query point p
-        void  closest_point(const vec3d & p, uint & id, vec3d & pos, double & dist) const;
-        vec3d closest_point(const vec3d & p) const;
+        void  closest_point(const vec3f & p, uint & id, vec3f & pos, float & dist) const;
+        vec3d closest_point(const vec3f & p) const;
 
         // returns respectively the first item and the full list of items containing query point p
         // note: this query becomes exact if CINOLIB_USES_EXACT_PREDICATES is defined
-        bool contains(const vec3d & p, const bool strict, uint & id) const;
-        bool contains(const vec3d & p, const bool strict, std::unordered_set<uint> & ids) const;
+        bool contains(const vec3f & p, const bool strict, uint & id) const;
+        bool contains(const vec3f & p, const bool strict, std::unordered_set<uint> & ids) const;
 
         // returns respectively the first and the full list of intersections
         // between items in the octree and a ray R(t) := p + t * dir
-        bool intersects_ray(const vec3d & p, const vec3d & dir, double & min_t, uint & id) const; // first hit
-        bool intersects_ray(const vec3d & p, const vec3d & dir, std::set<std::pair<double,uint>> & all_hits) const;
+        bool intersects_ray(const vec3f & p, const vec3f & dir, float & min_t, uint & id) const; // first hit
+        bool intersects_ray(const vec3f & p, const vec3f & dir, std::set<std::pair<float,uint>> & all_hits) const;
 
         // note: these queries becomes exact if CINOLIB_USES_EXACT_PREDICATES is defined
-        bool intersects_segment (const vec3d s[], const bool ignore_if_valid_complex, std::unordered_set<uint> & ids) const;
-        bool intersects_triangle(const vec3d t[], const bool ignore_if_valid_complex, std::unordered_set<uint> & ids) const;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        bool intersects_segment (const vec3f s[], const bool ignore_if_valid_complex, std::unordered_set<uint> & ids) const;
+        bool intersects_triangle(const vec3f t[], const bool ignore_if_valid_complex, std::unordered_set<uint> & ids) const;
 
     protected:
 
@@ -181,8 +157,6 @@ class Octree
         std::vector<SpatialDataStructureItem*> items;
         std::vector<AABB>                      aabbs;
         OctreeNode                            *root = nullptr;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         uint max_depth;      // maximum allowed depth of the tree
         uint items_per_leaf; // prescribed number of items per leaf (can't go deeper than max_depth anyways)
@@ -196,8 +170,8 @@ class Octree
         {
             double      dist  = inf_double;
             OctreeNode *node  = nullptr;
-            int         index = -1; // note: this is the item ID, NOT necessarily the index of vector items!!
-            vec3d       pos;        // closest point
+            int         index = -1; // note: this is the item ID, NOT necessarily the index of vector items!! Can it be redefined as short ?
+            vec3f       pos;        // closest point
         };
         struct Greater
         {
@@ -208,7 +182,6 @@ class Octree
         };
         typedef std::priority_queue<Obj,std::vector<Obj>,Greater> PrioQueue;
 };
-
 }
 
 #ifndef  CINO_STATIC_LIB
