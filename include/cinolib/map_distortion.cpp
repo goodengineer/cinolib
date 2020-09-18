@@ -41,7 +41,7 @@ namespace cinolib
 {
 
 CINO_INLINE
-double aspect_ratio_distortion(const double m[3][3])
+float aspect_ratio_distortion(const float m[3][3])
 {
     using namespace Eigen;
 
@@ -49,12 +49,11 @@ double aspect_ratio_distortion(const double m[3][3])
     from_std_3x3_to_Eigen_3x3(m,M);
 
     JacobiSVD<Matrix3d> svd(M);
-    DiagonalMatrix<double,3> s = DiagonalMatrix<double,3>(svd.singularValues());
+    DiagonalMatrix<float,3> s = DiagonalMatrix<float,3>(svd.singularValues());
 
     assert(s.diagonal()[0] >= s.diagonal()[1]);
     assert(s.diagonal()[1] >= s.diagonal()[2]);
 
     return s.diagonal()[0] / std::fabs(s.diagonal()[2]);
 }
-
 }
