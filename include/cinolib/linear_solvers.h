@@ -66,8 +66,6 @@ enum
     BiCGSTAB,
 };
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 static const std::string txt[4] =
 {
     "SIMPLICIAL_LLT"  ,
@@ -76,58 +74,46 @@ static const std::string txt[4] =
     "BiCGSTAB",
 };
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
-void solve_square_system(const Eigen::SparseMatrix<double> & A,
+void solve_square_system(const Eigen::SparseMatrix<float> & A,
                          const Eigen::VectorXd             & b,
                                Eigen::VectorXd             & x,
-                         int   solver = SIMPLICIAL_LLT);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+                         short   solver = SIMPLICIAL_LLT);
 
 CINO_INLINE
-void solve_square_system_with_bc(const Eigen::SparseMatrix<double> & A,
+void solve_square_system_with_bc(const Eigen::SparseMatrix<float> & A,
                                  const Eigen::VectorXd             & b,
                                        Eigen::VectorXd             & x,
-                                 const std::map<uint,double>       & bc, // Dirichlet boundary conditions
-                                 int   solver = SIMPLICIAL_LLT);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+                                 const std::map<uint,float>       & bc, // Dirichlet boundary conditions
+                                 short   solver = SIMPLICIAL_LLT);
 
 CINO_INLINE
-void solve_least_squares(const Eigen::SparseMatrix<double> & A,
+void solve_least_squares(const Eigen::SparseMatrix<float> & A,
                          const Eigen::VectorXd             & b,
                                Eigen::VectorXd             & x,
-                         int   solver = SIMPLICIAL_LLT);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+                         short   solver = SIMPLICIAL_LLT);
 
 CINO_INLINE
-void solve_least_squares_with_bc(const Eigen::SparseMatrix<double> & A,
+void solve_least_squares_with_bc(const Eigen::SparseMatrix<float> & A,
                                  const Eigen::VectorXd             & b,
                                        Eigen::VectorXd             & x,
-                                 const std::map<uint,double>       & bc, // Dirichlet boundary conditions
-                                 int   solver = SIMPLICIAL_LLT);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+                                 const std::map<uint,float>       & bc, // Dirichlet boundary conditions
+                                 short   solver = SIMPLICIAL_LLT);
 
 CINO_INLINE
-void solve_weighted_least_squares(const Eigen::SparseMatrix<double> & A,
+void solve_weighted_least_squares(const Eigen::SparseMatrix<float> & A,
                                   const Eigen::VectorXd             & w,
                                   const Eigen::VectorXd             & b,
                                         Eigen::VectorXd             & x,
-                                  int   solver = SIMPLICIAL_LLT);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+                                  short   solver = SIMPLICIAL_LLT);
 
 CINO_INLINE
-void solve_weighted_least_squares_with_bc(const Eigen::SparseMatrix<double> & A,
+void solve_weighted_least_squares_with_bc(const Eigen::SparseMatrix<float> & A,
                                           const Eigen::VectorXd             & w,
                                           const Eigen::VectorXd             & b,
                                                 Eigen::VectorXd             & x,
-                                          const std::map<uint,double>       & bc, // Dirichlet boundary conditions
-                                          int   solver = SIMPLICIAL_LLT);
+                                          const std::map<uint,float>       & bc, // Dirichlet boundary conditions
+                                          short   solver = SIMPLICIAL_LLT);
 
 }
 
