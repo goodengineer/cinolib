@@ -39,15 +39,13 @@
 namespace cinolib
 {
 
-typedef Eigen::Triplet<double> Entry;
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+typedef Eigen::Triplet<float> Entry;
 
 CINO_INLINE
-void solve_square_system(const Eigen::SparseMatrix<double> & A,
+void solve_square_system(const Eigen::SparseMatrix<float> & A,
                          const Eigen::VectorXd             & b,
                                Eigen::VectorXd             & x,
-                         int   solver)
+                         short   solver)
 {
     assert(A.rows() == A.cols());
 
@@ -55,7 +53,7 @@ void solve_square_system(const Eigen::SparseMatrix<double> & A,
     {
         case SIMPLICIAL_LLT:
         {
-            Eigen::SimplicialLLT< Eigen::SparseMatrix<double> > solver(A);
+            Eigen::SimplicialLLT< Eigen::SparseMatrix<float> > solver(A);
             assert(solver.info() == Eigen::Success);
             x = solver.solve(b).eval();
             break;
@@ -63,7 +61,7 @@ void solve_square_system(const Eigen::SparseMatrix<double> & A,
 
         case SIMPLICIAL_LDLT:
         {
-            Eigen::SimplicialLDLT< Eigen::SparseMatrix<double> > solver(A);
+            Eigen::SimplicialLDLT< Eigen::SparseMatrix<float> > solver(A);
             assert(solver.info() == Eigen::Success);
             x = solver.solve(b).eval();
             break;
@@ -71,7 +69,7 @@ void solve_square_system(const Eigen::SparseMatrix<double> & A,
 
         case BiCGSTAB:
         {
-            Eigen::BiCGSTAB< Eigen::SparseMatrix<double> , Eigen::IncompleteLUT<double> > solver;
+            Eigen::BiCGSTAB< Eigen::SparseMatrix<float> , Eigen::IncompleteLUT<float> > solver;
             //solver.setMaxIterations(100);
             solver.setTolerance(1e-5);
             solver.compute(A);
@@ -82,9 +80,9 @@ void solve_square_system(const Eigen::SparseMatrix<double> & A,
 
         case SparseLU:
         {
-            Eigen::SparseMatrix<double> Ac = A;
+            Eigen::SparseMatrix<float> Ac = A;
             Ac.makeCompressed();
-            Eigen::SparseLU<Eigen::SparseMatrix<double>, Eigen::COLAMDOrdering<int> > solver;
+            Eigen::SparseLU<Eigen::SparseMatrix<float>, Eigen::COLAMDOrdering<int> > solver;
             solver.analyzePattern(Ac);
             solver.factorize(Ac);
             x = solver.solve(b);
@@ -95,23 +93,19 @@ void solve_square_system(const Eigen::SparseMatrix<double> & A,
     }
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
-void solve_square_system_with_bc(const Eigen::SparseMatrix<double> & A,
+void solve_square_system_with_bc(const Eigen::SparseMatrix<float> & A,
                                  const Eigen::VectorXd             & b,
                                        Eigen::VectorXd             & x,
-                                 const std::map<uint,double>       & bc, // Dirichlet boundary conditions
-                                 int   solver)
+                                 const std::map<uint,float>       & bc, // Dirichlet boundary conditions
+                                 short   solver)
 {
     std::vector<int> col_map(A.rows(), -1);
     uint fresh_id = 0;
     for(uint col=0; col<A.cols(); ++col)
     {
         if (DOES_NOT_CONTAIN(bc, col))
-        {
             col_map[col] = fresh_id++;
-        }
     }
 
     uint size = A.rows() - bc.size();
@@ -122,9 +116,7 @@ void solve_square_system_with_bc(const Eigen::SparseMatrix<double> & A,
     for(uint row=0; row<A.rows(); ++row)
     {
         if (col_map[row] >= 0)
-        {
             bprime[ col_map[row] ] = b[row];
-        }
     }
 
     //
@@ -133,26 +125,21 @@ void solve_square_system_with_bc(const Eigen::SparseMatrix<double> & A,
     //
     for (uint i=0; i<A.outerSize(); ++i)
     {
-        for (Eigen::SparseMatrix<double>::InnerIterator it(A,i); it; ++it)
+        for (Eigen::SparseMatrix<float>::InnerIterator it(A,i); it; ++it)
         {
-            uint    row = it.row();
-            uint    col = it.col();
+            uint    row = it.row(),col = it.col();
             double val = it.value();
 
             if (col_map[row] < 0) continue;
 
             if (col_map[col] < 0)
-            {
-                bprime[ col_map[row] ] -= bc.at(col) * val;
-            }
-            else
-            {
+                bprime[ col_map[row] ] -= bc.at(col) * val;    
+            else    
                 Aprime_entries.push_back(Entry(col_map[row], col_map[col], val));
-            }
         }
     }
 
-    Eigen::SparseMatrix<double> Aprime(size, size);
+    Eigen::SparseMatrix<float> Aprime(size, size);
     Aprime.setFromTriplets(Aprime_entries.begin(), Aprime_entries.end());
 
     Eigen::VectorXd tmp_x(size);
@@ -163,80 +150,64 @@ void solve_square_system_with_bc(const Eigen::SparseMatrix<double> & A,
     for(uint col=0; col<A.cols(); ++col)
     {
         if (col_map[col] >= 0)
-        {
             x[col] = tmp_x[ col_map[col] ];
-        }
         else
-        {
             x[col] = bc.at(col);
-        }
     }
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
-void solve_least_squares(const Eigen::SparseMatrix<double> & A,
+void solve_least_squares(const Eigen::SparseMatrix<float> & A,
                          const Eigen::VectorXd             & b,
                                Eigen::VectorXd             & x,
-                         int   solver)
+                         short   solver)
 {
-    Eigen::SparseMatrix<double> At  = A.transpose();
-    Eigen::SparseMatrix<double> AtA = At * A;
+    Eigen::SparseMatrix<float> At  = A.transpose();
+    Eigen::SparseMatrix<float> AtA = At * A;
     Eigen::VectorXd             Atb = At * b;
 
     solve_square_system(AtA, Atb, x, solver);
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
-void solve_least_squares_with_bc(const Eigen::SparseMatrix<double> & A,
+void solve_least_squares_with_bc(const Eigen::SparseMatrix<float> & A,
                                  const Eigen::VectorXd             & b,
                                        Eigen::VectorXd             & x,
-                                 const std::map<uint,double>       & bc, // Dirichlet boundary conditions
-                                 int   solver)
+                                 const std::map<uint,float>       & bc, // Dirichlet boundary conditions
+                                 short   solver)
 {
-    Eigen::SparseMatrix<double> At  = A.transpose();
-    Eigen::SparseMatrix<double> AtA = At * A;
+    Eigen::SparseMatrix<float>  At  = A.transpose();
+    Eigen::SparseMatrix<float>  AtA = At * A;
     Eigen::VectorXd             Atb = At * b;
 
     solve_square_system_with_bc(AtA, Atb, x, bc, solver);
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
-void solve_weighted_least_squares(const Eigen::SparseMatrix<double> & A,
+void solve_weighted_least_squares(const Eigen::SparseMatrix<float> & A,
                                   const Eigen::VectorXd             & w,
                                   const Eigen::VectorXd             & b,
                                         Eigen::VectorXd             & x,
-                                  int   solver)
+                                  short   solver)
 {
-    Eigen::SparseMatrix<double> At   = A.transpose();
-    Eigen::SparseMatrix<double> AtWA = At * w.asDiagonal() * A;
+    Eigen::SparseMatrix<float> At   = A.transpose();
+    Eigen::SparseMatrix<float> AtWA = At * w.asDiagonal() * A;
     Eigen::VectorXd             AtWb = At * w.asDiagonal() * b;
 
     solve_square_system(AtWA, AtWb, x, solver);
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
-void solve_weighted_least_squares_with_bc(const Eigen::SparseMatrix<double> & A,
+void solve_weighted_least_squares_with_bc(const Eigen::SparseMatrix<float> & A,
                                           const Eigen::VectorXd             & w,
                                           const Eigen::VectorXd             & b,
                                                 Eigen::VectorXd             & x,
-                                          const std::map<uint,double>       & bc, // Dirichlet boundary conditions
-                                          int   solver)
+                                          const std::map<uint,float>       & bc, // Dirichlet boundary conditions
+                                          short   solver)
 {
-    Eigen::SparseMatrix<double> At   = A.transpose();
-    Eigen::SparseMatrix<double> AtWA = At * w.asDiagonal() * A;
+    Eigen::SparseMatrix<float> At   = A.transpose();
+    Eigen::SparseMatrix<float> AtWA = At * w.asDiagonal() * A;
     Eigen::VectorXd             AtWb = At * w.asDiagonal() * b;
-
     solve_square_system_with_bc(AtWA, AtWb, x, bc, solver);
 }
-
-
-
 }
