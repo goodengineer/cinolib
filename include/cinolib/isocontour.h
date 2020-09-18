@@ -52,17 +52,13 @@ class Isocontour
     public:
 
         explicit Isocontour();
-        explicit Isocontour(AbstractPolygonMesh<M,V,E,P> & m, double iso_value);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+        explicit Isocontour(AbstractPolygonMesh<M,V,E,P> & m, float iso_value);
 
         std::vector<uint> tessellate(Trimesh<M,V,E,P> & m) const;
 
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
     protected:
 
-        double             iso_value;
+        float              iso_value;
         std::vector<vec3d> segs;
 };
 
