@@ -104,7 +104,7 @@ size_t memory_usage_in_bytes()
 CINO_INLINE
 float memory_usage_in_kilo_bytes()
 {
-    static const double KByte = 1024.0;
+    static const float KByte = 1024.0;
     return memory_usage_in_bytes() / KByte;
 }
 
@@ -113,7 +113,7 @@ float memory_usage_in_kilo_bytes()
 CINO_INLINE
 float memory_usage_in_mega_bytes()
 {
-    static const double MByte = 1048576.0;
+    static const float MByte = 1048576.0;
     return memory_usage_in_bytes() / MByte;
 }
 
@@ -122,8 +122,7 @@ float memory_usage_in_mega_bytes()
 CINO_INLINE
 float memory_usage_in_giga_bytes()
 {
-    static const double GByte = 1073741824.0;
+    static const float GByte = 1073741824.0;
     return memory_usage_in_bytes() / GByte;
 }
-
 }
