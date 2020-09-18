@@ -43,7 +43,7 @@
 namespace cinolib
 {
 
-/* For the differences between cassical mean curvature flow (MCF) and
+/* For the differences between classical mean curvature flow (MCF) and
  * conformalized mean curvature flow (cMCF), please refer to:
  *
  * Can Mean-Curvature Flow be Modified to be Non-singular?
@@ -55,7 +55,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void MCF(AbstractPolygonMesh<M,V,E,P> & m,
          const uint                     n_iters,
-         const double                   time_scalar = 0.01, // I suggest very small steps for the conformalized version
+         const float                    time_scalar = 0.01, // I suggest very small steps for the conformalized version
          const bool                     conformalized = true);
 
 }
