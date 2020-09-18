@@ -46,7 +46,7 @@ CINO_INLINE
 ScalarField LSCM(const Trimesh<M,V,E,P>     & m,
                  const std::map<uint,vec2d> & bc)
 {
-    std::map<uint,double> bc_uv;
+    std::map<uint,float> bc_uv;
     if(!bc.empty())
     {
         for(auto obj : bc)
@@ -58,22 +58,18 @@ ScalarField LSCM(const Trimesh<M,V,E,P>     & m,
     else // fix two distant points on the boundary
     {
         auto b_verts = m.get_ordered_boundary_vertices();
-        uint v0 = b_verts.front();
-        uint v1 = b_verts.at(b_verts.size()*0.5);
-        uint nv = m.num_verts();
+        uint v0 = b_verts.front(),v1 = b_verts.at(b_verts.size()*0.5),nv = m.num_verts();
         bc_uv[v0   ] = 0;
         bc_uv[v0+nv] = 0;
         bc_uv[v1   ] = 1;
         bc_uv[v1+nv] = 1;
     }
 
-    Eigen::SparseMatrix<double> L   = laplacian(m, COTANGENT, 2);
-    Eigen::SparseMatrix<double> A   = vector_area_matrix(m);
-    Eigen::VectorXd             rhs = Eigen::VectorXd::Zero(2*m.num_verts());
+    Eigen::SparseMatrix<float> L=laplacian(m, COTANGENT, 2),A=vector_area_matrix(m);
+    Eigen::VectorXd            rhs = Eigen::VectorXd::Zero(2*m.num_verts());
 
     ScalarField f_uv;
     solve_square_system_with_bc(-L+2*A, rhs, f_uv, bc_uv, SIMPLICIAL_LDLT);
     return f_uv;
 }
-
 }
