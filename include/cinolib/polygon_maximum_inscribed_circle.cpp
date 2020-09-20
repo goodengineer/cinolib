@@ -106,7 +106,7 @@ struct boost::polygon::segment_traits<polygon_segment>
     }
 };
 //
-typedef boost::geometry::model::d2::point_xy<double> BoostPoint;
+typedef boost::geometry::model::d2::point_xy<float> BoostPoint;
 typedef boost::geometry::model::polygon<BoostPoint>  BoostPolygon;
 
 #endif // CINOLIB_USES_BOOST
@@ -117,37 +117,34 @@ namespace cinolib
 #ifdef CINOLIB_USES_BOOST
 
 CINO_INLINE
-BoostPolygon make_boost_poly(const std::vector<vec2d> & poly)
+BoostPolygon make_boost_poly(const std::vector<vec2f> & poly)
 {
     BoostPolygon boost_poly;
-    for(vec2d p : poly) boost::geometry::append(boost_poly, BoostPoint(p.x(), p.y()));
+    for(vec2f p : poly) boost::geometry::append(boost_poly, BoostPoint(p.x(), p.y()));
     boost::geometry::correct(boost_poly);
     return boost_poly;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
-void polygon_maximum_inscribed_circle(const std::vector<vec2d> & poly,
-                                            vec2d              & center,
-                                            double             & radius)
+void polygon_maximum_inscribed_circle(const std::vector<vec2f> & poly,
+                                            vec2f              & center,
+                                            float              & radius)
 {
     radius = 0.0;
-    center = vec2d(0,0);
+    center = vec2f(0,0);
 
-    vec2d min( inf_double,  inf_double);
-    vec2d max(-inf_double, -inf_double);
+    vec2f min( inf_double,  inf_double),max(-inf_double, -inf_double);
+    
     for(auto p : poly)
     {
         min = min.min(p);
         max = max.max(p);
     }
 
-    double scale_factor;
-    double diag = min.dist(max);
-
-    if(diag >= 1.0) scale_factor = std::numeric_limits<int>::max() / diag;
-    else            scale_factor = std::numeric_limits<int>::max() * diag;
+    float scale_factor,diag = min.dist(max);
+    
+    if(diag >= 1.0) scale_factor = std::numeric_limits<float>::max() / diag;
+    else            scale_factor = std::numeric_limits<float>::max() * diag;
 
     scale_factor *= 0.5; // dumb attempt to stay on the safe side and avoid overflows...
 
@@ -158,36 +155,34 @@ void polygon_maximum_inscribed_circle(const std::vector<vec2d> & poly,
     std::vector<polygon_segment> segments;
     for(uint i=0; i<poly.size(); ++i)
     {
-        vec2d v0 = scale_factor * poly.at(i);
-        vec2d v1 = scale_factor * poly.at((i+1)%poly.size());
+        vec2f v0 = scale_factor * poly.at(i),v1 = scale_factor * poly.at((i+1)%poly.size());
         segments.push_back(polygon_segment(v0.x(), v0.y(), v1.x(), v1.y()));
     }
 
-    voronoi_diagram<double> vd;
+    voronoi_diagram<float> vd;
     construct_voronoi(segments.begin(), segments.end(), &vd);
 
     BoostPolygon boost_poly = make_boost_poly(poly);
     for(auto it=vd.vertices().begin(); it!=vd.vertices().end(); ++it)
     {
-        const voronoi_diagram<double>::vertex_type &v = *it;
-        const voronoi_diagram<double>::edge_type   *e = v.incident_edge();
-        const voronoi_diagram<double>::cell_type   *c = e->cell();
+        const voronoi_diagram<float>::vertex_type &v = *it;
+        const voronoi_diagram<float>::edge_type   *e = v.incident_edge();
+        const voronoi_diagram<float>::cell_type   *c = e->cell();
         const polygon_segment                        &s = segments.at(c->source_index());
 
         // do not consider Voronoi vertices outside the polygon
         if (boost::geometry::within(BoostPoint(v.x()/scale_factor, v.y()/scale_factor), boost_poly))
         {
             // annoying wrap to vec3d (TODO: template cinolib::Segment to make it work in 2D too)
-            vec3d beg(s.p0.x, s.p0.y, 0);
-            vec3d end(s.p1.x, s.p1.y, 0);
-            vec3d c3d(v.x(),  v.y(),  0);
+            vec3f beg(s.p0.x, s.p0.y, 0),end(s.p1.x, s.p1.y, 0),c3d(v.x(),  v.y(),  0);
+            
             cinolib::Segment tmp(0, beg,end);
-            double d = tmp.dist(c3d);
+            float d = tmp.dist(c3d);
 
             if(d>radius)
             {
                 radius = d;
-                center = vec2d(c3d); // will automatically drop z
+                center = vec2f(c3d); // will automatically drop z
             }
         }
     }
@@ -196,19 +191,17 @@ void polygon_maximum_inscribed_circle(const std::vector<vec2d> & poly,
     center /= scale_factor;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
-void polygon_maximum_inscribed_circle(const std::vector<vec3d> & poly,   // will drop z component
-                                            vec3d              & center, // will have z=0
-                                            double             & radius)
+void polygon_maximum_inscribed_circle(const std::vector<vec3f> & poly,   // will drop z component
+                                            vec3f              & center, // will have z=0
+                                            float              & radius)
 {
-    std::vector<vec2d> poly_2d;
-    for(auto p : poly) poly_2d.push_back(vec2d(p.x(), p.y()));
+    std::vector<vec2f> poly_2d;
+    for(auto p : poly) poly_2d.push_back(vec2f(p.x(), p.y()));
 
-    vec2d center_2d;
+    vec2f center_2d;
     polygon_maximum_inscribed_circle(poly_2d, center_2d, radius);
-    center = vec3d(center_2d.x(), center_2d.y(), 0);
+    center = vec3f(center_2d.x(), center_2d.y(), 0);
 }
 
 #endif // CINOLIB_USES_BOOST
