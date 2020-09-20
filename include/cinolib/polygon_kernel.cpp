@@ -49,10 +49,10 @@ namespace cinolib
 {
 
 CINO_INLINE
-float polygon_kernel(const std::vector<vec3d> & poly,   // will discard z component
-                            std::vector<vec3d> & kernel) // z component will be zero
+float polygon_kernel(const std::vector<vec3f> & poly,   // will discard z component
+                            std::vector<vec3f> & kernel) // z component will be zero
 {
-    std::vector<vec2d> poly_2d, kernel_2d;
+    std::vector<vec2f> poly_2d, kernel_2d;
     for(auto p : poly) poly_2d.push_back(vec2f(p));
 
     float area = polygon_kernel(poly_2d, kernel_2d);
@@ -65,8 +65,6 @@ float polygon_kernel(const std::vector<vec3d> & poly,   // will discard z compon
     return area;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 #ifdef CINOLIB_USES_BOOST
 
 CINO_INLINE
@@ -77,8 +75,8 @@ float polygon_kernel(const std::vector<vec2f> & poly,
     if (poly.empty()) return 0;
 
     // define 2d axis aligned bbox
-    vec2f min( inf_double,  inf_double);
-    vec2f max(-inf_double, -inf_double);
+    vec2f min( inf_double,  inf_double),max(-inf_double, -inf_double);
+    
     for(const vec2f & p : poly)
     {
         min = min.min(p);
@@ -120,7 +118,7 @@ float polygon_kernel(const std::vector<vec2f> & poly,
     // convert from BoostPolygon to vec2d array
     for(uint i=0; i<kernel_boost.outer().size()-1; ++i)
     {
-        kernel.push_back(vec2d(boost::geometry::get<0>(kernel_boost.outer()[i]),
+        kernel.push_back(vec2f(boost::geometry::get<0>(kernel_boost.outer()[i]),
                                boost::geometry::get<1>(kernel_boost.outer()[i])));
     }
 
@@ -141,5 +139,4 @@ float polygon_kernel(const std::vector<vec2f> &,
 }
 
 #endif
-
 }
