@@ -79,7 +79,7 @@ void hex_principal_axes(const vec3d & p0, const vec3d & p1, const vec3d & p2, co
     X[1] = (p3 - p0) + (p2 - p1) + (p7 - p4) + (p6 - p5);
     X[2] = (p4 - p0) + (p5 - p1) + (p6 - p2) + (p7 - p3);
 
-    if(normalized) for(int i=0; i<3; ++i) if(!X[i].is_null()) X[i].normalize();
+    if(normalized) for(short i=0; i<3; ++i) if(!X[i].is_null()) X[i].normalize();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -93,7 +93,7 @@ void hex_cross_derivatives(const vec3d & p0, const vec3d & p1, const vec3d & p2,
     XX[1] = (p5 - p1) - (p4 - p0) + (p6 - p2) - (p7 - p3); // X_02 and X_20
     XX[2] = (p7 - p4) - (p3 - p0) + (p6 - p5) - (p2 - p1); // X_12 and X_21
 
-    if(normalized) for(int i=0; i<3; ++i) if(!XX[i].is_null()) XX[i].normalize();
+    if(normalized) for(short i=0; i<3; ++i) if(!XX[i].is_null()) XX[i].normalize();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -108,7 +108,7 @@ void hex_diagonals(const vec3d & p0, const vec3d & p1, const vec3d & p2, const v
     D[2] = p4 - p2;
     D[3] = p5 - p3;
 
-    if(normalized) for(int i=0; i<4; ++i) if(!D[i].is_null()) D[i].normalize();
+    if(normalized) for(short i=0; i<4; ++i) if(!D[i].is_null()) D[i].normalize();
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -146,8 +146,7 @@ double frobenius(const vec3d & col0, const vec3d & col1, const vec3d & col2)
     double det = determinant(col0, col1, col2);
     if(det <= min_double) return max_double;
 
-    double term1 = col0.dot(col0) + col1.dot(col1) + col2.dot(col2);
-    double term2 = (col0.cross(col1)).dot(col0.cross(col1)) +
+    double term1 = col0.dot(col0) + col1.dot(col1) + col2.dot(col2),term2 = (col0.cross(col1)).dot(col0.cross(col1)) +
                    (col1.cross(col2)).dot(col1.cross(col2)) +
                    (col2.cross(col0)).dot(col2.cross(col0));
     double frob  = sqrt(term1*term2)/det;
@@ -192,7 +191,7 @@ double hex_jacobian(const vec3d & p0, const vec3d & p1, const vec3d & p2, const 
     hex_principal_axes(p0, p1, p2, p3, p4, p5, p6, p7, X, false);
 
     double sj[9];
-    for(int i=0; i<9; ++i)
+    for(short i=0; i<9; ++i)
     {
         vec3d tet[3];
         hex_subtets(L, X, i, tet);
@@ -264,7 +263,7 @@ double hex_mean_aspect_Frobenius(const vec3d & p0, const vec3d & p1, const vec3d
     hex_principal_axes(p0, p1, p2, p3, p4, p5, p6, p7, X, false);
 
     double frob = 0;
-    for(int i=0; i<8; ++i)
+    for(short i=0; i<8; ++i)
     {
         vec3d tet[3];
         hex_subtets(L, X, i, tet);
@@ -287,7 +286,7 @@ double hex_oddy(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3
     hex_principal_axes(p0, p1, p2, p3, p4, p5, p6, p7, X, false);
 
     float oddy[9];
-    for(int i=0; i<9; ++i)
+    for(short i=0; i<9; ++i)
     {
         vec3d tet[3];
         hex_subtets(L, X, i, tet);
@@ -302,9 +301,8 @@ double hex_oddy(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec3
             double a23 = tet[1].dot(tet[2]);
             double a33 = tet[2].dot(tet[2]);
 
-            double AtA_sqrd = a11*a11 + 2.0*a12*a12 + 2.0*a13*a13 + a22*a22 + 2.0*a23*a23 +a33*a33;
-            double A_sqrd   = a11 + a22 + a33;
-
+            double AtA_sqrd = a11*a11 + 2.0*a12*a12 + 2.0*a13*a13 + a22*a22 + 2.0*a23*a23 +a33*a33,A_sqrd   = a11 + a22 + a33;
+            
             oddy[i] = (AtA_sqrd - A_sqrd*A_sqrd/3.0) / pow(det,four_over_three);
         }
         else return max_double;
@@ -338,7 +336,7 @@ double hex_scaled_jacobian(const vec3d & p0, const vec3d & p1, const vec3d & p2,
     hex_principal_axes(p0, p1, p2, p3, p4, p5, p6, p7, X, true);
 
     double sj[9];
-    for(int i=0; i<9; ++i)
+    for(short i=0; i<9; ++i)
     {
         vec3d tet[3];
         hex_subtets(L, X, i, tet);
@@ -363,14 +361,13 @@ double hex_shape(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec
     hex_principal_axes(p0, p1, p2, p3, p4, p5, p6, p7, X, false);
 
     double shape[9];
-    for(int i=0; i<9; ++i)
+    for(short i=0; i<9; ++i)
     {
         vec3d tet[3];
         hex_subtets(L, X, i, tet);
         double det = determinant(tet[0], tet[1], tet[2]);
         if(det<=min_double) return 0;
-        double num = pow(det, two_over_three);
-        double den = tet[0].dot(tet[0]) + tet[1].dot(tet[1]) + tet[2].dot(tet[2]);
+        double num = pow(det, two_over_three),den = tet[0].dot(tet[0]) + tet[1].dot(tet[1]) + tet[2].dot(tet[2]);
         if(den<=min_double) return 0;
         shape[i] = 3.0 * num/den;
     }
@@ -399,7 +396,7 @@ double hex_shear(const vec3d & p0, const vec3d & p1, const vec3d & p2, const vec
     hex_principal_axes(p0, p1, p2, p3, p4, p5, p6, p7, X, true);
 
     double shear[9];
-    for(int i=0; i<9; ++i)
+    for(short i=0; i<9; ++i)
     {
         vec3d tet[3];
         hex_subtets(L, X, i, tet);
@@ -512,5 +509,4 @@ double hex_unsigned_volume(const vec3d & p0, const vec3d & p1, const vec3d & p2,
 {
     return fabs(hex_volume(p0, p1, p2, p3, p4, p5, p6, p7));
 }
-
 }
