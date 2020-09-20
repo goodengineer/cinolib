@@ -45,16 +45,14 @@ namespace cinolib
 {
 
 CINO_INLINE
-void polygon_maximum_inscribed_circle(const std::vector<vec2d> & poly,  // ordered polygon vertex list
-                                            vec2d              & center,
-                                            double             & radius);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+void polygon_maximum_inscribed_circle(const std::vector<vec2f> & poly,  // ordered polygon vertex list
+                                            vec2f              & center,
+                                            float              & radius);
 
 CINO_INLINE
-void polygon_maximum_inscribed_circle(const std::vector<vec3d> & poly,   // will drop z component
-                                            vec3d              & center, // will have z=0
-                                            double             & radius);
+void polygon_maximum_inscribed_circle(const std::vector<vec3f> & poly,   // will drop z component
+                                            vec3f              & center, // will have z=0
+                                            float              & radius);
 }
 
 #ifndef  CINO_STATIC_LIB
