@@ -40,7 +40,7 @@ namespace cinolib
 
 #ifndef CINOLIB_USES_EXACT_PREDICATES
 /*********************************************************
- * BEGIN OF IMPlEMENTATION OF INEXACT GEOMETRIC PREDICATES
+ * BEGIN OF IMPLEMENTATION OF INEXACT GEOMETRIC PREDICATES
  *********************************************************/
 
 // basically the Shewchuk's orient2dfast()
@@ -152,7 +152,7 @@ double insphere(const double * pa,
 }
 
 /*******************************************************
- * END OF IMPlEMENTATION OF INEXACT GEOMETRIC PREDICATES
+ * END OF IMPLEMENTATION OF INEXACT GEOMETRIC PREDICATES
  *******************************************************/
 #endif
 
@@ -290,7 +290,7 @@ bool points_are_coplanar_3d(const double * p0,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // returns:
-// ON_VERTi         if p coincides with the i-th vertex of s
+// ON_VERTI         if p coincides with the i-th vertex of s
 // STRICTLY_INSIDE  if p lies inside segment s (endpoints excluded)
 // STRICTLY_OUTSIDE otherwise
 CINO_INLINE
@@ -304,7 +304,7 @@ PointInSimplex point_in_segment_2d(const vec2d & p,
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // returns:
-// ON_VERTi         if p coincides with the i-th vertex of s
+// ON_VERTI         if p coincides with the i-th vertex of s
 // STRICTLY_INSIDE  if p lies inside segment s (endpoints excluded)
 // STRICTLY_OUTSIDE otherwise
 CINO_INLINE
@@ -716,7 +716,7 @@ SimplexIntersection segment_segment_intersect_3d(const double * s00,
 // returns:
 // DO_NOT_INTERSECT     if s and t are fully disjoint
 // SIMPLICIAL_COMPLEX   if s is an edge of t, or s is degenerate and coincides with a vertex of t
-// INTERSECT            if s and t intersect and do not forma a valid simplex
+// INTERSECT            if s and t intersect and do not form a valid simplex
 CINO_INLINE
 SimplexIntersection segment_triangle_intersect_2d(const vec2d & s0,
                                                   const vec2d & s1,
@@ -732,7 +732,7 @@ SimplexIntersection segment_triangle_intersect_2d(const vec2d & s0,
 // returns:
 // DO_NOT_INTERSECT     if s and t are fully disjoint
 // SIMPLICIAL_COMPLEX   if s is an edge of t, or s is degenerate and coincides with a vertex of t
-// INTERSECT            if s and t intersect and do not forma a valid simplex
+// INTERSECT            if s and t intersect and do not form a valid simplex
 CINO_INLINE
 SimplexIntersection segment_triangle_intersect_2d(const double * s0,
                                                   const double * s1,
@@ -883,7 +883,7 @@ SimplexIntersection segment_triangle_intersect_3d(const double * s0,
 // returns:
 // DO_NOT_INTERSECT     if s and t are fully disjoint
 // SIMPLICIAL_COMPLEX   if s is an edge of t, or s is degenerate and coincides with a vertex of t
-// INTERSECT            if s and t intersect and do not forma a valid simplex
+// INTERSECT            if s and t intersect and do not form a valid simplex
 CINO_INLINE
 SimplexIntersection segment_tet_intersect_3d(const vec3d & s0,
                                              const vec3d & s1,
@@ -900,7 +900,7 @@ SimplexIntersection segment_tet_intersect_3d(const vec3d & s0,
 // returns:
 // DO_NOT_INTERSECT     if s and t are fully disjoint
 // SIMPLICIAL_COMPLEX   if s is an edge of t, or s is degenerate and coincides with a vertex of t
-// INTERSECT            if s and t intersect and do not forma a valid simplex
+// INTERSECT            if s and t intersect and do not form a valid simplex
 CINO_INLINE
 SimplexIntersection segment_tet_intersect_3d(const double * s0,
                                              const double * s1,
@@ -980,9 +980,8 @@ SimplexIntersection triangle_triangle_intersect_2d(const double * t00,
            !triangle_is_degenerate_2d(t10, t11, t12));
 
     // binary flags to mark coincident vertices in t0 and t1
-    std::bitset<3> t0_shared = { 0b000 };
-    std::bitset<3> t1_shared = { 0b000 };
-
+    std::bitset<3> t0_shared = { 0b000 },t1_shared = { 0b000 };
+    
     // find vert correspondences
     if(vec_equals_2d(t00, t10)) { t0_shared[0] = true; t1_shared[0] = true; }
     if(vec_equals_2d(t00, t11)) { t0_shared[0] = true; t1_shared[1] = true; }
@@ -995,9 +994,8 @@ SimplexIntersection triangle_triangle_intersect_2d(const double * t00,
     if(vec_equals_2d(t02, t12)) { t0_shared[2] = true; t1_shared[2] = true; }
 
     // count number of coincident vertices in t0 and t1
-    uint t0_count = t0_shared.count();
-    uint t1_count = t1_shared.count();
-
+    uint t0_count = t0_shared.count(),t1_count = t1_shared.count();
+    
     // either t0 and t1 are coincident or one of the two triangles
     // is degenerate and is an edge/vertex of the other
     if(t0_count == 3 || t1_count == 3) return SIMPLICIAL_COMPLEX;
@@ -1008,10 +1006,9 @@ SimplexIntersection triangle_triangle_intersect_2d(const double * t00,
     if(t0_count == 2 && t1_count == 2)
     {
         uint e[2];      // indices of the shared vertices (in t0)
-        uint count = 0; // index for e (to fill it)
-        uint opp0  = 0; // index of the vertex opposite to e in t0
-        uint opp1  = 0; // index of the vertex opposite to e in t1
-        for(uint i=0; i<3; ++i)
+        uint count = 0,opp0  = 0,opp1  = 0; // index for e (to fill it) // index of the vertex opposite to e in t0 // index of the vertex opposite to e in t1
+       
+        for(short i=0; i<3; ++i)
         {
             if(!t0_shared[i]) opp0 = i; else e[count++] = i;
             if(!t1_shared[i]) opp1 = i;
@@ -1029,12 +1026,12 @@ SimplexIntersection triangle_triangle_intersect_2d(const double * t00,
 
     // t0 and t1 share a vertex. Let v be the shared vertex and { opp0 , opp1 } be the two edges opposite to
     // v in t0 and t1, respectively. If v-opp0 intersects t1, or v-opp1 interects t0, the two triangles overlap.
-    // Otherwise they are verte-adjacent and form a valid simplicial complex
+    // Otherwise they are vertex-adjacent and form a valid simplicial complex
     if(t0_count == 1 && t1_count == 1)
     {
-        uint v0; // index of the shared vertex in t0
-        uint v1; // index of the shared vertex in t1
-        for(uint i = 0; i < 3; ++i)
+        uint v0,v1; // index of the shared vertex in t0 // index of the shared vertex in t1
+      
+        for(short i = 0; i < 3; ++i)
         {
             if(t0_shared[i]) v0 = i;
             if(t1_shared[i]) v1 = i;
@@ -1122,9 +1119,8 @@ SimplexIntersection triangle_triangle_intersect_3d(const double * t00,
            !triangle_is_degenerate_3d(t10, t11, t12));
 
     // binary flags to mark coincident vertices in t0 and t1
-    std::bitset<3> t0_shared = { 0b000 };
-    std::bitset<3> t1_shared = { 0b000 };
-
+    std::bitset<3> t0_shared = { 0b000 },t1_shared = { 0b000 };
+    
     // find vert correspondences
     if(vec_equals_3d(t00, t10)) { t0_shared[0] = true; t1_shared[0] = true; }
     if(vec_equals_3d(t00, t11)) { t0_shared[0] = true; t1_shared[1] = true; }
@@ -1148,10 +1144,9 @@ SimplexIntersection triangle_triangle_intersect_3d(const double * t00,
     if(t0_count == 2)
     {
         uint e[2];      // indices of the shared vertices (in t0)
-        uint count = 0; // index for e (to fill it)
-        uint opp0  = 0; // index of the vertex opposite to e in t0
-        uint opp1  = 0; // index of the vertex opposite to e in t1
-        for(uint i = 0; i < 3; ++i)
+        uint count = 0,opp0  = 0,opp1  = 0; // index for e (to fill it) // index of the vertex opposite to e in t0 // index of the vertex opposite to e in t1
+      
+        for(short i = 0; i < 3; ++i)
         {
             if(!t0_shared[i]) opp0 = i; else e[count++] = i;
             if(!t1_shared[i]) opp1 = i;
@@ -1167,22 +1162,18 @@ SimplexIntersection triangle_triangle_intersect_3d(const double * t00,
         double e1_dropX[2]   = {t0[e[1]][1], t0[e[1]][2]};
         double opp0_dropX[2] = {t0[opp0][1], t0[opp0][2]};
         double opp1_dropX[2] = {t1[opp1][1], t1[opp1][2]};
-        double opp0_wrt_e = orient2d(e0_dropX, e1_dropX, opp0_dropX);
-        double opp1_wrt_e = orient2d(e0_dropX, e1_dropX, opp1_dropX);
+        double opp0_wrt_e = orient2d(e0_dropX, e1_dropX, opp0_dropX),opp1_wrt_e = orient2d(e0_dropX, e1_dropX, opp1_dropX);
+       
         if((opp0_wrt_e > 0 && opp1_wrt_e < 0) || (opp0_wrt_e < 0 && opp1_wrt_e > 0)) return SIMPLICIAL_COMPLEX;
 
-        double e0_dropY[2]   = {t0[e[0]][0], t0[e[0]][2]};
-        double e1_dropY[2]   = {t0[e[1]][0], t0[e[1]][2]};
-        double opp0_dropY[2] = {t0[opp0][0], t0[opp0][2]};
-        double opp1_dropY[2] = {t1[opp1][0], t1[opp1][2]};
+        double e0_dropY[2]   = {t0[e[0]][0], t0[e[0]][2]},e1_dropY[2]   = {t0[e[1]][0], t0[e[1]][2]},opp0_dropY[2] = {t0[opp0][0], t0[opp0][2]},opp1_dropY[2] = {t1[opp1][0], t1[opp1][2]};
+        
         opp0_wrt_e = orient2d(e0_dropY, e1_dropY, opp0_dropY);
         opp1_wrt_e = orient2d(e0_dropY, e1_dropY, opp1_dropY);
         if((opp0_wrt_e > 0 && opp1_wrt_e < 0) || (opp0_wrt_e < 0 && opp1_wrt_e > 0)) return SIMPLICIAL_COMPLEX;
 
-        double e0_dropZ[2]   = {t0[e[0]][0], t0[e[0]][1]};
-        double e1_dropZ[2]   = {t0[e[1]][0], t0[e[1]][1]};
-        double opp0_dropZ[2] = {t0[opp0][0], t0[opp0][1]};
-        double opp1_dropZ[2] = {t1[opp1][0], t1[opp1][1]};
+        double e0_dropZ[2]   = {t0[e[0]][0], t0[e[0]][1]},e1_dropZ[2]   = {t0[e[1]][0], t0[e[1]][1]},opp0_dropZ[2] = {t0[opp0][0], t0[opp0][1]},opp1_dropZ[2] = {t1[opp1][0], t1[opp1][1]};
+       
         opp0_wrt_e = orient2d(e0_dropZ, e1_dropZ, opp0_dropZ);
         opp1_wrt_e = orient2d(e0_dropZ, e1_dropZ, opp1_dropZ);
         if((opp0_wrt_e > 0 && opp1_wrt_e < 0) || (opp0_wrt_e < 0 && opp1_wrt_e > 0)) return SIMPLICIAL_COMPLEX;
@@ -1195,9 +1186,9 @@ SimplexIntersection triangle_triangle_intersect_3d(const double * t00,
     // Otherwise they are vertex-adjacent and form a valid simplicial complex
     if(t0_count == 1)
     {
-        uint v0; // index of the shared vertex in t0
-        uint v1; // index of the shared vertex in t1
-        for(uint i = 0; i < 3; ++i)
+        uint v0, v1;// index of the shared vertex in t0 // index of the shared vertex in t1
+      
+        for(short i = 0; i < 3; ++i)
         {
             if(t0_shared[i]) v0 = i;
             if(t1_shared[i]) v1 = i;
