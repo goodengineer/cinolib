@@ -102,10 +102,8 @@ void Profiler::report() const
     std::cout << "::::::::::::::: PROFILER STATISTICS (" << tot_time << "s) :::::::::::::::" << std::endl;
 
     for(auto obj : ordered_items)
-    {
         std::cout << obj.first << "s\t" << obj.second << " (called " << log_calls.at(obj.second) << " times)" << std::endl;
-    }
-
+ 
     std::cout << ":::::::::::::::::::::::::::::::::::::::::::::::::::\n" << std::endl;
 }
 
