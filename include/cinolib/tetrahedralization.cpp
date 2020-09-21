@@ -50,9 +50,7 @@ void hex_to_tets(const Hexmesh<M,V,E,F,P> & hm,
                        Tetmesh<M,V,E,F,P> & tm)
 {
     for(uint vid=0; vid<hm.num_verts(); ++vid)
-    {
         tm.vert_add(hm.vert(vid));
-    }
 
     for(uint pid=0; pid<hm.num_polys(); ++pid)
     {
@@ -183,7 +181,7 @@ void hex_to_tets(const std::vector<uint> & hex,
         ref_h[4] = ref_h[3];
         ref_h[3] = tmp;
 
-             tmp = ref_h[5];
+        tmp = ref_h[5];
         ref_h[5] = ref_h[7];
         ref_h[7] = ref_h[2];
         ref_h[2] = tmp;
@@ -196,7 +194,7 @@ void hex_to_tets(const std::vector<uint> & hex,
         ref_h[3] = ref_h[4];
         ref_h[4] = tmp;
 
-             tmp = ref_h[5];
+        tmp = ref_h[5];
         ref_h[5] = ref_h[2];
         ref_h[2] = ref_h[7];
         ref_h[7] = tmp;
@@ -438,5 +436,4 @@ void prism_to_tets(const std::vector<uint> & prism,
     tets.push_back(ref_p[5]);
     tets.push_back(ref_p[3]);
 }
-
 }
