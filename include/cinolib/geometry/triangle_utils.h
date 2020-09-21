@@ -67,16 +67,12 @@ void triangle_traverse_with_ray(const vec3d   tri[3],
                                       vec3d & exit_pos,
                                       uint  & exit_edge);
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 // https://en.wikipedia.org/wiki/Law_of_sines
 //
 CINO_INLINE
 double triangle_law_of_sines(const double angle_0,
                              const double angle_1,
                              const double length_0); // returns length_1
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template <class vec>
 CINO_INLINE
@@ -86,23 +82,17 @@ void triangle_barycentric_coords(const vec & A,
                                  const vec & P,
                                  double wgts[]);
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 vec3d triangle_closest_point(const vec3d & P,
                              const vec3d & A,
                              const vec3d & B,
                              const vec3d & C);
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 double point_to_triangle_dist(const vec3d & P,
                               const vec3d & A,
                               const vec3d & B,
                               const vec3d & C);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 double point_to_triangle_dist_sqrd(const vec3d & P,
