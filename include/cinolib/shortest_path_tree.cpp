@@ -69,14 +69,11 @@ void shortest_path_tree(AbstractPolygonMesh<M,V,E,P> & m, const uint root, std::
         {
             int eid = m.edge_id(vid, nbr); assert(eid>=0);
             if(dist.at(vid) == m.edge_length(eid) + dist.at(nbr))
-            {
                 parent.push_back(nbr);
-            }
         }
         assert(!parent.empty());
         int eid = m.edge_id(vid, *std::min_element(parent.begin(), parent.end()));
         tree.at(eid) = true;
     }
 }
-
 }
