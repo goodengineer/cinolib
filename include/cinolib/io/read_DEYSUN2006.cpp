@@ -86,7 +86,7 @@ void read_DeyandSun2006(const char          * filename,
         arcs.push_back(v1);
 
         // some stuff we don't need at all
-        //
+        // are we confident here about the position and quantity of the sham(dummy)?
         float dummyF;
         uint dummyD1, dummyD2;
         fscanf(f, "%f", &dummyF);
@@ -101,5 +101,4 @@ void read_DeyandSun2006(const char          * filename,
     std::cout << coords.size() / 3 << " skel points read" << std::endl;
     std::cout << arcs.size()   / 2 << " skel arcs   read" << std::endl;
 }
-
 }
