@@ -45,32 +45,20 @@ namespace cinolib
 CINO_INLINE
 bool seek_keyword(FILE * f, const char * keyword);
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 bool next_is_keyword(FILE * f, const char * keyword);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 bool eat_word(FILE * f, char * word);
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 bool eat_double(FILE * f, double & d);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 bool eat_int(FILE * f, int & i);
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 bool eat_uint(FILE * f, uint & i);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 }
 
