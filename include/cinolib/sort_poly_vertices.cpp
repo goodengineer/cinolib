@@ -72,11 +72,9 @@ void sort_poly_vertices_as_hexa(const std::vector<std::vector<uint>> & poly_face
     if(poly_winding.at(0)) std::swap(hexa.at(1),hexa.at(3));
 
     // determine opposite face using v2v
-    for(uint i=0; i<4; ++i)
+    for(short i=0; i<4; ++i)
     for(uint vid : v2v.at(hexa.at(i)))
-    {
         if(!CONTAINS_VEC(hexa,vid)) hexa.push_back(vid);
-    }
     assert(hexa.size()==8);
 }
 
@@ -97,5 +95,4 @@ void sort_poly_vertices_as_hexa(const std::vector<std::vector<uint>> & faces,
         sort_poly_vertices_as_hexa(f, winding.at(pid), hexas.at(pid));
     }
 }
-
 }
