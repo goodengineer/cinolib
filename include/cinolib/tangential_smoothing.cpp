@@ -78,9 +78,6 @@ CINO_INLINE
 void tangential_smoothing(Trimesh<M,V,E,P> & m)
 {
     for(uint vid=0; vid<m.num_verts(); ++vid)
-    {
         tangential_smoothing(m,vid);
-    }
 }
-
 }
