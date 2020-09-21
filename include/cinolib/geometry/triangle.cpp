@@ -68,8 +68,7 @@ vec3d Triangle::point_closest_to(const vec3d & p) const
 CINO_INLINE
 bool Triangle::intersects_ray(const vec3d & p, const vec3d & dir, double & t, vec3d & pos) const
 {
-    bool  hits_backside;
-    bool  coplanar;
+    bool  hits_backside,coplanar;
     vec3d bary;
     if(Moller_Trumbore_intersection(p, dir, v[0], v[1], v[2], hits_backside, coplanar, t, bary))
     {
@@ -116,6 +115,5 @@ bool Triangle::intersects_triangle(const vec3d t[], const bool ignore_if_valid_c
     if(ignore_if_valid_complex) return (res > SIMPLICIAL_COMPLEX);
     return (res>=SIMPLICIAL_COMPLEX);
 }
-
 }
 
