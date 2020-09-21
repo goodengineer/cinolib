@@ -42,8 +42,6 @@
 namespace cinolib
 {
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 // http://mathworld.wolfram.com/PolygonArea.html
 CINO_INLINE
 double polygon_signed_area(const std::vector<vec2d> & poly)
@@ -51,23 +49,16 @@ double polygon_signed_area(const std::vector<vec2d> & poly)
     double area = 0.0;
     for(uint i=0; i<poly.size(); ++i)
     {
-        const vec2d & a = poly.at(i);
-        const vec2d & b = poly.at((i+1)%poly.size());
-
+        const vec2d &a = poly.at(i),&b = poly.at((i+1)%poly.size());
         area += a.x()*b.y() - a.y()*b.x();
     }
     return area * 0.5;
 }
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 double polygon_unsigned_area(const std::vector<vec2d> & poly)
 {
     return std::fabs(polygon_signed_area(poly));
 }
-
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 double polygon_is_CCW(const std::vector<vec2d> & poly)
@@ -75,14 +66,11 @@ double polygon_is_CCW(const std::vector<vec2d> & poly)
     return (polygon_signed_area(poly) > 0);
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 vec3d polygon_normal(const std::vector<vec3d> & poly)
 {
     Plane  best_fit(poly);
-    vec3d  Z     = vec3d(0,0,1);
-    vec3d  axis  = best_fit.n.cross(Z);
+    vec3d  Z     = vec3d(0,0,1),axis  = best_fit.n.cross(Z);
     double angle = best_fit.n.angle_rad(Z);
 
     // if the face is degenerate (i.e. does not span a plane),
@@ -101,8 +89,6 @@ vec3d polygon_normal(const std::vector<vec3d> & poly)
     return -best_fit.n;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 // project the polygon onto its best fitting plane,
 // align with XY, and drop Z coordinate
 //
@@ -118,8 +104,7 @@ bool polygon_flatten(const std::vector<vec3d> & poly3d,
     Plane best_fit(poly3d);
     if(best_fit.n.is_degenerate() || best_fit.n.length()==0) return false;
 
-    vec3d  Z     = vec3d(0,0,1);
-    vec3d  axis  = best_fit.n.cross(Z);
+    vec3d  Z     = vec3d(0,0,1),axis  = best_fit.n.cross(Z);
     double angle = best_fit.n.angle_rad(Z);
 
     for(auto p : poly3d)
@@ -131,8 +116,6 @@ bool polygon_flatten(const std::vector<vec3d> & poly3d,
     return true;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 // This is the fundamental building block of the ear cut algorithm for polygon triangulation
 // http://cgm.cs.mcgill.ca/~godfried/teaching/cg-projects/97/Ian/algorithm1.html
 //
@@ -143,8 +126,7 @@ int polygon_find_ear(const std::vector<vec2d> & poly)
     bool ear_not_found = true;
     while(ear_not_found)
     {
-        uint  prev   = (curr+poly.size()-1)%poly.size();
-        uint  next   = (curr+1)%poly.size();
+        uint  prev   = (curr+poly.size()-1)%poly.size(),next=(curr+1)%poly.size();
         vec2d ear[3] =
         {
             poly.at(prev),
@@ -158,9 +140,7 @@ int polygon_find_ear(const std::vector<vec2d> & poly)
             {
                 if(j == curr || j == prev || j == next) continue;
                 if(point_in_triangle_2d(poly.at(j), ear[0], ear[1], ear[2])>=STRICTLY_INSIDE)
-                {
                     contains_other_point = true;
-                }
             }
             if(!contains_other_point) ear_not_found = false;
         }
@@ -170,8 +150,6 @@ int polygon_find_ear(const std::vector<vec2d> & poly)
     }
     return curr;
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // Implementation of the ear-cut triangulation algorithm
 //
@@ -184,10 +162,8 @@ bool polygon_triangulate(std::vector<vec2d> & poly,
     // If the polygon is not CCW, flip it along X
     //
     if(!polygon_is_CCW(poly))
-    {
         for(auto & p : poly) p.x() = -p.x();
-    }
-
+   
     std::map<uint,uint> v_map;
     for(uint vid=0; vid<poly.size(); ++vid) v_map[vid] = vid;
 
@@ -201,9 +177,8 @@ bool polygon_triangulate(std::vector<vec2d> & poly,
             tris.clear();
             return false;
         }
-        uint prev = (curr+sub_poly.size()-1)%sub_poly.size();
-        uint next = (curr+1)%sub_poly.size();
-
+        uint prev = (curr+sub_poly.size()-1)%sub_poly.size(),next = (curr+1)%sub_poly.size();
+        
         tris.push_back(v_map.at(prev));
         tris.push_back(v_map.at(curr));
         tris.push_back(v_map.at(next));
@@ -220,11 +195,8 @@ bool polygon_triangulate(std::vector<vec2d> & poly,
         sub_poly = tmp_poly;
         v_map    = tmp_v_map;
     }
-
     return true;
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 bool polygon_triangulate(std::vector<vec3d> & poly,
@@ -232,25 +204,21 @@ bool polygon_triangulate(std::vector<vec3d> & poly,
 {
     std::vector<vec2d> poly2d;
     if(polygon_flatten(poly, poly2d))
-    {
         return polygon_triangulate(poly2d, tris);
-    }
+
     tris.clear();
     return false;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 double polygon_is_convex(const std::vector<vec2d> & poly)
 {
-    bool turn_left  = false;
-    bool turn_right = false;
+    bool turn_left  = false,turn_right = false;
+  
     for(uint curr=0; curr<poly.size(); ++curr)
     {
-        uint prev = (curr>0) ? curr-1 : poly.size()-1;
-        uint next = (curr<poly.size()-1) ? curr+1 : 0;
-
+        uint prev = (curr>0) ? curr-1 : poly.size()-1,next = (curr<poly.size()-1) ? curr+1 : 0;
+        
         double sign = orient2d(poly.at(prev), poly.at(curr), poly.at(next));
 
         if (sign > 0) turn_left  = true; else
@@ -260,6 +228,5 @@ double polygon_is_convex(const std::vector<vec2d> & poly)
     }
     return true;
 }
-
 }
 
