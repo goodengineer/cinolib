@@ -108,5 +108,4 @@ std::ostream & endl(std::ostream & os)
     flush(os);
     return os;
 }
-
 }
