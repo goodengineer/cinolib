@@ -93,10 +93,8 @@ void stretch_tensor(const vec3d  & p0,    // reference triangle <p0,p1,p2>
     //std::cout << "Q2: " << Q2 << std::endl;
 
     // compute deformation gradient F
-    vec2d u1_ref = P1-P0;
-    vec2d u2_ref = P2-P0;
-    vec2d u1     = Q1-Q0;
-    vec2d u2     = Q2-Q0;
+    vec2d u1_ref = P1-P0, u2_ref = P2-P0, u1= Q1-Q0, u2= Q2-Q0;
+   
     //
     Eigen::Matrix<double,2,2> U_ref;
     U_ref(0,0)=u1_ref.x();  U_ref(0,1)=u2_ref.x();
@@ -119,5 +117,4 @@ void stretch_tensor(const vec3d  & p0,    // reference triangle <p0,p1,p2>
     min = sqrt(min);
     max = sqrt(max);
 }
-
 }
