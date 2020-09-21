@@ -47,11 +47,11 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void laplacian_term(const AbstractPolygonMesh<M,V,E,P> & m,
                     const int                            mode, // UNIFORM, COTANGENT
-                    const double                         weight,
+                    const float                         weight,
                     uint                               & row,
-                    std::vector<double>                & w,       // weights matrix
+                    std::vector<float>                & w,       // weights matrix
                     std::vector<Entry>                 & entries, // coeff matrix
-                    std::vector<double>                & rhs)     // right hand side
+                    std::vector<float>                & rhs)     // right hand side
 {
     auto L = laplacian_matrix_entries(m, mode, 3); // TODO: add row and col offsets for laplacian...
     for(auto entry : L) entries.push_back(entry);
@@ -72,16 +72,14 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void smooth_on_tangent_space(const AbstractPolygonMesh<M,V,E,P> & m,
                              const uint                           vid,
-                             const double                         weight,
+                             const float                         weight,
                                    uint                         & row,
-                                   std::vector<double>          & w,       // weights matrix
+                                   std::vector<float>          & w,       // weights matrix
                                    std::vector<Entry>           & entries, // coeff matrix
-                                   std::vector<double>          & rhs)     // right hand side
+                                   std::vector<float>          & rhs)     // right hand side
 {
-    uint  nv    = m.num_verts();
-    uint  col_x = vid;
-    uint  col_y = nv + vid;
-    uint  col_z = nv + nv + vid;
+    uint  nv=m.num_verts(),col_x=vid,col_y=nv + vid,col_z=nv + nv + vid;
+    
     vec3d p     = m.vert(vid);
 
     // to make this piece of code robust against inconsistent
@@ -90,7 +88,7 @@ void smooth_on_tangent_space(const AbstractPolygonMesh<M,V,E,P> & m,
     // number of incident faces. The gobal weight is distributed
     // across all incident faces
     //
-    double norm_factor = m.adj_v2p(vid).size();
+    float norm_factor = m.adj_v2p(vid).size();
     for(uint pid : m.adj_v2p(vid))
     {
         vec3d n = m.poly_data(pid).normal;
@@ -114,11 +112,11 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void smooth_on_tangent_line(const AbstractPolygonMesh<M,V,E,P>                   & m,
                             const uint                                             vid,
-                            const double                                           weight,
+                            const float                                           weight,
                                   uint                                           & row,
-                                  std::vector<double>                            & w,       // weights matrix
+                                  std::vector<float>                            & w,       // weights matrix
                                   std::vector<Entry>                             & entries, // coeff matrix
-                                  std::vector<double>                            & rhs,     // right hand side
+                                  std::vector<float>                            & rhs,     // right hand side
                                   std::unordered_map<uint,std::pair<vec3d,uint>> & feature_data)
 {
     // set energy term: w * [p_new - (p + t*dir))^2] + t^2
@@ -142,11 +140,8 @@ void smooth_on_tangent_line(const AbstractPolygonMesh<M,V,E,P>                  
     assert(DOES_NOT_CONTAIN(feature_data,vid));
 
     vec3d p     = m.vert(vid);
-    uint  nv    = m.num_verts();
-    uint  col_x = vid;
-    uint  col_y = nv + vid;
-    uint  col_z = nv + nv + vid;
-    uint  col_t = nv + nv + nv + feature_data.size();
+    uint  nv    = m.num_verts(),col_x = vid,col_y = nv + vid,col_z = nv + nv + vid,col_t = nv + nv + nv + feature_data.size();
+    
     feature_data[vid] = std::make_pair(dir,col_t);
 
     entries.push_back(Entry(row, col_x,  1.0));
@@ -179,16 +174,14 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 void hold_in_curr_pos(const AbstractPolygonMesh<M,V,E,P> & m,
                  const uint                           vid,
-                 const double                         weight,
+                 const float                         weight,
                        uint                         & row,
-                       std::vector<double>          & w,       // weights matrix
+                       std::vector<float>          & w,       // weights matrix
                        std::vector<Entry>           & entries, // coeff matrix
-                       std::vector<double>          & rhs)     // right hand side
+                       std::vector<float>          & rhs)     // right hand side
 {
-    uint  nv    = m.num_verts();
-    uint  col_x = vid;
-    uint  col_y = nv + vid;
-    uint  col_z = nv + nv + vid;
+    uint  nv    = m.num_verts(),col_x = vid,col_y = nv + vid,col_z = nv + nv + vid;
+   
     vec3d p     = m.vert(vid);
 
     entries.push_back(Entry(row, col_x, 1.0));
@@ -248,9 +241,7 @@ void mesh_smoother(      AbstractPolygonMesh<M1,V1,E1,P1> & m,
         for(uint eid=0; eid<target.num_edges(); ++eid)
         {
             if(target.edge_data(eid).flags[MARKED]) // marked => flagged as a sharp feature
-            {
                 ref_feat.add_segment(eid, target.edge_verts(eid));
-            }
         }
         ref_feat.build();
     }
@@ -262,8 +253,8 @@ void mesh_smoother(      AbstractPolygonMesh<M1,V1,E1,P1> & m,
         //std::cout << "smooth iter #" << i << std::endl;
 
         std::vector<Entry>  entries; // coeff matrix
-        std::vector<double> w;       // weights matrix
-        std::vector<double> rhs;     // right hand side
+        std::vector<float> w;       // weights matrix
+        std::vector<float> rhs;     // right hand side
         uint row = 0;
 
         laplacian_term(m, opt.laplacian_mode, opt.w_laplace, row, w, entries, rhs);
@@ -285,11 +276,10 @@ void mesh_smoother(      AbstractPolygonMesh<M1,V1,E1,P1> & m,
             }
         }
 
-        Eigen::SparseMatrix<double> A(row,m.num_verts()*3+feature_data.size());
+        Eigen::SparseMatrix<float> A(row,m.num_verts()*3+feature_data.size());
         A.setFromTriplets(entries.begin(), entries.end());
-        Eigen::VectorXd RHS = Eigen::Map<Eigen::VectorXd>(rhs.data(), rhs.size());
-        Eigen::VectorXd W   = Eigen::Map<Eigen::VectorXd>(w.data(), w.size());
-        Eigen::VectorXd res;
+        Eigen::VectorXd RHS = Eigen::Map<Eigen::VectorXd>(rhs.data(), rhs.size()),W   = Eigen::Map<Eigen::VectorXd>(w.data(), w.size()),res;
+       
         solve_weighted_least_squares(A, W, RHS, res);
 
         uint nv = m.num_verts();
@@ -309,9 +299,7 @@ void mesh_smoother(      AbstractPolygonMesh<M1,V1,E1,P1> & m,
                 {
                     vec3d p = m.vert(vid);
                     if(CONTAINS(feature_data, vid)) // degenerate features are removed, I need this check
-                    {
                         p += feature_data.at(vid).first*res[feature_data.at(vid).second];
-                    }
                     m.vert(vid) = (opt.reproject_on_target) ? ref_feat.closest_point(p) : p;
                     break;
                 }
@@ -321,5 +309,4 @@ void mesh_smoother(      AbstractPolygonMesh<M1,V1,E1,P1> & m,
         }
     }
 }
-
 }
