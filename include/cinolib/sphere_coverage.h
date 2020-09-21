@@ -57,7 +57,9 @@ namespace cinolib
 //
 CINO_INLINE
 void sphere_coverage(const uint n_samples, std::vector<vec3d> & points);
-
+  
+CINO_INLINE
+void sphere_coverage_sunf(const uint n_samples, std::vector<vec3f> & points);
 }
 
 #ifndef  CINO_STATIC_LIB
