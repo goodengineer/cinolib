@@ -40,8 +40,6 @@
 namespace cinolib
 {
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 vec3d triangle_normal(const vec3d A, const vec3d B, const vec3d C)
 {
@@ -50,16 +48,12 @@ vec3d triangle_normal(const vec3d A, const vec3d B, const vec3d C)
     return n;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template <class vec>
 CINO_INLINE
 double triangle_area(const vec A, const vec B, const vec C)
 {
     return (0.5 * (B-A).cross(C-A).length());
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // Given a triangle t(A,B,C) and a ray r(P,dir) compute both
 // the edge and position where r exits from t
@@ -79,37 +73,26 @@ void triangle_traverse_with_ray(const vec3d   tri[3],
     vec3d uvw[3] = { tri[0]-P, tri[1]-P, tri[2]-P };
 
     std::set< std::pair<double,int> > sorted_by_angle;
-    for(uint i=0; i<3; ++i)
-    {
+    for(short i=0; i<3; ++i)
         sorted_by_angle.insert(std::make_pair(dir.angle_rad(uvw[i]),i));
-    }
-
+   
     uint  vert  = (*sorted_by_angle.begin()).second;
-    vec3d tn    = triangle_normal(tri[0], tri[1], tri[2]);
-    vec3d cross = dir.cross(uvw[vert]);
-
+    vec3d tn    = triangle_normal(tri[0], tri[1], tri[2]),cross = dir.cross(uvw[vert]);
+    
     exit_edge = (cross.dot(tn) >= 0) ? (vert+2)%3 : vert; // it's because e_i = ( v_i, v_(i+1)%3 )
 
     //
     // 2) Find the exit point using the law of sines
     //
 
-    vec3d  app     = tri[TRI_EDGES[exit_edge][1]];
-    vec3d  V1      = tri[TRI_EDGES[exit_edge][0]];
-    vec3d  V0      = P;
-    vec3d  e0_dir  = app - V1; e0_dir.normalize();
-    vec3d  e1_dir  = -dir;
-    vec3d  e2_dir  = V1 - V0; e2_dir.normalize();
-
-    double V0_ang  = e2_dir.angle_rad(-e1_dir);
-    double V2_ang  = e1_dir.angle_rad(-e0_dir);
-    double e2_len  = (V1 - V0).length();
-    double e0_len  = triangle_law_of_sines(V2_ang, V0_ang, e2_len);
-
+    vec3d  app=tri[TRI_EDGES[exit_edge][1]],V1=tri[TRI_EDGES[exit_edge][0]],V0=P;
+    
+    vec3d  e0_dir  = (app - V1).normalize(),e1_dir=-dir,e2_dir=(V1 - V0).normalize();
+    
+    double V0_ang  = e2_dir.angle_rad(-e1_dir),V2_ang  = e1_dir.angle_rad(-e0_dir),e2_len  = (V1 - V0).length(),e0_len=triangle_law_of_sines(V2_ang, V0_ang, e2_len);
+    
     exit_pos =  V1 + e0_len * e0_dir;
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // https://en.wikipedia.org/wiki/Law_of_sines
 //
@@ -118,8 +101,6 @@ double triangle_law_of_sines(const double angle_0, const double angle_1, const d
 {
     return sin(angle_1) * length_0 / sin(angle_0);
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
 //
@@ -142,14 +123,9 @@ void triangle_barycentric_coords(const vec & A,
                                  const vec & P,
                                  double wgts[])
 {
-    vec    u    = B - A;
-    vec    v    = C - A;
-    vec    w    = P - A;
-    double d00  = u.dot(u);
-    double d01  = u.dot(v);
-    double d11  = v.dot(v);
-    double d20  = w.dot(u);
-    double d21  = w.dot(v);
+    vec    u=B - A,v=C - A,w=P - A;
+   
+    double d00  = u.dot(u),d01  = u.dot(v),d11  = v.dot(v),d20  = w.dot(u),d21  = w.dot(v);
     double den  = d00 * d11 - d01 * d01;
 
     if(den==0) // degenerate
@@ -165,11 +141,9 @@ void triangle_barycentric_coords(const vec & A,
     wgts[0] = 1.0f - wgts[1] - wgts[2];      assert(!std::isnan(wgts[0]));
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 // Given a point P and a triangle ABC, finds the point in ABC that
 // is closest to P. This code was taken directly from Ericson's
-// seminal book "Real Time Collision Detection", Section 5.1.5
+// seminar book "Real Time Collision Detection", Section 5.1.5
 //
 CINO_INLINE
 vec3d triangle_closest_point(const vec3d & P,
@@ -177,27 +151,22 @@ vec3d triangle_closest_point(const vec3d & P,
                              const vec3d & B,
                              const vec3d & C)
 {
-    vec3d AB = B-A;
-    vec3d AC = C-A;
-    vec3d BC = C-B;
-
+    vec3d AB=B-A,AC=C-A,BC=C-B;
+  
     // compute parameter s for projection P’ of P on AB,
     // P’ = A+s*AB, s = s_num/(s_num+s_den)
-    double s_num = (P-A).dot(AB);
-    double s_den = (P-B).dot(A-B);
-
+    double s_num = (P-A).dot(AB),s_den = (P-B).dot(A-B);
+    
     // compute parameter t for projection P’ of P on AC,
     // P’ = A+t*AC, s = t_num/(t_num+t_den)
-    double t_num = (P-A).dot(AC);
-    double t_den = (P-C).dot(A-C);
-
+    double t_num = (P-A).dot(AC),t_den = (P-C).dot(A-C);
+    
     if(s_num<=0.0 && t_num<=0.0) return A;
 
     // compute parameter u for projection P’ of P on BC,
     // P’ = B+u*BC, u = u_num/(u_num+u_den)
-    double u_num = (P-B).dot(BC);
-    double u_den = (P-C).dot(B-C);
-
+    double u_num = (P-B).dot(BC),u_den = (P-C).dot(B-C);
+   
     if(s_den<=0.0 && u_num<=0.0) return B;
     if(t_den<=0.0 && u_den<=0.0) return C;
 
@@ -207,36 +176,26 @@ vec3d triangle_closest_point(const vec3d & P,
 
     // If P outside AB and within feature region of AB, // return projection of P onto AB
     if(vc<=0.0 && s_num>=0.0 && s_den>=0.0)
-    {
         return A + s_num/(s_num+s_den)*AB;
-    }
-
+   
     // P is outside (or on) BC if the triple scalar product [N PB PC]<=0
     double va = n.dot((B-P).cross(C-P));
 
     // If P outside BC and within feature region of BC, // return projection of P onto BC
     if(va<=0.0 && u_num>=0.0 && u_den>=0.0)
-    {
         return B + u_num/(u_num+u_den)*BC;
-    }
-
+   
     // P is outside (or on) CA if the triple scalar product [N PC PA]<=0
     double vb = n.dot((C-P).cross(A-P));
 
     // If P outside CA and within feature region of CA, // return projection of P onto CA
     if(vb<=0.0 && t_num>=0.0 && t_den>=0.0)
-    {
         return A + t_num/(t_num+t_den)*AC;
-    }
-
+  
     // P must project inside face region. Compute Q using barycentric coordinates
-    double u = va / (va + vb + vc);
-    double v = vb / (va + vb + vc);
-    double w = 1.0 - u - v;
+    double u = va / (va + vb + vc),v = vb / (va + vb + vc),w = 1.0 - u - v;
     return u*A + v*B + w*C;
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 double point_to_triangle_dist(const vec3d & P,
@@ -247,8 +206,6 @@ double point_to_triangle_dist(const vec3d & P,
     return P.dist(triangle_closest_point(P,A,B,C));
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 double point_to_triangle_dist_sqrd(const vec3d & P,
                                    const vec3d & A,
@@ -257,6 +214,5 @@ double point_to_triangle_dist_sqrd(const vec3d & P,
 {
     return P.dist_squared(triangle_closest_point(P,A,B,C));
 }
-
 }
 
