@@ -61,21 +61,19 @@ void read_HEXEX(const char         * filename,
         exit(-1);
     }
 
-    int nv;
-    fscanf(f,"%d\n", &nv);
-    verts = std::vector<vec3d>(nv);
-    for(int vid=0; vid<nv; ++vid)
-    {
+    int nvt;
+  
+    fscanf(f,"%d\n", &nvt);
+    verts = std::vector<vec3d>(nvt);
+    for(int vid=0; vid<nvt; ++vid)
         fscanf(f,"%lf %lf %lf", &verts.at(vid).x(), &verts.at(vid).y(), &verts.at(vid).z());
-    }
-
-    int nt;
-    fscanf(f,"%d\n", &nt);
-    tets.reserve(4*nt);
-    tets_param = std::vector<vec3d>(4*nt);
-    for(int tid=0; tid<nt; ++tid)
+   
+    fscanf(f,"%d\n", &nvt);
+    tets.reserve(4*nvt);
+    tets_param = std::vector<vec3d>(4*nvt);
+    uint v0,v1,v2,v3;
+    for(int tid=0; tid<nvt; ++tid)
     {
-        uint v0,v1,v2,v3;
         fscanf(f,"%d %d %d %d %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf %lf",
                &v0, &v1, &v2, &v3,
                &tets_param.at(4*tid+0).x(),
@@ -96,7 +94,6 @@ void read_HEXEX(const char         * filename,
         tets.push_back(v2);
         tets.push_back(v3);
     }
-
     fclose(f);
 }
 }
