@@ -61,41 +61,42 @@ void read_HEDRA(const char                     * filename,
         exit(-1);
     }
 
-    uint nv, nf, np;
+    uint nv, nf, np,n_verts,vid,nf;
+    int fid;
+    double x, y, z;
+  
     fscanf(fp, "%d %d %d", &nv, &nf, &np);
 
     for(uint i=0; i<nv; ++i)
     {
-        double x, y, z;
         fscanf(fp, "%lf %lf %lf", &x, &y, &z);
         verts.push_back(vec3d(x,y,z));
     }
 
+    std::vector<uint> f;
     for(uint i=0; i<nf; ++i)
     {
-        uint n_verts;
         fscanf(fp, "%d", &n_verts);
 
-        std::vector<uint> f;
+        f.clear();
         for(uint j=0; j<n_verts; ++j)
         {
-            uint vid;
             fscanf(fp, "%d", &vid);
             f.push_back(vid-1);
         }
         faces.push_back(f);
     }
 
-    for(uint i=0; i<np; ++i)
-    {
-        uint nf;
-        fscanf(fp, "%d", &nf);
-
         std::vector<uint> p;
         std::vector<bool> p_winding;
+    for(uint i=0; i<np; ++i)
+    {
+        fscanf(fp, "%d", &nf);
+
+        p.clear();
+        p_winding.clear();
         for(uint j=0; j<nf; ++j)
         {
-            int fid;
             fscanf(fp, "%d", &fid);
 
             if (fid > 0)
@@ -115,5 +116,4 @@ void read_HEDRA(const char                     * filename,
 
     fclose(fp);
 }
-
 }
