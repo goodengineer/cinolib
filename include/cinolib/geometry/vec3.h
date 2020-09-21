@@ -234,7 +234,7 @@ template<typename real> class vec3
 
         bool operator<(const vec3<real> in) const
         {
-            for(uint i=0; i<3; ++i)
+            for(short i=0; i<3; ++i)
             {
                 if( this->operator[](i) < in[i] ) return true;
                 if( this->operator[](i) > in[i] ) return false;
@@ -272,8 +272,7 @@ template<typename real> class vec3
 
         double angle_rad(const vec3<real> &in) const
         {
-            vec3<real> u = *this;
-            vec3<real> v = in;
+            vec3<real> u = *this,v = in;
             if(!u.is_degenerate()) u.normalize(); else return 0;
             if(!v.is_degenerate()) v.normalize(); else return 0;
             // ensure dot stays srictly in between 0 and 1 (included)
@@ -322,9 +321,8 @@ template<typename real> class vec3
         }
 
         bool is_degenerate() const
-        {
             return is_null() || is_nan() || is_inf();
-        }
+      
 };
 
 template<typename real>
@@ -367,11 +365,9 @@ void bake_rotation_matrix(const vec3   & axis,
                           const double   angle,
                                 double   m[3][3])
 {
-    double u    = axis.x();
-    double v    = axis.y();
-    double w    = axis.z();
-    double rcos = cos(angle);
-    double rsin = sin(angle);
+    double u=axis.x(),v=axis.y(),w=axis.z();
+    double rcos = cos(angle),rsin = sin(angle);
+    
     m[0][0] =      rcos + u*u*(1-rcos);
     m[1][0] =  w * rsin + v*u*(1-rcos);
     m[2][0] = -v * rsin + w*u*(1-rcos);
@@ -418,27 +414,21 @@ double distance_to_segment(const vec3 & P,
                            const vec3 & P0,
                            const vec3 & P1)
 {
-	vec3d v = P1 - P0;
-	vec3d w = P  - P0;
-
-	float cos_wv = w.dot(v);
-	float cos_vv = v.dot(v);
-
+	vec3d v = P1 - P0,w = P  - P0;
+	
+	float cos_wv = w.dot(v),cos_vv = v.dot(v);
+	
 	if (cos_wv <= 0.0) // before P0
-	{
 		return (P-P0).length();
-	}
+	
 
 	if (cos_vv <= cos_wv) // after P1
-	{
 		return (P-P1).length();
-	}
-
+	
 	float b  = cos_wv / cos_vv;
 	vec3d Pb = P0 + v*b;
 	return (P-Pb).length();
 }
-
 }
 
 #endif // CINO_VEC3_H
