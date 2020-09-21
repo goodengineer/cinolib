@@ -69,8 +69,6 @@ GLcanvas::GLcanvas(QWidget * parent)
     });
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 void GLcanvas::make_popup_menu()
 {
@@ -92,14 +90,10 @@ void GLcanvas::make_popup_menu()
     QAction *paste_POV = new QAction("Paste POV", this);
     connect(paste_POV, &QAction::triggered, [&]() {
         if (QApplication::clipboard()->mimeData()->hasText())
-        {
             deserialize_camera(QApplication::clipboard()->mimeData()->text().toStdString());
-        }
     });
     popup->addAction(paste_POV);
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void GLcanvas::mousePressEvent(QMouseEvent *event)
@@ -115,15 +109,11 @@ void GLcanvas::mousePressEvent(QMouseEvent *event)
     QGLViewer::mousePressEvent(event);
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 void GLcanvas::init()
 {
     setFPSIsDisplayed(true);
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void GLcanvas::clear()
@@ -131,20 +121,14 @@ void GLcanvas::clear()
     drawlist.clear();
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 void GLcanvas::draw()
 {
     setBackgroundColor(clear_color);
 
     for(auto obj : drawlist)
-    {
         obj->draw( sceneRadius() );
-    }
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void GLcanvas::push_obj(DrawableObject *obj, bool refit_scene)
@@ -152,21 +136,17 @@ void GLcanvas::push_obj(DrawableObject *obj, bool refit_scene)
     drawlist.push_back(obj);
 
     if (refit_scene)
-    {
         fit_scene();
-    }
 
     updateGL();
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void GLcanvas::fit_scene()
 {
     vec3d center(0,0,0);
     float radius = 0.0;
-    int   count  = 0;
+    uint   count  = 0;
 
     for(const DrawableObject *obj : drawlist)
     {
@@ -188,16 +168,12 @@ void GLcanvas::fit_scene()
     //cout << endl;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 void GLcanvas::set_clear_color(const QColor &color)
 {
     clear_color = color;
     updateGL();
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 bool GLcanvas::pop_all_occurrences_of(int type)
@@ -211,8 +187,6 @@ bool GLcanvas::pop_all_occurrences_of(int type)
 
     return found;
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 std::string GLcanvas::serialize_drawlist() const
@@ -238,8 +212,6 @@ std::string GLcanvas::serialize_drawlist() const
     return ss.str();
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 std::string GLcanvas::serialize_camera() const
 {
@@ -260,8 +232,6 @@ std::string GLcanvas::serialize_camera() const
     return ss.str();
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 void GLcanvas::deserialize_camera(const std::string & s)
 {
@@ -280,8 +250,6 @@ void GLcanvas::deserialize_camera(const std::string & s)
     updateGL();
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 bool GLcanvas::pop_first_occurrence_of(int type)
 {
@@ -298,8 +266,6 @@ bool GLcanvas::pop_first_occurrence_of(int type)
     return false;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 bool GLcanvas::pop(DrawableObject *obj)
 {
@@ -314,8 +280,6 @@ bool GLcanvas::pop(DrawableObject *obj)
     return false;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 void GLcanvas::updateGL()
 {
@@ -326,5 +290,4 @@ void GLcanvas::updateGL()
         QGLViewer::update();
     #endif
 }
-
 }
