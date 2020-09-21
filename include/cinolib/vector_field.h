@@ -51,18 +51,12 @@ class VectorField : public Eigen::VectorXd, public Serializable
         explicit VectorField(const uint size);
         explicit VectorField(const std::vector<vec3d> & data);
 
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         vec3d vec_at(const int pos) const;
         void  set(const int pos, const vec3d & vec);
         void  normalize();
 
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         void serialize  (const char *filename) const;
         void deserialize(const char *filename);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         // for more info, see:
         // http://eigen.tuxfamily.org/dox/TopicCustomizingEigen.html
@@ -78,7 +72,6 @@ class VectorField : public Eigen::VectorXd, public Serializable
         template<typename OtherDerived>
         VectorField(const Eigen::MatrixBase<OtherDerived>& other);
 };
-
 }
 
 #ifndef  CINO_STATIC_LIB
