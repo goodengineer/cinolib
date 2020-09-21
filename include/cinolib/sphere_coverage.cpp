@@ -54,9 +54,9 @@ void sphere_coverage(const uint n_samples, std::vector<vec3d> & points)
     points.clear();
 
     srand(time(NULL));
-    double rnd      = rand() * n_samples;
-    double offset   = 2.0/double(n_samples);
-    double increment = M_PI * (3.0 - sqrt(5.0));
+    float rnd      = rand() * n_samples;
+    float offset   = 2.0/float(n_samples);
+    float increment = M_PI * (3.0 - sqrt(5.0));
 
     for(uint i=0; i<n_samples; ++i)
     {
@@ -68,5 +68,23 @@ void sphere_coverage(const uint n_samples, std::vector<vec3d> & points)
         points.push_back(vec3d(x,y,z));
     }
 }
-
+   
+    //sunflower coverage(experimental, https://stackoverflow.com/questions/9600801/evenly-distributing-n-points-on-a-sphere)):
+    CINO_INLINE
+    void sphere_coverage_sunf(const uint n_samples, std::vector<vec3f> & points)
+    {
+      
+        points.clear();
+        float phi,theta,x,y,z;
+            
+        for(uint i = 0.5;i<n_samples;i++)
+        {
+        phi = acos(1 - 2*i/n_samples);
+        theta = M_PI*(1 + sqrt(5))*i;
+        x = cos(theta)*sin(phi); 
+        y = sin(theta)*sin(phi); 
+        z = cos(phi);
+        points.push_back(vec3f(x,y,z));
+        }   
+    } 
 }
