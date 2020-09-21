@@ -102,8 +102,7 @@ template<typename real> class vec2
 
         inline real dot(const vec2<real> & in) const
         {
-            return m_x * in.m_x +
-                   m_y * in.m_y;
+            return m_x * in.m_x + m_y * in.m_y;
         }
 
         //inline vec2<real> cross(const vec2<real> & in) const
@@ -114,14 +113,12 @@ template<typename real> class vec2
 
         inline real length_squared() const
         {
-            return m_x * m_x +
-                   m_y * m_y;
+            return m_x * m_x + m_y * m_y;
         }
 
         inline real length() const
         {
-            return sqrt(m_x * m_x +
-                        m_y * m_y);
+            return sqrt(m_x * m_x + m_y * m_y);
         }
 
         inline real normalize()
@@ -155,64 +152,55 @@ template<typename real> class vec2
 
         inline vec2<real> operator+(const vec2<real> b) const
         {
-            return vec2<real>(m_x + b.m_x,
-                              m_y + b.m_y);
+            return vec2<real>(m_x + b.m_x,m_y + b.m_y);
         }
 
         inline vec2<real> operator-(const vec2<real> b) const
         {
-            return vec2<real>(m_x - b.m_x,
-                              m_y - b.m_y);
+            return vec2<real>(m_x - b.m_x,m_y - b.m_y);
         }
 
         inline vec2<real> operator*(const real b) const
         {
-            return vec2<real>(m_x * b,
-                              m_y * b);
+            return vec2<real>(m_x * b,m_y * b);
         }
 
 
         inline vec2<real> operator*(const vec2<real> b) const
         {
-            return vec2<real>(m_x * b.x(),
-                              m_y * b.y());
+            return vec2<real>(m_x * b.x(),m_y * b.y());
         }
 
 
         inline vec2<real> operator/(const real b) const
         {
-            return vec2<real>(m_x / b,
-                              m_y / b);
+            return vec2<real>(m_x / b,m_y / b);
         }
 
         inline vec2<real> operator+=(const vec2<real> b)
         {
-            vec2<real> tmp(m_x + b.m_x,
-                           m_y + b.m_y);
+            vec2<real> tmp(m_x + b.m_x,m_y + b.m_y);
             *this=tmp;
             return tmp;
         }
 
         inline vec2<real> operator-=(const vec2<real> b)
         {
-            vec2<real> tmp(m_x - b.m_x,
-                           m_y - b.m_y);
+            vec2<real> tmp(m_x - b.m_x,m_y - b.m_y);
             *this = tmp;
             return tmp;
         }
 
         inline vec2<real> operator*=(const real b)
         {
-            vec2<real> tmp(m_x * b,
-                           m_y * b);
+            vec2<real> tmp(m_x * b,m_y * b);
             *this = tmp;
             return tmp;
         }
 
         inline vec2<real> operator/=(const real b)
         {
-            vec2<real> tmp(m_x / b,
-                           m_y / b);
+            vec2<real> tmp(m_x / b,m_y / b);
             *this = tmp;
             return tmp;
         }
@@ -225,7 +213,7 @@ template<typename real> class vec2
 
         inline bool operator<(const vec2<real> in) const
         {
-            for(uint i=0; i<2; ++i)
+            for(short i=0; i<2; ++i)
             {
                 if( this->operator[](i) < in[i] ) return true;
                 if( this->operator[](i) > in[i] ) return false;
@@ -259,8 +247,7 @@ template<typename real> class vec2
 
         double angle_rad(const vec2<real> &in) const
         {
-            vec2<real> u = *this; u.normalize();
-            vec2<real> v = in;    v.normalize();
+            vec2<real> u = (*this).normalize(),v = in.normalize();
             double angle = acos(u.dot(v));
             assert(!std::isnan(angle));
             return angle;
@@ -295,7 +282,6 @@ std::ostream& operator<<(std::ostream &in, const vec2<real> &val)
 typedef vec2<double> vec2d;
 typedef vec2<float>  vec2f;
 typedef vec2<int>    vec2i;
-
 }
 
 #endif // CINO_VEC2_H
