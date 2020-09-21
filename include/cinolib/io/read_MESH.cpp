@@ -63,11 +63,10 @@ void read_MESH(const char                     * filename,
         exit(-1);
     }
 
-    std::unordered_set<int> v_unique_labels;
-    std::unordered_set<int> p_unique_labels;
-
+    std::unordered_set<int> v_unique_labels,p_unique_labels;
+  
     // read header
-    int ver, dim, nv, nc;
+    int ver, dim, nv, nc,l,i;
     if(!seek_keyword(f, "MeshVersionFormatted")) assert(false && "could not find keyword MESHVERSIONFORMATTED");
     eat_int(f, ver);
     if(!seek_keyword(f, "Dimension")) assert(false && "could not find keyword DIMENSION");
@@ -76,10 +75,11 @@ void read_MESH(const char                     * filename,
     // read verts
     if(!seek_keyword(f, "Vertices")) assert(false && "could not find keyword VERTICES");
     eat_int(f, nv);
-    for(int i=0; i<nv; ++i)
+  
+    double x=0,y=0,z=0;
+
+    for(i=0; i<nv; ++i)
     {
-        double x=0,y=0,z=0;
-        int l;
         if(!eat_double(f, x) ||
            !eat_double(f, y) ||
            !eat_double(f, z) ||
@@ -90,7 +90,8 @@ void read_MESH(const char                     * filename,
     }
 
     // read cells
-    char cell_type[50];
+    char cell_type[50],line[1024];;
+
     while(eat_word(f, cell_type))
     {
         if(strcmp(cell_type, "End")==0)
@@ -103,16 +104,15 @@ void read_MESH(const char                     * filename,
         else if(strcmp(cell_type, "#")==0)
         {
             // comment, ignore whole line up to next \n
-            char line[1024];
             fgets(line, 1024, f);
         }
         else if(strcmp(cell_type, "Tetrahedra")==0)
         {
             if(!eat_int(f, nc)) assert(false && "failed reading num tets");
-            for(int i=0; i<nc; ++i)
+            std::vector<uint> tet(4);
+            for(i=0; i<nc; ++i)
             {
-                int l;
-                std::vector<uint> tet(4);
+                tet.clear();
                 if(!eat_uint(f, tet[0]) ||
                    !eat_uint(f, tet[1]) ||
                    !eat_uint(f, tet[2]) ||
@@ -128,10 +128,10 @@ void read_MESH(const char                     * filename,
         else if(strcmp(cell_type, "Hexahedra")==0)
         {
             if(!eat_int(f, nc)) assert(false && "failed reading num hexa");
-            for(int i=0; i<nc; ++i)
+            std::vector<uint> hex(8); 
+            for(i=0; i<nc; ++i)
             {
-                int l;
-                std::vector<uint> hex(8);                
+                hex.clear();             
                 if(!eat_uint(f, hex[0]) ||
                    !eat_uint(f, hex[1]) ||
                    !eat_uint(f, hex[2]) ||
@@ -151,10 +151,10 @@ void read_MESH(const char                     * filename,
         else if(strcmp(cell_type, "Triangles")==0)
         {
             if(!eat_int(f, nc))  assert(false && "failed reading num tris");
-            for(int i=0; i<nc; ++i)
+            std::vector<uint> tri(4);
+            for(i=0; i<nc; ++i)
             {
-                int l;
-                std::vector<uint> tri(4);
+                tri.clear();
                 if(!eat_uint(f, tri[0]) ||
                    !eat_uint(f, tri[1]) ||
                    !eat_uint(f, tri[2]) ||
@@ -165,10 +165,10 @@ void read_MESH(const char                     * filename,
         else if(strcmp(cell_type, "Quadrilaterals")==0)
         {
             if(!eat_int(f, nc))  assert(false && "failed reading num quads");
-            for(int i=0; i<nc; ++i)
+            std::vector<uint> quad(4);
+            for(i=0; i<nc; ++i)
             {
-                int l;
-                std::vector<uint> quad(4);
+                quad.clear();
                 if(!eat_uint(f, quad[0]) ||
                    !eat_uint(f, quad[1]) ||
                    !eat_uint(f, quad[2]) ||
@@ -180,10 +180,10 @@ void read_MESH(const char                     * filename,
         else if(strcmp(cell_type, "Edges")==0)
         {
             if(!eat_int(f, nc)) assert(false && "failed reading num edges");
-            for(int i=0; i<nc; ++i)
+            std::vector<uint> edge(4);
+            for(i=0; i<nc; ++i)
             {
-                int l;
-                std::vector<uint> edge(4);
+                edge.clear();
                 if(!eat_uint(f, edge[0]) ||
                    !eat_uint(f, edge[1]) ||
                    !eat_int(f, l)) assert(false && "failed reading edge");
@@ -193,17 +193,16 @@ void read_MESH(const char                     * filename,
         else if(strcmp(cell_type, "Corners")==0)
         {
             if(!eat_int(f, nc)) assert(false && "failed reading corners");
-            for(int i=0; i<nc; ++i)
+            std::vector<uint> corner(4);
+            for(i=0; i<nc; ++i)
             {
-                std::vector<uint> corner(4);
+                corner.clear();
                 if(!eat_uint(f, corner[0])) assert(false && "failed reading corner");
                 // discard these elements
             }
         }
     }
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void read_MESH(const char                     * filename,
@@ -213,8 +212,6 @@ void read_MESH(const char                     * filename,
     std::vector<int> vert_labels, poly_labels;
     read_MESH(filename, verts, polys, vert_labels, poly_labels);
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void read_MESH(const char                     * filename,
@@ -226,5 +223,4 @@ void read_MESH(const char                     * filename,
     read_MESH(filename, verts, polys, vert_labels, poly_labels);
     coords = serialized_xyz_from_vec3d(verts);
 }
-
 }
