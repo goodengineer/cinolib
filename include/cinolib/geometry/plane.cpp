@@ -48,20 +48,15 @@ std::ostream & operator<<(std::ostream & in, const Plane & plane)
     return in;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 Plane::Plane(const vec3d & p0, const vec3d & p1, const vec3d & p2)
 {
-    vec3d u = p1 - p0;
-    vec3d v = p2 - p0;
+    vec3d u = p1 - p0,v = p2 - p0;
     set_plane(p0, u.cross(v));
     assert(fabs(operator[](p0)) < 1e-10);
     assert(fabs(operator[](p1)) < 1e-10);
     assert(fabs(operator[](p2)) < 1e-10);
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 Plane::Plane(const vec3d & point, const vec3d & normal)
@@ -69,8 +64,6 @@ Plane::Plane(const vec3d & point, const vec3d & normal)
     set_plane(point, normal);
     assert(fabs(operator[](point)) < 1e-10);
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // http://www.ilikebigbits.com/blog/2015/3/2/plane-from-points
 CINO_INLINE
@@ -82,9 +75,8 @@ Plane::Plane(const std::vector<vec3d> & samples)
     c /= static_cast<double>(samples.size());
 
     // 3x3 covariance matrix
-    double xx = 0.0; double yy = 0.0;
-    double xy = 0.0; double yz = 0.0;
-    double xz = 0.0; double zz = 0.0;
+    double xx = 0.0,yy = 0.0,xy = 0.0,yz = 0.0,xz = 0.0,zz = 0.0;
+    
     //
     for(auto p : samples)
     {
@@ -97,9 +89,7 @@ Plane::Plane(const std::vector<vec3d> & samples)
         zz += pc.z() * pc.z();
     }
 
-    double det_x   = yy*zz - yz*yz;
-    double det_y   = xx*zz - xz*xz;
-    double det_z   = xx*yy - xy*xy;
+    double det_x   = yy*zz - yz*yz,det_y   = xx*zz - xz*xz,det_z   = xx*yy - xy*xy;
     double det_max = std::max(det_x, std::max(det_y, det_z));
 
     //if(fabs(det_max) <= 1e-5) std::cerr << "WARNING : the samples don't span a plane!" << std::endl;
@@ -113,16 +103,13 @@ Plane::Plane(const std::vector<vec3d> & samples)
     set_plane(c,n);
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 void Plane::set_plane(const vec3d & point, const vec3d & normal)
 {
     if(point.is_degenerate() || normal.is_degenerate())
     {
         //std::cout << "WARNING : failed to set degenerate plane!" << std::endl;
-        p = vec3d(0,0,0);
-        n = vec3d(0,0,0);
+        p = n = vec3d(0,0,0);
         return;
     }
     p = point;
@@ -132,15 +119,11 @@ void Plane::set_plane(const vec3d & point, const vec3d & normal)
     assert(fabs(operator[](point)) < 1e-10);
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 double Plane::operator[](const vec3d & p) const
 {
     return (n.dot(p) - d);
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // http://mathworld.wolfram.com/HessianNormalForm.html
 // http://mathworld.wolfram.com/Point-PlaneDistance.html (eq. 13)
@@ -153,15 +136,11 @@ double Plane::point_plane_dist_signed(const vec3d & p) const
     return u.dot(n);
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 double Plane::point_plane_dist(const vec3d & p) const
 {
     return std::fabs(point_plane_dist_signed(p));
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 vec3d Plane::project_onto(const vec3d & p) const
@@ -170,5 +149,5 @@ vec3d Plane::project_onto(const vec3d & p) const
     assert(point_plane_dist(res) < 1e-10);
     return res;
 }
-
+    
 }
