@@ -40,8 +40,6 @@
 namespace cinolib
 {
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class T>
 CINO_INLINE
 Tree<T>::Tree()
@@ -49,8 +47,6 @@ Tree<T>::Tree()
     // add a fake root (to make sure that the graph has always a single root)
     tree.push_back(TreeNode<T>());
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class T>
 CINO_INLINE
@@ -70,15 +66,11 @@ uint Tree<T>::add_children(T item, uint father)
     return fresh_id;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class T>
 CINO_INLINE
 void Tree<T>::depth_first_traverse(std::vector<T> & items, const uint id) const
 {
     if (id > 0) items.push_back(node(id).item);
-
     for(const uint c : node(id).children) depth_first_traverse(items, c);
 }
-
 }
