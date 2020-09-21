@@ -52,14 +52,10 @@ void read_MESH(const char                     * filename,
                std::vector<int>               & vert_labels,
                std::vector<int>               & poly_labels);
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 void read_MESH(const char                     * filename,
                std::vector<vec3d>             & verts,
                std::vector<std::vector<uint>> & polys);
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void read_MESH(const char                     * filename,
