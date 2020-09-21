@@ -89,6 +89,12 @@ CINO_INLINE
 bool Segment::intersects_ray(const vec3d & /*p*/, const vec3d & /*dir*/, double & /*t*/, vec3d & /*pos*/) const
 {
     assert(false && "TODO");
+    
+    //possible implementations: https://github.com/liamdavis26/RayTriangleIntersection/blob/master/src/main.cpp
+    //https://github.com/Lycheeicy/godot/blob/6fcb58f40dae8228074591e3262d5db97db3e2d7/core/math/face3.cpp
+    //Segments intersects ray? Moller-Trumbore method?:
+    //Intersection point
+			// vec3d vecIntersect = p + (t * dir); //?
     return true;
 }
 
