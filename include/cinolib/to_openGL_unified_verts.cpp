@@ -67,8 +67,7 @@ void to_openGL_unified_verts(const std::vector<vec3d>             & v_attr_0,   
         std::vector<uint> poly;
         for(uint off=0; off<v2v_v_attr_0.at(pid).size(); ++off)
         {
-            uint v  = v2v_v_attr_0.at(pid).at(off);
-            uint vt = v2v_v_attr_1.at(pid).at(off);
+            uint v  = v2v_v_attr_0.at(pid).at(off),vt = v2v_v_attr_1.at(pid).at(off);
             v_vt_pair key = std::make_pair(v,vt);
 
             auto query = v_map.find(key);
@@ -81,9 +80,7 @@ void to_openGL_unified_verts(const std::vector<vec3d>             & v_attr_0,   
                 poly.push_back(fresh_id);
             }
             else
-            {
                 poly.push_back(query->second);
-            }
         }
         unified_v2v.push_back(poly);
     }
@@ -121,9 +118,7 @@ void to_openGL_unified_verts(const std::vector<vec3d>             & v_attr_0,
         std::vector<uint> poly;
         for(uint off=0; off<v2v_attr_0.at(pid).size(); ++off)
         {
-            uint v  = v2v_attr_0.at(pid).at(off);
-            uint vt = v2v_attr_1.at(pid).at(off);
-            uint vn = v2v_attr_2.at(pid).at(off);
+            uint v  = v2v_attr_0.at(pid).at(off),vt = v2v_attr_1.at(pid).at(off),vn = v2v_attr_2.at(pid).at(off);
             v_vt_vn key = std::make_tuple(v,vt,vn);
 
             auto query = v_map.find(key);
@@ -137,12 +132,9 @@ void to_openGL_unified_verts(const std::vector<vec3d>             & v_attr_0,
                 poly.push_back(fresh_id);
             }
             else
-            {
                 poly.push_back(query->second);
-            }
         }
         unified_v2v.push_back(poly);
     }
 }
-
 }
