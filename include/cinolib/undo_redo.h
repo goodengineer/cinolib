@@ -77,10 +77,8 @@ class AbstractUndoRedo
 
     private:
 
-        std::stack<State> undo_stack;
-        std::stack<State> redo_stack;
+        std::stack<State> undo_stack,redo_stack;
 };
-
 }
 
 #ifndef  CINO_STATIC_LIB
