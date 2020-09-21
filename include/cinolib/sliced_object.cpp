@@ -48,9 +48,7 @@ SlicedObj<M,V,E,P>::SlicedObj(const char * filename, const double thick_radius)
     : Trimesh<M,V,E,P>()
     , thick_radius(thick_radius)
 {
-    std::vector<std::vector<std::vector<vec3d>>> slice_polys;
-    std::vector<std::vector<std::vector<vec3d>>> slice_holes;
-    std::vector<std::vector<std::vector<vec3d>>> supports;
+    std::vector<std::vector<std::vector<vec3d>>> slice_polys,slice_holes,supports;
     read_CLI(filename, slice_polys, slice_holes, supports, hatches);
     init(slice_polys, slice_holes, supports);
 }
@@ -92,18 +90,16 @@ void SlicedObj<M,V,E,P>::init(const std::vector<std::vector<std::vector<vec3d>>>
 
     for(uint sid=0; sid<num_slices; ++sid)
     {
-        uint np = slice_holes.at(sid).size();
-        uint nh = slice_polys.at(sid).size();
-        uint ns = (thick_radius>0) ? supports.at(sid).size() : 0;
-
+        uint np = slice_holes.at(sid).size(),nh = slice_polys.at(sid).size(),ns = (thick_radius>0) ? supports.at(sid).size() : 0;
+        
         std::cout << "processing slice " << sid << " out of " << num_slices << "\t(" << np << " polys / " << nh << " holes / "  << ns << " supports)" << std::endl;
 
         if(np>0) z.push_back(slice_holes.at(sid).front().front().z()); else
         if(ns>0) z.push_back(supports.at(sid).front().front().z());    else
         continue; // empty slice, skip it
 
-        std::vector<BoostPolygon> polys;
-        std::vector<BoostPolygon> holes;
+        std::vector<BoostPolygon> polys,holes;
+        
         for(auto p : slice_holes.at(sid)) polys.push_back(make_polygon(p));
         for(auto h : slice_polys.at(sid)) holes.push_back(make_polygon(h));
         if(thick_radius>0)
@@ -233,5 +229,4 @@ bool SlicedObj<M,V,E,P>::slice_contains(const uint sid, const vec2d & p) const
 {
     return polygon_contains(slices.at(sid), p, true);
 }
-
 }
