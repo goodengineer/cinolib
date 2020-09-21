@@ -45,7 +45,7 @@ namespace cinolib
 {
 
 // Solve the smallest-circle problem (or minimum covering circle problem)
-// using a recirsive implementation of the Welzl's algorithm. References:
+// using a recursive implementation of the Welzl's algorithm. References:
 //
 //    1) https://en.wikipedia.org/wiki/Smallest-circle_problem
 //
@@ -57,7 +57,7 @@ namespace cinolib
 CINO_INLINE
 void smallest_enclosing_disk(const std::vector<vec2d> & points,
                                    vec2d              & center,
-                                   double             & radius);
+                                   float              & radius);
 
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -65,7 +65,7 @@ void smallest_enclosing_disk(const std::vector<vec2d> & points,
 CINO_INLINE
 void smallest_enclosing_disk(const std::vector<vec3d> & points,  // will drop z component
                                    vec3d              & center,  // will have z=0
-                                   double             & radius);
+                                   float              & radius);
 }
 
 #ifndef  CINO_STATIC_LIB
