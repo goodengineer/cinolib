@@ -41,16 +41,12 @@
 namespace cinolib
 {
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 enum
 {
     INTERNAL = 0, // inner slice boundary (i.e., slice holes)
     EXTERNAL = 1, // external slice boundary
     OPEN     = 2  // open curve (typically used for support structures)
 };
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 std::vector<vec3d> read_polyline(std::string line, const double z)
@@ -74,8 +70,6 @@ std::vector<vec3d> read_polyline(std::string line, const double z)
     }
     return polyline;
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // Reference for COMMON LAYER INTERFACE (CLI) file format:
 // http://www.hmilch.net/downloads/cli_format.html
@@ -120,9 +114,7 @@ void read_CLI(const char                                   * filename,
             hatches.resize(n_layers);
         }
         else if(sscanf(line.c_str(), "$$LAYER/%lf", &z) == 1)
-        {
             ++layer;
-        }
         else if(sscanf(line.c_str(), "$$POLYLINE/%*d,%d,%*d,%*s", &type) == 1)
         {
             // NOTE: for INTERNAL and EXTERNAL, the last point is a duplication of the first one
@@ -139,5 +131,4 @@ void read_CLI(const char                                   * filename,
     }
     f.close();
 }
-
 }
