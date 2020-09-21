@@ -67,16 +67,14 @@ void tetgen_wrap(const std::vector<double>            & coords_in,
     in.pointlist      = new REAL[coords_in.size()];
 
     for(uint i=0; i<coords_in.size(); ++i)
-    {
         in.pointlist[i] = static_cast<REAL>(coords_in[i]);
-    }
 
     // faces
     //
     in.numberoffacets = polys_in.size();
     in.facetlist      = new tetgenio::facet[in.numberoffacets];
 
-    for(int fid=0; fid<in.numberoffacets; ++fid)
+    for(uint fid=0; fid<in.numberoffacets; ++fid)
     {
         f = &in.facetlist[fid];
         f->numberofpolygons = 1;
@@ -86,10 +84,8 @@ void tetgen_wrap(const std::vector<double>            & coords_in,
         p = &f->polygonlist[0];
         p->numberofvertices = polys_in.at(fid).size();
         p->vertexlist = new int[p->numberofvertices];
-        for(int i=0; i<p->numberofvertices; ++i)
-        {
+        for(uint i=0; i<p->numberofvertices; ++i)
             p->vertexlist[i] = polys_in.at(fid).at(i);
-        }
     }
 
     // edges
@@ -97,9 +93,7 @@ void tetgen_wrap(const std::vector<double>            & coords_in,
     in.numberofedges = edges_in.size() / 2;
     in.edgelist       = new int[edges_in.size()];
     for(uint i=0; i<edges_in.size(); ++i)
-    {
         in.edgelist[i] = edges_in[i];
-    }
 
     // tetgen options
     //
@@ -109,17 +103,17 @@ void tetgen_wrap(const std::vector<double>            & coords_in,
 
     // generate tetmesh
     //
-    for(int vid=0; vid<out.numberofpoints; ++vid)
+    for(uint vid=0; vid<out.numberofpoints; ++vid)
     {
-        int vid_ptr = 3 * vid;
+        uint vid_ptr = 3 * vid;
         coords_out.push_back(static_cast<double>(out.pointlist[vid_ptr    ]));
         coords_out.push_back(static_cast<double>(out.pointlist[vid_ptr + 1]));
         coords_out.push_back(static_cast<double>(out.pointlist[vid_ptr + 2]));
     }
 
-    for(int tid=0; tid<out.numberoftetrahedra; ++tid)
+    for(uint tid=0; tid<out.numberoftetrahedra; ++tid)
     {
-        int tid_ptr = 4 * tid;
+        uint tid_ptr = 4 * tid;
         tets_out.push_back(out.tetrahedronlist[tid_ptr    ]);
         tets_out.push_back(out.tetrahedronlist[tid_ptr + 1]);
         tets_out.push_back(out.tetrahedronlist[tid_ptr + 2]);
@@ -225,5 +219,4 @@ void tetgen_wrap(const AbstractPolygonMesh<M,V,E,F> & m_srf,
 {
     tetgen_wrap(m_srf.vector_verts(), m_srf.vector_polys(), {}, flags, m);
 }
-
 }
