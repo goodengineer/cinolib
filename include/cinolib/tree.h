@@ -42,7 +42,7 @@
 /*
  * This class implements a trivial n-ary tree. This is not supposed to be perfect,
  * and there is a lot of stuff missing (e.g., node deletion). The only reason it
- * exists is because the cinolib::Profiler is bassed around this class.
+ * exists is because the cinolib::Profiler is based around this class.
 */
 
 namespace cinolib
