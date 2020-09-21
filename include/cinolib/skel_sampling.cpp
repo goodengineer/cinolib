@@ -54,14 +54,10 @@ void recursive_mid_sampling(Skel          & skel,
     float mid_sample = beg_sample + ((end_sample - beg_sample) * 0.5);
     int   mid_vid    = skel.sample_bone_at(bid, mid_sample);
 
-    vec3d beg_pos = skel.vertex(beg_vid);
-    vec3d mid_pos = skel.vertex(mid_vid);
-    vec3d end_pos = skel.vertex(end_vid);
-
-    double beg_r = skel.max_sphere_radius(beg_vid);
-    double mid_r = skel.max_sphere_radius(mid_vid);
-    double end_r = skel.max_sphere_radius(end_vid);
-
+    vec3d beg_pos = skel.vertex(beg_vid),mid_pos = skel.vertex(mid_vid),end_pos = skel.vertex(end_vid);
+    
+    float beg_r = skel.max_sphere_radius(beg_vid), mid_r = skel.max_sphere_radius(mid_vid), end_r = skel.max_sphere_radius(end_vid);
+   
     if ((beg_pos - mid_pos).length() > beg_r + mid_r || // <= logic OR, remember that!
         (mid_pos - end_pos).length() > mid_r + end_r)   //    note to myself ;)
     {
@@ -105,5 +101,4 @@ void radius_based_mid_sampling(Skel & skel)
         if (bone.size() == 2) skel.sample_bone_at(bid, 0.5);
     }
 }
-
 }
