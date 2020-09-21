@@ -46,10 +46,8 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void subdivision_barycentric(Tetmesh<M,V,E,F,P> & m)
 {
-    std::unordered_map<uint,uint> e_map; // edge midpoints
-    std::unordered_map<uint,uint> f_map; // face centroids
-    std::unordered_map<uint,uint> p_map; // poly centroids
-
+    std::unordered_map<uint,uint> e_map,f_map,p_map; // edge midpoints,face centroids,poly centroids
+   
     for(uint eid=0; eid<m.num_edges(); ++eid) e_map[eid] = m.vert_add(m.edge_sample_at(eid,0.5));
     for(uint fid=0; fid<m.num_faces(); ++fid) f_map[fid] = m.vert_add(m.face_centroid(fid));
     for(uint pid=0; pid<m.num_polys(); ++pid) p_map[pid] = m.vert_add(m.poly_centroid(pid));
@@ -107,7 +105,7 @@ void subdivision_barycentric(Tetmesh<M,V,E,F,P> & m)
         // tet centroid
         uint c = p_map.at(pid);
 
-        for(uint i=0; i<4; ++i)
+        for(short i=0; i<4; ++i)
         {
             // split i^th face
             m.poly_add({c, f[i][0], e[i][0], fc[i]});
@@ -122,6 +120,4 @@ void subdivision_barycentric(Tetmesh<M,V,E,F,P> & m)
     // remove the old polys
     for(int pid=np-1; pid>=0; --pid) m.poly_remove(pid);
 }
-
-
 }
