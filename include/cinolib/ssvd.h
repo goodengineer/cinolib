@@ -58,8 +58,6 @@ void ssvd(const Eigen::Matrix3d                 & m,
                 Eigen::DiagonalMatrix<double,3> & s,
                 Eigen::Matrix3d                 & v);
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 void closest_pos_det_matrix(double T[3][3]);
 
