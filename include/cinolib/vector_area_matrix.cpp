@@ -50,8 +50,7 @@ Eigen::SparseMatrix<double> vector_area_matrix(const AbstractPolygonMesh<M,V,E,P
 
     for(auto e : b_edges)
     {
-        uint v0 = e.first;
-        uint v1 = e.second;
+        uint v0 = e.first,v1 = e.second;
         entries.push_back(Entry(v0+vn, v1,    -0.25));
         entries.push_back(Entry(v1,    v0+vn, -0.25));
         entries.push_back(Entry(v0,    v1+vn,  0.25));
@@ -63,5 +62,4 @@ Eigen::SparseMatrix<double> vector_area_matrix(const AbstractPolygonMesh<M,V,E,P
 
     return A;
 }
-
 }
