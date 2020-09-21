@@ -47,17 +47,13 @@ Line::Line(const vec3d & p0, const vec3d & p1)
     this->p1 = p1;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 std::vector<Plane> Line::to_planes() const
 {
     vec3d d = dir();
 
-    vec3d n0(-d.y(),  d.x(),     0);
-    vec3d n1(-d.z(),      0, d.x());
-    vec3d n2(     0, -d.z(), d.y());
-
+    vec3d n0(-d.y(),d.x(),0),n1(-d.z(),0,d.x()),n2(0,-d.z(),d.y());
+   
     std::vector<Plane> planes;
     if (n0.length() > 0) planes.push_back(Plane(p0, n0));
     if (n1.length() > 0) planes.push_back(Plane(p0, n1));
@@ -67,14 +63,9 @@ std::vector<Plane> Line::to_planes() const
     return planes;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 vec3d Line::dir() const
 {
-    vec3d d = p0-p1;
-    d.normalize();
-    return d;
+    return (p0-p1).normalize();
 }
-
 }
