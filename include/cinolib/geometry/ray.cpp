@@ -46,15 +46,11 @@ Ray::Ray(const vec3d & p, const vec3d & dir)
     direction.normalize();
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 std::vector<Plane> Ray::to_planes() const
 {
-    vec3d n0(-direction.y(),  direction.x(),             0);
-    vec3d n1(-direction.z(),              0, direction.x());
-    vec3d n2(             0, -direction.z(), direction.y());
-
+    vec3d n0(-direction.y(),direction.x(),0),n1(-direction.z(),0, direction.x()),n2(0, -direction.z(), direction.y());
+    
     std::vector<Plane> planes;
     if (n0.length() > 0) planes.push_back(Plane(start, n0));
     if (n1.length() > 0) planes.push_back(Plane(start, n1));
@@ -64,23 +60,17 @@ std::vector<Plane> Ray::to_planes() const
     return planes;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 const vec3d & Ray::dir() const
 {
     return direction;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 const vec3d & Ray::begin() const
 {
     return start;
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 bool Ray::on_positive_half_space(const vec3d & p) const
@@ -89,22 +79,17 @@ bool Ray::on_positive_half_space(const vec3d & p) const
     return false;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 double Ray::dist_to_point(const vec3d & p) const
 {
-    vec3d u = direction;
-    vec3d w = p - start;
-
-    float cos_wv = w.dot(u);
-    float cos_uu = u.dot(u);
-
+    vec3d u = direction,w = p - start;
+   
+    float cos_wv = w.dot(u),cos_uu = u.dot(u);
+   
     if (cos_wv <= 0.0) return start.dist(p);
 
     float b  = cos_wv / cos_uu;
     vec3d Pb = start + u*b;
     return (p-Pb).length();
 }
-
 }
