@@ -83,18 +83,16 @@ void triangle_wrap(const std::vector<double> & coords_in,
 
     in.numberofpoints = coords_in.size()/2;
     in.pointlist      = (double*)calloc(coords_in.size(),sizeof(double));
-    for(int vid=0; vid<in.numberofpoints; ++vid)
+    for(uint vid=0; vid<in.numberofpoints; ++vid)
     {
         in.pointlist[vid*2  ] = coords_in.at(vid*2  );
         in.pointlist[vid*2+1] = coords_in.at(vid*2+1);
     }
     in.numberofpointattributes = 0;
     in.pointmarkerlist         = (int*)calloc(in.numberofpoints,sizeof(int));
-    for(int vid=0; vid<in.numberofpoints; ++vid)
-    {
+    for(uint vid=0; vid<in.numberofpoints; ++vid)
        in.pointmarkerlist[vid] = 1;
-    }
-
+  
     in.numberoftriangles          = 0;
     in.numberofcorners            = 0;
     in.numberoftriangleattributes = 0;
@@ -104,14 +102,13 @@ void triangle_wrap(const std::vector<double> & coords_in,
     in.numberofsegments = segs_in.size()/2;
     in.segmentlist      = (int*)calloc(segs_in.size(),sizeof(int));
     for(uint i=0; i<segs_in.size(); ++i)
-    {
         in.segmentlist[i] = static_cast<int>(segs_in[i]);
-    }
+   
     in.segmentmarkerlist = NULL;
 
     in.numberofholes = holes_in.size()/2;
     in.holelist      = (double*)calloc(holes_in.size(),sizeof(double));
-    for(int hid=0; hid<in.numberofholes; ++hid)
+    for(uint hid=0; hid<in.numberofholes; ++hid)
     {
         in.holelist[hid*2  ] = holes_in.at(hid*2  );
         in.holelist[hid*2+1] = holes_in.at(hid*2+1);
@@ -127,14 +124,14 @@ void triangle_wrap(const std::vector<double> & coords_in,
     triangulate(const_cast<char*>(s.c_str()), &in, &out, NULL);
 
     coords_out.reserve(out.numberofpoints*2);
-    for(int vid=0; vid<out.numberofpoints; ++vid)
+    for(uint vid=0; vid<out.numberofpoints; ++vid)
     {
         coords_out.push_back(out.pointlist[vid*2  ]);
         coords_out.push_back(out.pointlist[vid*2+1]);
     }
 
     tris_out.reserve(out.numberoftriangles * 3);
-    for(int tid=0; tid<out.numberoftriangles; ++tid)
+    for(uint tid=0; tid<out.numberoftriangles; ++tid)
     {
         tris_out.push_back(out.trianglelist[tid*3  ]);
         tris_out.push_back(out.trianglelist[tid*3+1]);
