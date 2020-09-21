@@ -40,8 +40,6 @@
 namespace cinolib
 {
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class Object, class State>
 CINO_INLINE
 AbstractUndoRedo<Object,State>::AbstractUndoRedo(const State & initial_state)
@@ -49,16 +47,12 @@ AbstractUndoRedo<Object,State>::AbstractUndoRedo(const State & initial_state)
     push_state(initial_state);
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class Object, class State>
 CINO_INLINE
 void AbstractUndoRedo<Object,State>::push_state(const State & state)
 {
     undo_stack.push(state);
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class Object, class State>
 CINO_INLINE
@@ -75,8 +69,6 @@ bool AbstractUndoRedo<Object,State>::undo(Object & obj)
     return true;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class Object, class State>
 CINO_INLINE
 bool AbstractUndoRedo<Object,State>::redo(Object & obj)
@@ -88,8 +80,6 @@ bool AbstractUndoRedo<Object,State>::redo(Object & obj)
     return true;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class Object, class State>
 CINO_INLINE
 void AbstractUndoRedo<Object,State>::reset(Object & obj)
@@ -99,5 +89,4 @@ void AbstractUndoRedo<Object,State>::reset(Object & obj)
     while(!redo_stack.empty()) redo_stack.pop();
     set_state(undo_stack.top(), obj);
 }
-
 }
