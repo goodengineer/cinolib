@@ -59,8 +59,8 @@ void vertex_clustering(const std::vector<Vertex>             & points,
 
     // visit the resulting graph with BFS to
     // isolate clusters of adjacent vertices
-    uint nv   = points.size();
-    uint seed = 0;
+    uint nv   = points.size(),seed = 0;
+
     std::vector<bool> visited(nv, false);
     do
     {
@@ -75,7 +75,5 @@ void vertex_clustering(const std::vector<Vertex>             & points,
     }
     while (seed < nv);
 }
-
-
 }
 
