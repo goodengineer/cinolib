@@ -48,8 +48,7 @@ void segment_insertion_linear_earcut(const std::vector<vec>  & poly,
 
     // doubly linked list for fast polygon inspection
     uint size = poly.size();
-    std::vector<uint> prev(size);
-    std::vector<uint> next(size);
+    std::vector<uint> prev(size),next(size);
     std::iota(prev.begin(), prev.end(),-1);
     std::iota(next.begin(), next.end(), 1);
     prev.front() = size-1;
@@ -120,5 +119,4 @@ void segment_insertion_linear_earcut(const std::vector<vec>  & poly,
         }
     }
 }
-
 }
