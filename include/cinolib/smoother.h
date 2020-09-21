@@ -41,7 +41,7 @@
 namespace cinolib
 {
 
-/* Smooths a given polygonal mesh minimizing the same fairing energy
+/* Smoothes a given polygonal mesh minimizing the same fairing energy
  * described in:
  *
  *   Practical Hex-Mesh Optimization via Edge-Cone Rectification
@@ -56,7 +56,7 @@ namespace cinolib
  *
  * NOTE: feature lines are detected as chains of consecutive edges marked in the mesh.
  * While the classification is done internally, proper edge marking/unmarking must be
- * done prior calling the smother.
+ * done prior calling the smoother.
  *
  * The energy being minimized is the following :
  *
@@ -88,11 +88,11 @@ enum { REGULAR, CORNER, FEATURE };
 typedef struct
 {
     uint   n_iters             = 10;      // # of smoothing iterations
-    double w_curr_pos          = 10.0;    // attraction to current position
-    double w_regular           = 10.0;    // attraction to tangent space for regular vertices
-    double w_feature           = 100.0;   // attraction to tangent curve for feature vertices
-    double w_corner            = 100.0;   // attraction to current pos for features corner
-    double w_laplace           = 0.001;   // weight of laplacian energy terms
+    float w_curr_pos          = 10.0;    // attraction to current position
+    float w_regular           = 10.0;    // attraction to tangent space for regular vertices
+    float w_feature           = 100.0;   // attraction to tangent curve for feature vertices
+    float w_corner            = 100.0;   // attraction to current pos for features corner
+    float w_laplace           = 0.001;   // weight of laplacian energy terms
     int    laplacian_mode      = UNIFORM; // laplacian mode (UNIFORM or COTANGENT)
     bool   reproject_on_target = true;    // reproject to target surface after each smoothing iteration
     //bool   with_ray_casting    = false;   // reproject via aray casting if true, via closest point if false
