@@ -65,16 +65,10 @@ class GLcanvas : public QGLViewer
 
         explicit GLcanvas(QWidget * parent = 0);
 
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         void make_popup_menu();
         void mousePressEvent(QMouseEvent *event);
 
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         void updateGL();
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void init();
         void draw();
@@ -82,14 +76,10 @@ class GLcanvas : public QGLViewer
         void set_clear_color(const QColor & color);
         void fit_scene();
 
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         void push_obj(DrawableObject * obj, bool refit_scene = true);
         bool pop(DrawableObject * obj);
         bool pop_first_occurrence_of(int type);
         bool pop_all_occurrences_of (int type);
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         std::string serialize_drawlist() const;
         std::string serialize_camera() const;
