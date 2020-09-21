@@ -44,15 +44,15 @@ Eigen::SparseMatrix<double> mass_matrix(const AbstractMesh<M,V,E,P> & m, const i
 {
     typedef Eigen::Triplet<double> Entry;
 
-    uint nv = m.num_verts();
-    uint base[n];
-    for(int i=0; i<n; ++i) base[i] = nv*i;
+    uint nv = m.num_verts(),base[n];
+    uint i;
+    for(i=0; i<n; ++i) base[i] = nv*i;
 
     std::vector<Entry>  entries;
     for(uint vid=0; vid<m.num_verts(); ++vid)
     {
         double mass = m.vert_mass(vid);
-        for(int i=0; i<n; ++i) entries.push_back(Entry(base[i] + vid, base[i] + vid, mass));
+        for(i=0; i<n; ++i) entries.push_back(Entry(base[i] + vid, base[i] + vid, mass));
     }
 
     nv = n*m.num_verts();
@@ -61,7 +61,5 @@ Eigen::SparseMatrix<double> mass_matrix(const AbstractMesh<M,V,E,P> & m, const i
 
     return MM;
 }
-
-
 }
 
