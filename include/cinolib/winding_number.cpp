@@ -55,8 +55,6 @@ int winding_number(const std::vector<vec3d> & verts,
     return static_cast<int>(round(w));
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class M, class V, class E, class P>
 CINO_INLINE
 int winding_number(const AbstractPolygonMesh<M,V,E,P> & m,
@@ -76,6 +74,5 @@ int winding_number(const AbstractPolygonMesh<M,V,E,P> & m,
     }
     return static_cast<int>(round(w));
 }
-
 }
 
