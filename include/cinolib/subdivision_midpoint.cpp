@@ -45,9 +45,7 @@ CINO_INLINE
 void subdivision_midpoint(const AbstractPolyhedralMesh<M,V,E,F,P> & m_in,
                                 AbstractPolyhedralMesh<M,V,E,F,P> & m_out)
 {
-    std::unordered_map<uint,uint> edge_verts;
-    std::unordered_map<uint,uint> face_verts;
-    std::unordered_map<uint,uint> poly_verts;
+    std::unordered_map<uint,uint> edge_verts,face_verts,poly_verts;
     subdivision_midpoint(m_in, m_out, edge_verts, face_verts, poly_verts);
 }
 
@@ -65,9 +63,8 @@ void subdivision_midpoint(const AbstractPolyhedralMesh<M,V,E,F,P> & m_in,
     face_verts.clear();
     poly_verts.clear();
 
-    std::vector<vec3d>             verts = m_in.vector_verts();
-    std::vector<std::vector<uint>> faces;
-    std::vector<std::vector<uint>> polys;
+    std::vector<vec3d> verts = m_in.vector_verts();
+    std::vector<std::vector<uint>> faces,polys;
     std::vector<std::vector<bool>> polys_winding;
 
     // 1) add one new vert for each edge/face/poly
@@ -85,8 +82,7 @@ void subdivision_midpoint(const AbstractPolyhedralMesh<M,V,E,F,P> & m_in,
     for(uint pid=0; pid<m_in.num_polys(); ++pid)
     for(uint eid : m_in.adj_p2e(pid))
     {
-        std::vector<uint> inc_f = m_in.poly_e2f(pid,eid);
-        std::vector<uint> f;
+        std::vector<uint> inc_f = m_in.poly_e2f(pid,eid),f;
         f.push_back(poly_verts.at(pid));
         f.push_back(face_verts.at(inc_f.front()));
         f.push_back(edge_verts.at(eid));
@@ -104,8 +100,7 @@ void subdivision_midpoint(const AbstractPolyhedralMesh<M,V,E,F,P> & m_in,
     for(uint fid = 0; fid<m_in.num_faces(); ++fid)
     for(uint vid : m_in.adj_f2v(fid))
     {
-        std::vector<uint> e = m_in.face_v2e(fid,vid);
-        std::vector<uint> f;
+        std::vector<uint> e = m_in.face_v2e(fid,vid),f;
         f.push_back(face_verts.at(fid));
         f.push_back(edge_verts.at(e.front()));
         f.push_back(vid);
@@ -156,5 +151,4 @@ void subdivision_midpoint(const AbstractPolyhedralMesh<M,V,E,F,P> & m_in,
         default : assert(false);
     }
 }
-
 }
