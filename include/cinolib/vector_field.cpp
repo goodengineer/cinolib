@@ -42,15 +42,11 @@ namespace cinolib
 CINO_INLINE
 VectorField::VectorField() {}
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 VectorField::VectorField(const uint size)
 {
     setZero(3 * size);
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 VectorField::VectorField(const std::vector<vec3d> & data)
@@ -59,16 +55,12 @@ VectorField::VectorField(const std::vector<vec3d> & data)
     for(uint i=0; i<data.size(); ++i) set(i,data.at(i));
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 vec3d VectorField::vec_at(const int pos) const
 {
     int ptr = pos * 3;
     return vec3d((*this)[ptr], (*this)[ptr+1], (*this)[ptr+2]);
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void VectorField::set(const int pos, const vec3d & vec)
@@ -96,7 +88,7 @@ void VectorField::normalize()
      * Here I choose the former. Play with it if you
      * need something different...
     */
-    for(int i=0; i<rows(); i+=3)
+    for(uint i=0; i<rows(); i+=3)
     {
         vec3d tmp((*this)[i], (*this)[i+1], (*this)[i+2]);
         (*this)[i + 0] /= tmp.length();
@@ -104,8 +96,6 @@ void VectorField::normalize()
         (*this)[i + 2] /= tmp.length();
     }
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void VectorField::serialize(const char *filename) const
@@ -115,14 +105,11 @@ void VectorField::serialize(const char *filename) const
     f.open(filename);
     assert(f.is_open());
     f << "VECTOR_FIELD " << size()/3 << "\n";
-    for(int i=0; i<rows(); ++i)
-    {
+    for(uint i=0; i<rows(); ++i)
         f << (*this)[i] << "\n";
-    }
+
     f.close();
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void VectorField::deserialize(const char *filename)
@@ -138,8 +125,6 @@ void VectorField::deserialize(const char *filename)
     for(uint i=0; i<3*size; ++i) f >> (*this)[i];
     f.close();
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 // for more info, see:
 // http://eigen.tuxfamily.org/dox/TopicCustomizingEigen.html
@@ -159,6 +144,5 @@ VectorField & VectorField::operator= (const Eigen::MatrixBase<OtherDerived>& oth
 template<typename OtherDerived>
 CINO_INLINE
 VectorField::VectorField(const Eigen::MatrixBase<OtherDerived>& other) : Eigen::VectorXd(other) {}
-
 }
 
