@@ -79,19 +79,18 @@ void read_Livesu2012(const char          * filename,
 
     std::set<arc>     arc_set;
     std::map<int,int> id_map;
+    
+    double      x, y, z, r;
+    int         id, n_arcs,nbr;
 
     for (int i=0; i<count; ++i)
     {
-        double      x, y, z, r;
-        int         id, n_arcs;
-
         // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
         //
         fscanf(f, "%d %lf %lf %lf %lf %d ", &id, &x, &y, &z, &r, &n_arcs);
 
         for (int j=0; j<n_arcs; ++j)
         {
-            int nbr;
             fscanf(f, "%d ", &nbr);
             arc_set.insert(unique_arc(id,nbr));
         }
@@ -116,9 +115,8 @@ void read_Livesu2012(const char          * filename,
     {
         arc a = *it;
 
-        int id0 = id_map[a.first];
-        int id1 = id_map[a.second];
-
+        int id0 = id_map[a.first],id1 = id_map[a.second];
+    
         arcs.push_back(id0);
         arcs.push_back(id1);
     }
@@ -126,5 +124,4 @@ void read_Livesu2012(const char          * filename,
     std::cout << coords.size() / 3 << " skel points read" << std::endl;
     std::cout << arcs.size()   / 2 << " skel arcs   read" << std::endl;
 }
-
 }
