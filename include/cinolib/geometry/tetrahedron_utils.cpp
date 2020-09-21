@@ -156,10 +156,7 @@ void tet_barycentric_coords(const vec3d & t0,
     m3(3,0) = p[0];  m3(3,1) = p[1];  m3(3,2) = p[2];  m3(3,3) = 1;
 
     //double det_M  = M.determinant();
-    double det_m0 = m0.determinant();
-    double det_m1 = m1.determinant();
-    double det_m2 = m2.determinant();
-    double det_m3 = m3.determinant();
+    double det_m0 = m0.determinant(),det_m1 = m1.determinant(),det_m2 = m2.determinant(),det_m3 = m3.determinant();
     double sum    = det_m0 + det_m1 + det_m2 + det_m3;
 
     if(sum==0) // degenerate
@@ -176,6 +173,5 @@ void tet_barycentric_coords(const vec3d & t0,
     wgts[2] = det_m2/sum; assert(!std::isnan(wgts[2]));
     wgts[3] = det_m3/sum; assert(!std::isnan(wgts[3]));
 }
-
 }
 
