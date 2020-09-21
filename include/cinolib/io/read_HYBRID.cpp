@@ -65,47 +65,46 @@ void read_HYBDRID(const char                     * filename,
     fscanf(fp, "%d %d %d", &nv, &nf, &nc);
     nc /= 3; // hack, bug in files?
 
+    double x, y, z;
     for(uint i=0; i<nv; ++i)
     {
-        double x, y, z;
         fscanf(fp, "%lf %lf %lf", &x, &y, &z);
         verts.push_back(vec3d(x,y,z));
     }
-
+    uint n_verts,vid,nf,fid,dummy,winding;
+    std::vector<uint> face;
+  
     for(uint i=0; i<nf; ++i)
     {
-        uint n_verts;
         fscanf(fp, "%d", &n_verts);
 
-        std::vector<uint> face;
+        face.clear();
         for(uint j=0; j<n_verts; ++j)
         {
-            uint vid;
             fscanf(fp, "%d", &vid);
             face.push_back(vid);
         }
         faces.push_back(face);
     }
 
+    std::vector<uint> poly;
+    std::vector<bool> cell_winding;
     for(uint i=0; i<nc; ++i)
     {
-        uint nf;
         fscanf(fp, "%d", &nf);
 
-        std::vector<uint> poly;
-        std::vector<bool> cell_winding;
+        poly.clear();
+        cell_winding.clear();
         for(uint j=0; j<nf; ++j)
         {
-            uint fid;
             fscanf(fp, "%d", &fid);
             poly.push_back(fid);
         }
         polys.push_back(poly);
 
-        uint dummy; fscanf(fp, "%d", &dummy);
+        fscanf(fp, "%d", &dummy);
         for(uint j=0; j<nf; ++j)
         {
-            uint winding;
             fscanf(fp, "%d", &winding);
             assert(winding==0 || winding==1);
             cell_winding.push_back(winding);
@@ -115,5 +114,4 @@ void read_HYBDRID(const char                     * filename,
 
     fclose(fp);
 }
-
 }
