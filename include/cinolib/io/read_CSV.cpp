@@ -84,5 +84,4 @@ void read_CSV(const char          * filename,
     std::cout << "Gesture Loaded - " << coords.size()/3 << " points" << std::endl;
     std::cout << std::endl;
 }
-
 }
