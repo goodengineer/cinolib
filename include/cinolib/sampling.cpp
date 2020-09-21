@@ -46,9 +46,8 @@ std::vector<T> sample_within_interval(const T    min,
 {
     assert(n_samples >= 2);
     std::vector<T> samples;
-    T step = (max-min)/(n_samples-1);
-    T s    = min;
-
+    T step = (max-min)/(n_samples-1),s= min;
+    
     do
     {
         samples.push_back(s);
@@ -60,5 +59,4 @@ std::vector<T> sample_within_interval(const T    min,
 
     return samples;
 }
-
 }
