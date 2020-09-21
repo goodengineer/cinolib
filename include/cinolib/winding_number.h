@@ -59,8 +59,6 @@ int winding_number(const std::vector<vec3d> & verts,
                    const std::vector<uint>  & tris,
                    const vec3d              & p);
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class M, class V, class E, class P>
 CINO_INLINE
 int winding_number(const AbstractPolygonMesh<M,V,E,P> & m,
