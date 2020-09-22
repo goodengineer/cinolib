@@ -61,22 +61,20 @@ void read_Tagliasacchi2012(const char          * filename,
 
     int dummy, nv, ne;
     fscanf(f,"# D:%d NV:%d NE:%d\n", &dummy, &nv, &ne);
-
-    for (int i=0; i<nv; ++i)
+    double x, y, z;
+    for (uint i=0; i<nv; ++i)
     {
         // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
         //
-        double x, y, z;
         fscanf(f, "v %lf %lf %lf\n", &x, &y, &z);
         coords.push_back(x);
         coords.push_back(y);
         coords.push_back(z);
         radius.push_back(0); // not supported
     }
-
-    for (int i=0; i<ne; ++i)
+    int v0, v1;
+    for (uint i=0; i<ne; ++i)
     {
-        int v0, v1;
         fscanf(f, "e %d %d\n", &v0, &v1);
         v0 -= 1;
         v1 -= 1;
@@ -89,5 +87,4 @@ void read_Tagliasacchi2012(const char          * filename,
     std::cout << coords.size() / 3 << " skel points read" << std::endl;
     std::cout << arcs.size()   / 2 << " skel arcs   read" << std::endl;
 }
-
 }
