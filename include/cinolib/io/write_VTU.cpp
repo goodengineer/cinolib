@@ -69,13 +69,10 @@ void write_VTU(const char                           * filename,
     hexselector->SetName("hex_selector");
 
     for(const vec3d & v : verts)
-    {
         points->InsertNextPoint(v.x(), v.y(), v.z());
-    }
-
-    bool has_tets = false;
-    bool has_hexa = false;
-
+   
+    bool has_tets = has_hexa = false;
+  
     for(auto p : polys)
     {
         switch (p.size())
@@ -118,8 +115,6 @@ void write_VTU(const char                           * filename,
     writer->Write();
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 void write_VTU(const char                * filename,
                const std::vector<double> & xyz,
@@ -141,14 +136,14 @@ void write_VTU(const char                * filename,
 
     // write the vertex coordinates
     //
-    for(size_t i=0; i<xyz.size(); i+=3)
-    {
+    size_t i;
+    for(i=0; i<xyz.size(); i+=3)
         points->InsertNextPoint(xyz[i+0], xyz[i+1], xyz[i+2]);
-    }
+
 
     // write the tetrahedra
     //
-    for(size_t i=0; i<tets.size(); i+=4)
+    for(i=0; i<tets.size(); i+=4)
     {
         vtkIdType pid[] = { tets[i+0], tets[i+1], tets[i+2], tets[i+3] };
         grid->InsertNextCell(VTK_TETRA, 4, pid);
@@ -158,7 +153,7 @@ void write_VTU(const char                * filename,
 
     // write the hexahedra
     //
-    for(size_t i=0; i<hexa.size(); i+=8 )
+    for(i=0; i<hexa.size(); i+=8 )
     {
         vtkIdType pid[] = { hexa[i+0], hexa[i+1], hexa[i+2], hexa[i+3],
                             hexa[i+4], hexa[i+5], hexa[i+6], hexa[i+7] };
@@ -175,7 +170,7 @@ void write_VTU(const char                * filename,
     if (hexa.size() > 0) grid->GetCellData()->AddArray(hexselector);
 
 #if VTK_MAJOR_VERSION < 6
-    writer->SetInput( grid );
+    writer->SetInput(grid);
 #else
     writer->SetInputData(grid);
 #endif
@@ -195,8 +190,6 @@ void write_VTU(const char                *,
     exit(-1);
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 void write_VTU(const char                           *,
                const std::vector<vec3d>             &,
@@ -205,7 +198,6 @@ void write_VTU(const char                           *,
     std::cerr << "ERROR : VTK missing. Install VTK and recompile defining symbol CINOLIB_USES_VTK" << std::endl;
     exit(-1);
 }
-
 
 #endif
 
