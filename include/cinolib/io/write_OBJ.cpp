@@ -62,27 +62,22 @@ void write_OBJ(const char                * filename,
         exit(-1);
     }
 
-    for(size_t i=0; i<xyz.size(); i+=3)
+    size_t i=0;
+    for(i=0; i<xyz.size(); i+=3)
     {
         // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
         //
         fprintf(fp, "v %.17g %.17g %.17g\n", xyz[i], xyz[i+1], xyz[i+2]);
     }
 
-    for(size_t i=0; i<tri.size(); i+=3)
-    {
+    for(i=0; i<tri.size(); i+=3)
         fprintf(fp, "f %d %d %d\n", tri[i] + 1, tri[i+1] + 1, tri[i+2] + 1);
-    }
 
-    for(size_t i=0; i<quad.size(); i+=4)
-    {
+    for(i=0; i<quad.size(); i+=4)
         fprintf(fp, "f %d %d %d %d\n", quad[i] + 1, quad[i+1] + 1, quad[i+2] + 1, quad[i+3] + 1);
-    }
 
     fclose(fp);
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void write_OBJ(const char                           * filename,
@@ -98,8 +93,8 @@ void write_OBJ(const char                           * filename,
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_OBJ() : couldn't open input file " << filename << std::endl;
         exit(-1);
     }
-
-    for(uint i=0; i<xyz.size(); i+=3)
+    uint i;
+    for(i=0; i<xyz.size(); i+=3)
     {
         // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
         //
@@ -116,8 +111,6 @@ void write_OBJ(const char                           * filename,
     fclose(fp);
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 void write_OBJ(const char                * filename,
                const std::vector<double> & xyz,
@@ -131,8 +124,7 @@ void write_OBJ(const char                * filename,
     mtl_filename.resize(mtl_filename.size()-4);
     mtl_filename.append(".mtu");
 
-    FILE *f_mtl = fopen(mtl_filename.c_str(), "w");
-    FILE *f_obj = fopen(filename, "w");
+    FILE *f_mtl = fopen(mtl_filename.c_str(), "w"),*f_obj = fopen(filename, "w");
 
     if(!f_obj || !f_mtl)
     {
@@ -143,12 +135,12 @@ void write_OBJ(const char                * filename,
     assert(colors.size() == tri.size()/3 + quad.size()/4);
 
     std::map<Color,uint> color_map;
-
+    uint fresh_id,i; 
     for(const Color & c : colors)
     {
         if (DOES_NOT_CONTAIN(color_map, c))
         {
-            uint fresh_id = color_map.size();
+            fresh_id = color_map.size();
             color_map[c]  = fresh_id;
             fprintf(f_mtl, "newmtl color_%d\nKd %f %f %f\n", fresh_id, c.r, c.g, c.b);
         }
@@ -156,20 +148,20 @@ void write_OBJ(const char                * filename,
 
     fprintf(f_obj, "mtllib %s\n", get_file_name(mtl_filename).c_str());
 
-    for(uint i=0; i<xyz.size(); i+=3)
+    for(i=0; i<xyz.size(); i+=3)
     {
         // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
         //
         fprintf(f_obj, "v %.17g %.17g %.17g\n", xyz[i], xyz[i+1], xyz[i+2]);
     }
 
-    for(uint i=0; i<tri.size(); i+=3)
+    for(i=0; i<tri.size(); i+=3)
     {
         fprintf(f_obj, "usemtl color_%d\n", color_map[colors.at(i/3)]);
         fprintf(f_obj, "f %d %d %d\n", tri[i] + 1, tri[i+1] + 1, tri[i+2] + 1);
     }
 
-    for(uint i=0; i<quad.size(); i+=4)
+    for(i=0; i<quad.size(); i+=4)
     {
         fprintf(f_obj, "usemtl color_%d\n", color_map[colors.at(i/4)]);
         fprintf(f_obj, "f %d %d %d %d\n", quad[i] + 1, quad[i+1] + 1, quad[i+2] + 1, quad[i+3] + 1);
@@ -178,8 +170,6 @@ void write_OBJ(const char                * filename,
     fclose(f_obj);
     fclose(f_mtl);
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void write_OBJ(const char                * filename,
@@ -194,9 +184,8 @@ void write_OBJ(const char                * filename,
     mtl_filename.resize(mtl_filename.size()-4);
     mtl_filename.append(".mtu");
 
-    FILE *f_mtl = fopen(mtl_filename.c_str(), "w");
-    FILE *f_obj = fopen(filename, "w");
-
+    FILE *f_mtl = fopen(mtl_filename.c_str(), "w"),*f_obj = fopen(filename, "w");
+    uint i;
     if(!f_obj || !f_mtl)
     {
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_OBJ() : couldn't open input file " << filename << std::endl;
@@ -206,20 +195,20 @@ void write_OBJ(const char                * filename,
     fprintf(f_mtl, "newmtl color\nKd %f %f %f\n", color.r, color.g, color.b);
     fprintf(f_obj, "mtllib %s\n", get_file_name(mtl_filename).c_str());
 
-    for(uint i=0; i<xyz.size(); i+=3)
+    for(i=0; i<xyz.size(); i+=3)
     {
         // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
         //
         fprintf(f_obj, "v %.17g %.17g %.17g\n", xyz[i], xyz[i+1], xyz[i+2]);
     }
 
-    for(uint i=0; i<tri.size(); i+=3)
+    for(i=0; i<tri.size(); i+=3)
     {
         fprintf(f_obj, "usemtl color\n");
         fprintf(f_obj, "f %d %d %d\n", tri[i] + 1, tri[i+1] + 1, tri[i+2] + 1);
     }
 
-    for(uint i=0; i<quad.size(); i+=4)
+    for(i=0; i<quad.size(); i+=4)
     {
         fprintf(f_obj, "usemtl color\n");
         fprintf(f_obj, "f %d %d %d %d\n", quad[i] + 1, quad[i+1] + 1, quad[i+2] + 1, quad[i+3] + 1);
@@ -228,8 +217,6 @@ void write_OBJ(const char                * filename,
     fclose(f_obj);
     fclose(f_mtl);
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void write_OBJ(const char                           * filename,
@@ -243,9 +230,8 @@ void write_OBJ(const char                           * filename,
     mtl_filename.resize(mtl_filename.size()-4);
     mtl_filename.append(".mtu");
 
-    FILE *f_mtl = fopen(mtl_filename.c_str(), "w");
-    FILE *f_obj = fopen(filename, "w");
-
+    FILE *f_mtl = fopen(mtl_filename.c_str(), "w"),*f_obj = fopen(filename, "w");
+    
     if(!f_obj || !f_mtl)
     {
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : save_OBJ() : couldn't open input file " << filename << std::endl;
@@ -255,12 +241,12 @@ void write_OBJ(const char                           * filename,
     assert(colors.size() == poly.size());
 
     std::map<Color,uint> color_map;
-
+    uint fresh_id,i,fid;
     for(const Color & c : colors)
     {
         if (DOES_NOT_CONTAIN(color_map, c))
         {
-            uint fresh_id = color_map.size();
+            fresh_id = color_map.size();
             color_map[c]  = fresh_id;
             fprintf(f_mtl, "newmtl color_%d\nKd %f %f %f\n", fresh_id, c.r, c.g, c.b);
         }
@@ -268,14 +254,14 @@ void write_OBJ(const char                           * filename,
 
     fprintf(f_obj, "mtllib %s\n", get_file_name(mtl_filename).c_str());
 
-    for(uint i=0; i<xyz.size(); i+=3)
+    for(i=0; i<xyz.size(); i+=3)
     {
         // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
         //
         fprintf(f_obj, "v %.17g %.17g %.17g\n", xyz[i], xyz[i+1], xyz[i+2]);
     }
 
-    for(uint fid=0; fid<poly.size(); ++fid)
+    for(fid=0; fid<poly.size(); ++fid)
     {
         fprintf(f_obj, "usemtl color_%d\n", color_map.at(colors.at(fid)));
         fprintf(f_obj, "f ");
