@@ -80,26 +80,24 @@ void read_OFF(const char                     * filename,
     do getline(f, line, '\n'); while(sscanf(line.c_str(), "%d %d %d\n", &nv, &np, &ne)!=3);
 
     // read verts
+    double x, y, z;
     for(uint i=0; i<nv; ++i)
     {
         getline(f, line, '\n');
         std::stringstream ss(line);
 
-        double x, y, z;
         if(ss >> x >> y >> z)
-        {
             verts.push_back(vec3d(x,y,z));
-        }
         else --i;
     }
 
     // read polys
+    uint n_corners;
     for(uint i=0; i<np; ++i)
     {
         getline(f, line, '\n');
         std::stringstream ss(line);
 
-        uint n_corners;
         if(ss >> n_corners)
         {
             uint vid;
@@ -117,7 +115,7 @@ void read_OFF(const char                     * filename,
 
             switch(attr.size())
             {
-                case 1 : break; // TODO: READ LABEL (cast to int)!!!
+                case 1 : break; // TODO: READ LABEL (cast to int)!!! poly_colors.push_back(Color(attr.at(0)); // or int label; ss>>label and then what?
                 case 3 : poly_colors.push_back(Color(attr.at(0), attr.at(1), attr.at(2))); break;
                 case 4 : poly_colors.push_back(Color(attr.at(0), attr.at(1), attr.at(2), attr.at(3))); break;
                 default: break;
@@ -126,5 +124,4 @@ void read_OFF(const char                     * filename,
         else --i;
     }
 }
-
 }
