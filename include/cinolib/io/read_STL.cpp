@@ -58,8 +58,6 @@ void read_STL(const char         * filename,
     read_STL(filename, verts, normals, tris, merge_duplicated_verts);
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 void read_STL(const char         * filename,
               std::vector<vec3d> & verts,
@@ -97,9 +95,9 @@ void read_STL(const char         * filename,
 
             if(!seek_keyword(fp, "outer")) assert(false && "could not find keyword OUTER");
             if(!seek_keyword(fp, "loop"))  assert(false && "could not find keyword LOOP");
-            for(int i=0; i<3; ++i)
+            vec3d v;
+            for(short i=0; i<3; ++i)
             {
-                vec3d v;
                 if(!seek_keyword(fp, "vertex")) assert(false && "could not find keyword VERTEX");
                 if(!eat_double(fp, v.x())) assert(false && "could not parse x coord");
                 if(!eat_double(fp, v.y())) assert(false && "could not parse y coord");
@@ -143,18 +141,17 @@ void read_STL(const char         * filename,
         // read triangles
         unsigned int nt;
         if(fread(&nt, sizeof(unsigned int), 1, fp)!=1) assert(false && "error reading number of triangles");
+        float nf[3],vf[3];
         for(unsigned int i=0; i<nt; ++i)
         {
             // read normal
-            float nf[3];
             if(fread(&nf, sizeof(float), 3, fp)!=3) assert(false && "error reading normal");
             vec3d n(nf[0], nf[1], nf[2]);
             normals.push_back(n);
 
             // read verts
-            for(int j=0; j<3; ++j)
+            for(short j=0; j<3; ++j)
             {
-                float vf[3];
                 if(fread(&vf, sizeof(float), 3, fp)!=3) assert(false && "error reading vertex");
 
                 vec3d v(vf[0], vf[1], vf[2]);                
@@ -184,5 +181,4 @@ void read_STL(const char         * filename,
         fclose(fp);
     }
 }
-
 }
