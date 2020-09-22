@@ -59,28 +59,22 @@ void write_OFF(const char                * filename,
 
     int n_poly = tri.size()/3 + quad.size()/4;
     fprintf (fp, "OFF\n%zu %d 0\n", xyz.size()/3, n_poly);
-
-    for(size_t i=0; i<xyz.size(); i+=3)
+    size_t i;
+    for(i=0; i<xyz.size(); i+=3)
     {
         // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
         //
         fprintf(fp, "%.17g %.17g %.17g\n", xyz[i], xyz[i+1], xyz[i+2]);
     }
 
-    for(size_t i=0; i<tri.size(); i+=3)
-    {
+    for(i=0; i<tri.size(); i+=3)
         fprintf(fp, "3 %d %d %d\n", tri[i], tri[i+1], tri[i+2]);
-    }
-
-    for(size_t i=0; i<quad.size(); i+=4)
-    {
+   
+    for(i=0; i<quad.size(); i+=4)
         fprintf(fp, "4 %d %d %d %d\n", quad[i], quad[i+1], quad[i+2], quad[i+3]);
-    }
-
+  
     fclose(fp);
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void write_OFF(const char                           * filename,
@@ -97,28 +91,26 @@ void write_OFF(const char                           * filename,
         exit(-1);
     }
 
-    uint n_faces = faces.size();
+    uint n_faces = faces.size(),i,j;
+  
     fprintf (fp, "OFF\n%zu %d 0\n", xyz.size()/3, n_faces);
 
-    for(uint i=0; i<xyz.size(); i+=3)
+    for(i=0; i<xyz.size(); i+=3)
     {
         // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
         //
         fprintf(fp, "%.17g %.17g %.17g\n", xyz[i], xyz[i+1], xyz[i+2]);
     }
 
-    for(uint i=0; i<faces.size(); ++i)
+    for(i=0; i<faces.size(); ++i)
     {
         fprintf(fp, "%d ", static_cast<int>(faces.at(i).size()));
-        for(uint j=0; j<faces.at(i).size(); ++j)
-        {
+        for(j=0; j<faces.at(i).size(); ++j)
             fprintf(fp, "%d ", faces.at(i).at(j));
-        }
         fprintf(fp, "\n");
     }
 
     fclose(fp);
 }
-
 
 }
