@@ -50,8 +50,6 @@ void write_OFF(const char                * filename,
                const std::vector<uint>   & tri,
                const std::vector<uint>   & quad);
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 void write_OFF(const char                           * filename,
                const std::vector<double>            & xyz,
