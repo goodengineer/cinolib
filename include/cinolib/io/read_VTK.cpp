@@ -59,19 +59,18 @@ void read_VTK(const char                      * filename,
     reader->Update();
     vtkSmartPointer<vtkUnstructuredGrid> grid(reader->GetUnstructuredGridOutput());
 
-    for(uint i=0; i<grid->GetNumberOfPoints(); ++i)
+    double pnt[3];
+    std::vector<uint> polyhedron;
+    uint i;
+    for(i=0; i<grid->GetNumberOfPoints(); ++i)
     {
-        double pnt[3];
         grid->GetPoint(i, pnt);
-
         verts.push_back(vec3d(pnt[0],pnt[1],pnt[2]));
     }
 
-    for(uint i=0; i<grid->GetNumberOfCells(); ++i)
+    for(i=0; i<grid->GetNumberOfCells(); ++i)
     {
         vtkCell *c = grid->GetCell(i);
-
-        std::vector<uint> polyhedron;
         switch (c->GetCellType())
         {
             case VTK_TETRA:      for(uint j=0; j<4; ++j) polyhedron.push_back(c->GetPointId(j)); break;
@@ -81,8 +80,6 @@ void read_VTK(const char                      * filename,
         if(!polyhedron.empty()) poly.push_back(polyhedron);
     }
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void read_VTK(const char                      * filename,
@@ -96,9 +93,11 @@ void read_VTK(const char                      * filename,
     reader->Update();
     vtkSmartPointer<vtkUnstructuredGrid> grid(reader->GetUnstructuredGridOutput());
 
-    for(uint i=0; i<grid->GetNumberOfPoints(); ++i)
+    double pnt[3];
+    std::vector<uint> polyhedron;
+    uint i;
+    for(i=0; i<grid->GetNumberOfPoints(); ++i)
     {
-        double pnt[3];
         grid->GetPoint(i, pnt);
 
         xyz.push_back(pnt[0]);
@@ -106,11 +105,10 @@ void read_VTK(const char                      * filename,
         xyz.push_back(pnt[2]);
     }
 
-    for(uint i=0; i<grid->GetNumberOfCells(); ++i)
+    for(i=0; i<grid->GetNumberOfCells(); ++i)
     {
         vtkCell *c = grid->GetCell(i);
 
-        std::vector<uint> polyhedron;
         switch (c->GetCellType())
         {
             case VTK_TETRA:      for(uint j=0; j<4; ++j) polyhedron.push_back(c->GetPointId(j)); break;
@@ -120,8 +118,6 @@ void read_VTK(const char                      * filename,
         if(!polyhedron.empty()) poly.push_back(polyhedron);
     }
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void read_VTK(const char          * filename,
@@ -136,9 +132,10 @@ void read_VTK(const char          * filename,
     reader->Update();
     vtkSmartPointer<vtkUnstructuredGrid> grid(reader->GetUnstructuredGridOutput());
 
-    for(uint i=0; i<grid->GetNumberOfPoints(); ++i)
+    double pnt[3];
+    uint i;
+    for(i=0; i<grid->GetNumberOfPoints(); ++i)
     {
-        double pnt[3];
         grid->GetPoint(i, pnt);
 
         xyz.push_back(pnt[0]);
@@ -146,7 +143,7 @@ void read_VTK(const char          * filename,
         xyz.push_back(pnt[2]);
     }
 
-    for(uint i=0; i<grid->GetNumberOfCells(); ++i)
+    for(i=0; i<grid->GetNumberOfCells(); ++i)
     {
         vtkCell *c = grid->GetCell(i);
 
