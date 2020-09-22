@@ -52,8 +52,7 @@ class AbstractDrawablePolygonMesh : public virtual Mesh, public DrawableObject
 
         MeshSlicer<Mesh> slicer;
         Material         material_;
-        RenderData       drawlist;
-        RenderData       drawlist_marked; // rendering info about marked edges (can be extended to handle marked verts/faces too)
+        RenderData       drawlist,drawlist_marked; // rendering info about marked edges (can be extended to handle marked verts/faces too)
         Color            marked_edge_color;
         float            AO_alpha = 1.0;
 
@@ -61,14 +60,10 @@ class AbstractDrawablePolygonMesh : public virtual Mesh, public DrawableObject
 
         explicit AbstractDrawablePolygonMesh() : Mesh() {}
 
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         void       draw(const float scene_size=1) const;
         vec3d      scene_center() const { return this->bb.center();     }
         float      scene_radius() const { return this->bb.diag() * 0.5; }
         ObjectType object_type()  const = 0;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void vert_set_color(const Color & c) { Mesh::vert_set_color(c); updateGL(); }
         void edge_set_color(const Color & c) { Mesh::edge_set_color(c); updateGL(); }
@@ -77,27 +72,17 @@ class AbstractDrawablePolygonMesh : public virtual Mesh, public DrawableObject
         void edge_set_alpha(const float   a) { Mesh::edge_set_alpha(a); updateGL(); }
         void poly_set_alpha(const float   a) { Mesh::poly_set_alpha(a); updateGL(); }
 
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         void init_drawable_stuff();
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void updateGL();        // regenerates rendering data for both mesh and marked elements
         void updateGL_mesh();   // regenerates rendering data for mesh elements
         void updateGL_marked(); // regenerates rendering data for marked mesh elements
 
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         const Material & material() const { return material_; }
               Material & material()       { return material_; }
 
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         void slice(const SlicerState & s);
         void slicer_reset();
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void show_mesh(const bool b);
         void show_AO_alpha(const float alpha);
