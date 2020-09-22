@@ -49,8 +49,6 @@ void write_NODE_ELE(const char                           * basename,
                     const std::vector<vec3d>             & verts,
                     const std::vector<std::vector<uint>> & poly);
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 void write_NODE_ELE_2D(const char                           * basename,
                        const std::vector<vec3d>             & verts, // z will be discarded
