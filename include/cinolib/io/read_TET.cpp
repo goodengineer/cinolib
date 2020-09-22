@@ -63,25 +63,24 @@ void read_TET(const char          * filename,
     fgets(line,1024,fp);
     sscanf(line, "%d tets", &nt);
 
+    double x,y,z;
     for(uint vid=0; vid<nv; ++vid)
     {
         fgets(line, 1024, fp);
 
         // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
         //
-        double x,y,z;
         sscanf(line, "%lf %lf %lf ", &x, &y, &z);
 
         xyz.push_back(x);
         xyz.push_back(y);
         xyz.push_back(z);
     }
-
+    uint v0, v1, v2, v3;
     for(uint tid=0; tid<nt; ++tid)
     {
         fgets(line, 1024, fp);
 
-        uint v0, v1, v2, v3;
         sscanf(line, "4 %d %d %d %d", &v0, &v1, &v2, &v3);
 
         tets.push_back(v0);
@@ -92,8 +91,6 @@ void read_TET(const char          * filename,
 
     fclose(fp);
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 CINO_INLINE
 void read_TET(const char                     * filename,
@@ -122,25 +119,23 @@ void read_TET(const char                     * filename,
     verts.reserve(nv);
     polys.reserve(np);
 
+    vec3d p;
     for(uint vid=0; vid<nv; ++vid)
     {
         fgets(line, 1024, fp);
 
         // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
         //
-        vec3d p;
         sscanf(line, "%lf %lf %lf ", &p.x(), &p.y(), &p.z());
         verts.push_back(p);
     }
-
+    uint v0, v1, v2, v3;
+    std::vector<uint> tet;
     for(uint pid=0; pid<np; ++pid)
     {
         fgets(line, 1024, fp);
 
-        uint v0, v1, v2, v3;
         sscanf(line, "4 %d %d %d %d", &v0, &v1, &v2, &v3);
-
-        std::vector<uint> tet;
         tet.push_back(v0);
         tet.push_back(v3);
         tet.push_back(v2);
@@ -150,5 +145,4 @@ void read_TET(const char                     * filename,
 
     fclose(fp);
 }
-
 }
