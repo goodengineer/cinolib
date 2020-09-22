@@ -60,13 +60,13 @@ void write_Livesu2012(const char                       * filename,
 
     fprintf( f, "ID Cx Cy Cz RADIUS #NEIGHBORS NEIGHBORS_LIST\n%d\n", nv);
 
+    std::vector<int> nbrs
+    uint i;
     for(uint vid=0; vid<nv; ++vid)
     {
-        vec3d pos(coords[3*vid+0],
-                  coords[3*vid+1],
-                  coords[3*vid+2]);
+        vec3d pos(coords[3*vid+0],coords[3*vid+1],coords[3*vid+2]);
 
-        std::vector<int> nbrs = adj_vtx2vtx.at(vid);
+        nbrs = adj_vtx2vtx.at(vid);
 
         fprintf(f,
                 "%d %f %f %f %f %d ",
@@ -77,15 +77,12 @@ void write_Livesu2012(const char                       * filename,
                 max_spheres.at(vid),
                 (int)nbrs.size());
 
-        for(uint i=0; i<nbrs.size(); ++i)
-        {
+        for(i=0; i<nbrs.size(); ++i)
             fprintf(f, "%d ", nbrs[i]);
-        }
 
         fprintf(f, "\n");
     }
 
     fclose(f);
 }
-
 }
