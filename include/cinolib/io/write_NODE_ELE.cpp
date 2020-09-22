@@ -46,12 +46,10 @@ void write_NODE_ELE(const char                           * basename,
 {
     setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 
-    std::string node_filename = std::string(basename) + ".node";
-    std::string ele_filename  = std::string(basename) + ".ele";
-
-    FILE *f_node = fopen(node_filename.c_str(), "w");
-    FILE *f_ele  = fopen(ele_filename.c_str(),  "w");
-
+    std::string node_filename = std::string(basename) + ".node",ele_filename  = std::string(basename) + ".ele";
+   
+    FILE *f_node = fopen(node_filename.c_str(), "w"),*f_ele  = fopen(ele_filename.c_str(),  "w");
+   
     if(!f_node || !f_ele)
     {
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : write_NODE_ELE() : couldn't create output file(s)." << std::endl;
@@ -78,9 +76,6 @@ void write_NODE_ELE(const char                           * basename,
     fclose(f_ele);
 }
 
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 CINO_INLINE
 void write_NODE_ELE_2D(const char                           * basename,
                        const std::vector<vec3d>             & verts,
@@ -88,12 +83,10 @@ void write_NODE_ELE_2D(const char                           * basename,
 {
     setlocale(LC_NUMERIC, "en_US.UTF-8"); // makes sure "." is the decimal separator
 
-    std::string node_filename = std::string(basename) + ".node";
-    std::string ele_filename  = std::string(basename) + ".ele";
+    std::string node_filename = std::string(basename) + ".node",ele_filename  = std::string(basename) + ".ele";
 
-    FILE *f_node = fopen(node_filename.c_str(), "w");
-    FILE *f_ele  = fopen(ele_filename.c_str(),  "w");
-
+    FILE *f_node = fopen(node_filename.c_str(), "w"),*f_ele  = fopen(ele_filename.c_str(),  "w");
+ 
     if(!f_node || !f_ele)
     {
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : write_NODE_ELE() : couldn't create output file(s)." << std::endl;
@@ -119,5 +112,4 @@ void write_NODE_ELE_2D(const char                           * basename,
     fclose(f_node);
     fclose(f_ele);
 }
-
 }
