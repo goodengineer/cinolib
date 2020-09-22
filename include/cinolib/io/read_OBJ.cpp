@@ -95,9 +95,7 @@ void read_OBJ(const char                     * filename,
     read_OBJ(filename, pos, tex, nor, poly_pos, poly_tex, poly_nor, poly_col);
 
     if (poly_pos.size() == poly_tex.size())
-    {
         to_openGL_unified_verts(pos, tex, poly_pos, poly_tex, xyz, uvw, poly);
-    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -149,7 +147,7 @@ void read_OBJ(const char                     * filename,
                 // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
                 //
                 double a, b, c;
-                     if(sscanf(line.data(), "v  %lf %lf %lf", &a, &b, &c) == 3) pos.push_back(vec3d(a,b,c));
+                if(sscanf(line.data(), "v  %lf %lf %lf", &a, &b, &c) == 3) pos.push_back(vec3d(a,b,c));
                 else if(sscanf(line.data(), "vt %lf %lf %lf", &a, &b, &c) == 3) tex.push_back(vec3d(a,b,c));
                 else if(sscanf(line.data(), "vt %lf %lf %lf", &a, &b, &c) == 2) tex.push_back(vec3d(a,b,0));
                 else if(sscanf(line.data(), "vn %lf %lf %lf", &a, &b, &c) == 3) nor.push_back(vec3d(a,b,c));
@@ -161,9 +159,9 @@ void read_OBJ(const char                     * filename,
                 line = line.substr(1,line.size()-1); // discard the 'f' letter
                 std::istringstream ss(line);
                 std::vector<uint> p_pos, p_tex, p_nor;
+                int v_pos, v_tex, v_nor;
                 for(std::string sub_str; ss >> sub_str;)
                 {
-                    int v_pos, v_tex, v_nor;
                     read_point_id(strdup(sub_str.c_str()), v_pos, v_tex, v_nor);
                     if (v_pos >= 0) p_pos.push_back(v_pos);
                     if (v_tex >= 0) p_tex.push_back(v_tex);
@@ -186,9 +184,7 @@ void read_OBJ(const char                     * filename,
                 {
                     auto query = color_map.find(std::string(mat_c));
                     if (query != color_map.end())
-                    {
                         curr_color = query->second;
-                    }
                     else std::cerr << "WARNING: could not find material: " << mat_c << std::endl;
                 }
                 break;
@@ -225,9 +221,7 @@ void read_OBJ(const char                     * filename,
               std::vector<std::vector<uint>> & poly_nor,    // polygons with references to nor
               std::vector<Color>             & poly_col)    // per polygon colors
 {
-    std::string  diffuse_path;
-    std::string  specular_path;
-    std::string  normal_path;
+    std::string  diffuse_path,specular_path,normal_path;
     read_OBJ(filename, pos, tex, nor, poly_pos, poly_tex, poly_nor, poly_col, diffuse_path, specular_path, normal_path);
 }
 
@@ -253,8 +247,7 @@ void read_MTU(const char                  * filename,
         exit(-1);
     }
 
-    char curr_material[1024];
-    char line[1024];
+    char curr_material[1024],line[1024];
     while(fgets(line, 1024, f))
     {
         switch(line[0])
@@ -299,5 +292,4 @@ void read_MTU(const char                  * filename,
     std::string  normal_path;
     read_MTU(filename, color_map, diffuse_path, specular_path, normal_path);
 }
-
 }
