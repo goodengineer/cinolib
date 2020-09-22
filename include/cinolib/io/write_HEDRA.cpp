@@ -56,10 +56,8 @@ void write_HEDRA(const char                           * filename,
         exit(-1);
     }
 
-    uint nv = verts.size();
-    uint nf = faces.size();
-    uint np = polys.size();
-
+    uint nv = verts.size(),nf = faces.size(),np = polys.size();
+    
     fprintf(fp, "%d %d %d\n", nv, nf, np);
 
     // http://stackoverflow.com/questions/16839658/printf-width-specifier-to-maintain-precision-of-floating-point-value
@@ -87,5 +85,4 @@ void write_HEDRA(const char                           * filename,
 
     fclose(fp);
 }
-
 }
