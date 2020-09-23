@@ -170,7 +170,7 @@ void Tetmesh<M,V,E,F,P>::save(const char * filename) const
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
+// TODO: this methode(routine) is very likely to be repeated in multiple classes and so to refactor -> extract it to a universal methods set for normals. 
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
 void Tetmesh<M,V,E,F,P>::update_f_normal(const uint fid)
@@ -244,7 +244,7 @@ uint Tetmesh<M,V,E,F,P>::edge_split(const uint eid, const vec3d & p)
     this->edge_data(e1) = this->edge_data(eid);
     for(uint fid : this->adj_e2f(eid))
     {
-        uint vopp = this->face_vert_opposite_to(fid,eid);
+         uint vopp = this->face_vert_opposite_to(fid,eid);
          int f0   = this->face_id({vid0,new_vid,vopp}); assert(f0>=0);
          int f1   = this->face_id({vid1,new_vid,vopp}); assert(f1>=0);
          this->face_data(f0) = this->face_data(fid);
@@ -355,7 +355,7 @@ bool Tetmesh<M,V,E,F,P>::edge_is_geometrically_collapsible(const uint eid, const
     for(uint pid : polys_to_test)
     {
         vec3d v[4];
-        for(int i=0; i<4; ++i)
+        for(short i=0; i<4; ++i)
         {
             bool is_v0 = (this->poly_vert_id(pid,i) == vid0);
             bool is_v1 = (this->poly_vert_id(pid,i) == vid1);
@@ -600,7 +600,7 @@ uint Tetmesh<M,V,E,F,P>::face_split(const uint fid, const vec3d & p)
     for(uint pid : this->adj_f2p(fid))
     {
         uint opp_vid = this->poly_vert_opposite_to(pid, fid);
-        for(uint off=0; off<3; ++off)
+        for(short off=0; off<3; ++off)
         {
             std::vector<uint> tet =
             {
@@ -682,10 +682,8 @@ int Tetmesh<M,V,E,F,P>::poly_shared_vert(const uint pid, const std::vector<uint>
         ++v_count[TET_EDGES[e][0]];
         ++v_count[TET_EDGES[e][1]];
     }
-    for(uint i=0; i<4; ++i)
-    {
+    for(short i=0; i<4; ++i)
         if (v_count[i] == incident_edges.size()) return this->poly_vert_id(pid,i);
-    }
     return -1;
 }
 
@@ -810,7 +808,7 @@ int Tetmesh<M,V,E,F,P>::poly_id_from_vids(const std::vector<uint> & vlist) const
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
+//ToDo: check this methods repeats from other classes, can be refactored -> extracted
 template<class M, class V, class E, class F, class P>
 CINO_INLINE
 double Tetmesh<M,V,E,F,P>::poly_dihedral_angle(const uint pid, const uint fid0, const uint fid1) const
