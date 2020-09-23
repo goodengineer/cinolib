@@ -59,9 +59,7 @@ CINO_INLINE
 Polygon2D::Polygon2D(const std::vector<double> & ring)
 {
     for(uint vid=0; vid<ring.size()/2; ++vid)
-    {
         boost::geometry::append(poly, BoostPoint(ring[2*vid], ring[2*vid+1]));
-    }
     boost::geometry::correct(poly);
 
     remove_duplicated_vertices();
@@ -305,10 +303,11 @@ void Polygon2D::triangulate(std::vector<double> & coords,
         uint e[2];
 
         assert(hole.size() > 3);
+        double x,y;
         for(uint vid=0; vid<hole.size()-1; ++vid)
         {
-            double x = boost::geometry::get<0>(hole[vid]);
-            double y = boost::geometry::get<1>(hole[vid]);
+            x = boost::geometry::get<0>(hole[vid]);
+            y = boost::geometry::get<1>(hole[vid]);
 
             coords_in.push_back(x);
             coords_in.push_back(y);
@@ -339,10 +338,11 @@ void Polygon2D::triangulate(std::vector<double> & coords,
 
     if (tmp.poly.inners().size() > 0)
     {
+        bool   found;
+        double hx,hy;
         for(uint hid=0; hid<hole_edges.size()/2; ++hid)
         {
-            bool   found = false;
-            double hx,hy;
+            found = false;
             uint    e[2] = { hole_edges[2*hid+0] , hole_edges[2*hid+1] };
             for(uint tid=0; tid<tris.size()/3; ++tid)
             {
@@ -472,10 +472,8 @@ std::vector<Polygon2D> Polygon2D::operator ^ (const Polygon2D &p) const // xor
 CINO_INLINE
 std::vector<Polygon2D> Polygon2D::sym_overlay(const Polygon2D & p) const // (A^B) U (A&B)
 {
-    std::vector<Polygon2D> xor_p = *this ^ p;
-    std::vector<Polygon2D> and_p = *this & p;
+    std::vector<Polygon2D> xor_p = *this ^ p,nd_p = *this & p,res;
 
-    std::vector<Polygon2D> res;
     std::copy(xor_p.begin(), xor_p.end(), std::back_inserter(res));
     std::copy(and_p.begin(), and_p.end(), std::back_inserter(res));
 
@@ -490,14 +488,14 @@ void Polygon2D::get_3D_segments(const double z_coord, std::vector<vec3d> & point
 {
     assert(points.empty());
     assert(segs.empty());
-
+    uint base_addr,n_vertices;
+    double x0,y0;
     for(uint ring=0; ring<1+n_holes(); ++ring)
     {
-        uint base_addr = points.size();
-        uint n_vertices = (ring == 0) ? n_out_vertices() : n_hole_vertices(ring-1);
+        base_addr = points.size();
+        n_vertices = (ring == 0) ? n_out_vertices() : n_hole_vertices(ring-1);
         for(uint i=0; i<n_vertices; ++i)
         {
-            double x0,y0;
             get_coords(ring, i, x0, y0);
             points.push_back(vec3d(x0,y0,z_coord));
             segs.push_back(base_addr + i);
@@ -527,10 +525,9 @@ void Polygon2D::get_3D_points(const double z_coord, std::vector<vec3d> & points,
     assert(ring >= 0 && ring <= n_holes());
 
     uint n_vertices = (ring == 0) ? n_out_vertices() : n_hole_vertices(ring-1);
-
+    double x, y;
     for(uint i=0; i<n_vertices; ++i)
     {
-        double x, y;
         get_coords(ring, i, x, y);
         points.push_back(vec3d(x,y,z_coord));
     }
@@ -541,10 +538,7 @@ void Polygon2D::get_3D_points(const double z_coord, std::vector<vec3d> & points,
 CINO_INLINE
 std::vector<Polygon2D> Polygon2D::overlay(const Polygon2D & p) const // (A-B) U (A&B)
 {
-    std::vector<Polygon2D> min_p = *this - p;
-    std::vector<Polygon2D> and_p = *this & p;
-
-    std::vector<Polygon2D> res;
+    std::vector<Polygon2D> min_p = *this - p,and_p = *this & p,res;
     std::copy(min_p.begin(), min_p.end(), std::back_inserter(res));
     std::copy(and_p.begin(), and_p.end(), std::back_inserter(res));
 
@@ -616,13 +610,12 @@ void Polygon2D::merge_adjacent_nearby_vertices(const double eps)
 
     std::vector<std::vector<double>> new_rings;
     std::vector<std::vector<vec3d>>  old_rings(1 + n_holes());
-
+    std::vector<double> ring;
     for(uint r=0; r<n_holes()+1; ++r)
     {
         get_3D_points(0, old_rings[r], r);
 
-        std::vector<double> ring;
-
+        ring.clear();
         for(uint i=0; i<old_rings[r].size(); ++i)
         {
             vec3d curr = old_rings[r][i];
