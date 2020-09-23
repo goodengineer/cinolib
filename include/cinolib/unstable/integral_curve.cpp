@@ -348,7 +348,7 @@ Curve::Sample IntegralCurve<Trimesh<>>::move_forward_from_face(const uint fid, c
     vec3d grad = grad_ptr->vec_at(fid);
     grad.normalize();
 
-    for(uint e=0; e<3; ++e)
+    for(short e=0; e<3; ++e)
     {
         vec3d   e0  = m_ptr->poly_vert(fid,  TRI_EDGES[e][0]);
         vec3d   e1  = m_ptr->poly_vert(fid,  TRI_EDGES[e][1]);
