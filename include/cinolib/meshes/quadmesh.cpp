@@ -101,9 +101,7 @@ CINO_INLINE
 bool Quadmesh<M,V,E,P>::vert_is_singular(const uint vid) const
 {
     if (this->vert_is_boundary(vid))
-    {
         return (this->vert_valence(vid)!=3);
-    }
     return (this->vert_valence(vid)!=4);
 }
 
@@ -128,9 +126,7 @@ int Quadmesh<M,V,E,P>::vert_next_along_chain(const uint curr, const uint prev) c
     assert(e1>=0);
 
     for(uint e2 : this->adj_v2e(curr))
-    {
         if (!this->edges_share_poly(e1,e2)) return this->vert_opposite_to(e2,curr);
-    }
     assert(false);
 }
 
@@ -178,8 +174,7 @@ CINO_INLINE
 std::vector<uint> Quadmesh<M,V,E,P>::edge_chain(const uint eid, const uint vid) const
 {
     std::vector<uint> chain = { eid };
-    int curr_vid = vid;
-    int curr_eid = eid;
+    int curr_vid = vid,curr_eid = eid;
     do
     {
         if ((curr_eid = edge_next_along_chain(curr_eid, curr_vid)) >= 0)
