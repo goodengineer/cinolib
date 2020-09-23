@@ -109,9 +109,7 @@ class Skel
         {
             std::vector<int> j;
             for(int vid=0; vid<num_vertices(); ++vid)
-            {
                 if (vertex_is_joint(vid)) j.push_back(vid);
-            }
             return j;
         }
 
@@ -196,7 +194,7 @@ class Skel
         {
             double length = 0;
             std::vector<int> bone = segment_bone(bid);
-            for(int i=0; i<(int)bone.size(); ++i) length += segment_length(bone[i]);
+            for(std::size_t i=0; i<bone.size(); ++i) length += segment_length(bone[i]);
             return length;
         }
 
@@ -266,9 +264,7 @@ class Skel
         {
             assert(vertex_is_bone(curr_vid));
             if (adj_vtx2vtx(curr_vid, 0) == prev_vid)
-            {
                 return adj_vtx2vtx(curr_vid, 1);
-            }
             return adj_vtx2vtx(curr_vid, 0);
         }
 
@@ -276,9 +272,10 @@ class Skel
         {
             std::set<int> adj_bones;
             std::vector<int> nbrs = adj_vtx2vtx(vid);
-            for(int i=0; i<(int)nbrs.size(); ++i)
+            int nbr;
+            for(std::size_t i=0; i<nbrs.size(); ++i)
             {
-                int nbr = nbrs[i];
+                nbr = nbrs[i];
                 adj_bones.insert( vertex_bone_id(nbr) );
             }
             return adj_bones;
