@@ -290,12 +290,12 @@ std::vector<uint> Hexmesh<M,V,E,F,P>::face_sheet(const uint fid) const
         q.pop();
 
         sheet.push_back(fid);
-
-        for(uint eid : this->adj_f2e(fid))
+        uint eid,nbr;
+        for(eid : this->adj_f2e(fid))
         {
             if (this->edge_is_singular(eid)) continue;
 
-            for(uint nbr : this->adj_e2f(eid))
+            for(nbr : this->adj_e2f(eid))
             {
                 if(!this->faces_share_poly(fid,nbr) && DOES_NOT_CONTAIN(visited,nbr))
                 {
@@ -344,15 +344,15 @@ void Hexmesh<M,V,E,F,P>::poly_subdivide(const std::vector<std::vector<std::vecto
     std::vector<vec3d> new_verts;
     std::vector<uint>  new_polys;
     std::map<std::vector<uint>,uint> v_map;
-
+    std::vector<uint> vids;
     for(uint pid=0; pid<this->num_polys(); ++pid)
     {
         for(const auto & sub_poly: poly_split_scheme)
         {
             assert(sub_poly.size() == 8);
-            for(uint off=0; off<8; ++off)
+            for(short off=0; off<8; ++off)
             {
-                std::vector<uint> vids;
+                vids.clear();
                 for(uint i : sub_poly.at(off)) vids.push_back(this->poly_vert_id(pid,i));
                 sort(vids.begin(), vids.end());
 
