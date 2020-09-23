@@ -87,9 +87,7 @@ void AbstractPolygonMesh<M,V,E,P>::load(const char * filename)
         poly_pos = polys_from_serialized_vids(tris, 3);
     }
     else
-    {
         std::cerr << "ERROR : " << __FILE__ << ", line " << __LINE__ << " : load() : file format not supported yet " << std::endl;
-    }
 
     init(pos, tex, nor, poly_pos, poly_tex, poly_nor, poly_col);
 }
@@ -159,9 +157,7 @@ void AbstractPolygonMesh<M,V,E,P>::init(const std::vector<vec3d>             & v
     std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
 
     // pre-allocate memory
-    uint nv = verts.size();
-    uint np = polys.size();
-    uint ne = 1.5*np;
+    uint nv = verts.size(),np = polys.size(),ne = 1.5*np;  
     this->verts.reserve(nv);
     this->edges.reserve(ne*2);
     this->polys.reserve(np);
@@ -251,9 +247,7 @@ void AbstractPolygonMesh<M,V,E,P>::init(      std::vector<vec3d>             & p
     {
         std::cout << "load textures" << std::endl;
         for(uint vid=0; vid<this->num_verts(); ++vid)
-        {
             this->vert_data(vid).uvw = tex.at(vid);
-        }
     }
     else this->copy_xyz_to_uvw(UVW_param);
 
@@ -262,9 +256,7 @@ void AbstractPolygonMesh<M,V,E,P>::init(      std::vector<vec3d>             & p
     {
         std::cout << "load normals" << std::endl;
         for(uint vid=0; vid<this->num_verts(); ++vid)
-        {
             this->vert_data(vid).normal = nor.at(vid);
-        }
     }
 
     // customize colors
@@ -272,9 +264,7 @@ void AbstractPolygonMesh<M,V,E,P>::init(      std::vector<vec3d>             & p
     {
         std::cout << "load per polygon colors" << std::endl;
         for(uint pid=0; pid<this->num_polys(); ++pid)
-        {
             this->poly_data(pid).color = poly_col.at(pid);
-        }
     }
 }
 
@@ -949,7 +939,7 @@ void AbstractPolygonMesh<M,V,E,P>::vert_switch_id(const uint vid0, const uint vi
 
     for(uint eid : edges_to_update)
     {
-        for(uint i=0; i<2; ++i)
+        for(short i=0; i<2; ++i)
         {
             uint & vid = this->edges.at(2*eid+i);
             if (vid == vid0) vid = vid1; else
@@ -1589,11 +1579,11 @@ CINO_INLINE
 std::vector<ipair> AbstractPolygonMesh<M,V,E,P>::get_boundary_edges() const
 {
     std::vector<ipair> res;
+    ipair e;
     for(uint eid=0; eid<this->num_edges(); ++eid)
     {
         if (this->edge_is_boundary(eid))
         {
-            ipair e;
             e.first  = this->edge_vert_id(eid,0);
             e.second = this->edge_vert_id(eid,1);
             res.push_back(e);
@@ -1788,5 +1778,4 @@ void AbstractPolygonMesh<M,V,E,P>::poly_export_element(const uint pid, std::vect
     for(uint vid : adj_p2v(pid)) verts.push_back(this->vert(vid));
     faces.push_back(f);
 }
-
 }
