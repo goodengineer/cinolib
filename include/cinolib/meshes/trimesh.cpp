@@ -187,7 +187,7 @@ bool Trimesh<M,V,E,P>::edge_is_geometrically_collapsible(const uint eid, const d
     for(uint pid : polys_to_test)
     {
         vec3d v[3];
-        for(int i=0; i<3; ++i)
+        for(short i=0; i<3; ++i)
         {
             bool is_v0 = (this->poly_vert_id(pid,i) == vid0);
             bool is_v1 = (this->poly_vert_id(pid,i) == vid1);
@@ -215,15 +215,17 @@ uint Trimesh<M,V,E,P>::vert_split(const uint eid0, const uint eid1)
     std::vector<uint> p_ring = this->vert_ordered_polys_star(v0);
     std::vector<uint> pids0, pids1;
     bool push0 = true;
+    uint curr,mext;
+    int eid;
     for(uint i=0; i<p_ring.size(); ++i)
     {
-        uint curr = p_ring.at(i);
+        curr = p_ring.at(i);
         if(push0) pids0.push_back(curr);
         else      pids1.push_back(curr);
         if(i<p_ring.size()-1)
         {
-            uint next = p_ring.at(i+1);
-             int eid  = this->edge_shared(curr,next); assert(eid>=0);
+            next = p_ring.at(i+1);
+            eid  = this->edge_shared(curr,next); assert(eid>=0);
             if((uint)eid==eid0 || (uint)eid==eid1) push0 = !push0;
         }
     }
@@ -402,11 +404,13 @@ double Trimesh<M,V,E,P>::edge_cotangent_weight(const uint eid) const
     uint   vid1  = this->edge_vert_id(eid,1);
     double count = 0.0;
     double sum   = 0.0;
+    uint   v_opp;
+    double alpha,c;
     for(uint pid : this->adj_e2p(eid))
     {
-        uint   v_opp = this->vert_opposite_to(pid, vid0, vid1);
-        double alpha = this->poly_angle_at_vert(pid, v_opp);
-        double c     = cot(alpha);
+        v_opp = this->vert_opposite_to(pid, vid0, vid1);
+        alpha = this->poly_angle_at_vert(pid, v_opp);
+        c     = cot(alpha);
         if (!std::isnan(c))
         {
             sum   += std::max(1e-10, c); // avoid negative weights
@@ -599,9 +603,10 @@ uint Trimesh<M,V,E,P>::vert_opposite_to(const uint pid, const uint vid0, const u
     assert(vid0!=vid1);
     assert(this->poly_contains_vert(pid, vid0));
     assert(this->poly_contains_vert(pid, vid1));
+    uint vid;
     for(uint off=0; off<this->verts_per_poly(pid); ++off)
     {
-        uint vid = this->poly_vert_id(pid,off);
+        vid = this->poly_vert_id(pid,off);
         if (vid != vid0 && vid != vid1) return vid;
     }
     assert(false);
