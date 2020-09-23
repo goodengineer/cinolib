@@ -192,7 +192,6 @@ class AbstractPolygonMesh : public AbstractMesh<M,V,E,P>
         const std::vector<uint>  & poly_tessellation       (const uint pid) const;
               void                 poly_export_element     (const uint pid, std::vector<vec3d> & verts, std::vector<std::vector<uint>> & faces) const override;
 };
-
 }
 
 #ifndef  CINO_STATIC_LIB
