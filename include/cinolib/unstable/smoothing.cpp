@@ -62,20 +62,21 @@ void smooth_taubin(AbstractMesh<M,V,E,P> & m,
     assert(lambda >  0 );
     assert(lambda <  1 );
     assert(lambda < -mu);
-
+    std::vector<std::pair<uint,double>> wgts;
+    double sum;
+    uint vid;
     for(uint iter=0; iter<n_iters; ++iter)
     {
         // shrink
-        //
-        for(uint vid=0; vid<m.num_verts(); ++vid)
+       
+        for(vid=0; vid<m.num_verts(); ++vid)
         {
             if (CONTAINS(do_not_smooth, vid)) continue;
-
-            std::vector<std::pair<uint,double>> wgts;
+            wgts.clear();
             m.vert_weights(vid, mode, wgts);
 
             // normalize weights...
-            double sum = 0;
+            sum = 0;
             for(auto  w : wgts) sum += w.second;
             for(auto &w : wgts) w.second /= sum;
 
@@ -85,16 +86,16 @@ void smooth_taubin(AbstractMesh<M,V,E,P> & m,
         }
 
         // inflate
-        //
-        for(uint vid=0; vid<m.num_verts(); ++vid)
+       
+        for(vid=0; vid<m.num_verts(); ++vid)
         {
             if (CONTAINS(do_not_smooth, vid)) continue;
 
-            std::vector<std::pair<uint,double>> wgts;
+            wgts.clear();
             m.vert_weights(vid, mode, wgts);
 
             // normalize weights...
-            double sum = 0;
+            sum = 0;
             for(auto  w : wgts) sum += w.second;
             for(auto &w : wgts) w.second /= sum;
 
