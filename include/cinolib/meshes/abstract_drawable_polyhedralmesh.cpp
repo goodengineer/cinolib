@@ -60,8 +60,6 @@ void AbstractDrawablePolyhedralMesh<Mesh>::init_drawable_stuff()
     updateGL();
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::draw(const float) const
@@ -71,8 +69,6 @@ void AbstractDrawablePolyhedralMesh<Mesh>::draw(const float) const
     render(drawlist_marked);
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::updateGL()
@@ -81,8 +77,6 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL()
     updateGL_in();
     updateGL_out();
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class Mesh>
 CINO_INLINE
@@ -96,17 +90,19 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_marked()
     drawlist_marked.seg_coords.clear();
     drawlist_marked.seg_colors.clear();
 
-    for(uint fid=0; fid<this->num_faces(); ++fid)
+    uint fid,i,vid0,vid,vid2,eid;
+    int base_addr;
+    for(fid=0; fid<this->num_faces(); ++fid)
     {
         if(!this->face_data(fid).flags[MARKED]) continue;
 
-        for(uint i=0; i<this->face_tessellation(fid).size()/3; ++i)
+        for(i=0; i<this->face_tessellation(fid).size()/3; ++i)
         {
-            uint vid0 = this->face_tessellation(fid).at(3*i+0);
-            uint vid1 = this->face_tessellation(fid).at(3*i+1);
-            uint vid2 = this->face_tessellation(fid).at(3*i+2);
-
-            int base_addr = drawlist_marked.tri_coords.size()/3;
+            vid0 = this->face_tessellation(fid).at(3*i+0);
+            vid1 = this->face_tessellation(fid).at(3*i+1);
+            vid2 = this->face_tessellation(fid).at(3*i+2);
+          
+            base_addr = drawlist_marked.tri_coords.size()/3;
 
             drawlist_marked.tris.push_back(base_addr    );
             drawlist_marked.tris.push_back(base_addr + 1);
@@ -146,15 +142,15 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_marked()
             drawlist_marked.tri_v_colors.push_back(marked_face_color.a);
         }
     }
-
-    for(uint eid=0; eid<this->num_edges(); ++eid)
+    vec3d vid0,vid1;
+    for(eid=0; eid<this->num_edges(); ++eid)
     {
         if(!this->edge_data(eid).flags[MARKED]) continue;
 
-        vec3d vid0 = this->edge_vert(eid,0);
-        vec3d vid1 = this->edge_vert(eid,1);
+        vid0 = this->edge_vert(eid,0);
+        vid1 = this->edge_vert(eid,1);
 
-        int base_addr = drawlist_marked.seg_coords.size()/3;
+        base_addr = drawlist_marked.seg_coords.size()/3;
         drawlist_marked.segs.push_back(base_addr    );
         drawlist_marked.segs.push_back(base_addr + 1);
 
@@ -176,8 +172,6 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_marked()
     }
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_out()
@@ -192,28 +186,32 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_out()
     drawlist_out.seg_coords.clear();
     drawlist_out.seg_colors.clear();
 
-    for(uint fid=0; fid<this->num_faces(); ++fid)
+    uint fid, pid_beneath,i,vid0,vid1,vid2;
+    vec3d n;
+    float AO_vid0,AO_vid1,AO_vid2;
+    int base_addr;
+  
+    for(fid=0; fid<this->num_faces(); ++fid)
     {
         if (!this->face_is_on_srf(fid)) continue;
-
-        uint pid_beneath;
+       
         if(!this->face_is_visible(fid,pid_beneath)) continue;
 
-        vec3d n = this->poly_face_normal(pid_beneath, fid);
+        n = this->poly_face_normal(pid_beneath, fid);
 
-        for(uint i=0; i<this->face_tessellation(fid).size()/3; ++i)
+        for(i=0; i<this->face_tessellation(fid).size()/3; ++i)
         {
-            uint vid0 = this->face_tessellation(fid).at(3*i+0);
-            uint vid1 = this->face_tessellation(fid).at(3*i+1);
-            uint vid2 = this->face_tessellation(fid).at(3*i+2);
+            vid0 = this->face_tessellation(fid).at(3*i+0);
+            vid1 = this->face_tessellation(fid).at(3*i+1);
+            vid2 = this->face_tessellation(fid).at(3*i+2);
 
             // average AO with adjacent visible faces having dihedral angle lower than 60 degrees
             auto  vid0_vis_fids = this->vert_adj_visible_faces(vid0, n, 60.0);
             auto  vid1_vis_fids = this->vert_adj_visible_faces(vid1, n, 60.0);
             auto  vid2_vis_fids = this->vert_adj_visible_faces(vid2, n, 60.0);
-            float AO_vid0 = 0.0;
-            float AO_vid1 = 0.0;
-            float AO_vid2 = 0.0;
+            AO_vid0 = 0.0;
+            AO_vid1 = 0.0;
+            AO_vid2 = 0.0;
             for(auto fp : vid0_vis_fids) AO_vid0 += this->face_data(fp.first).AO*AO_alpha + (1.0 - AO_alpha);
             for(auto fp : vid1_vis_fids) AO_vid1 += this->face_data(fp.first).AO*AO_alpha + (1.0 - AO_alpha);
             for(auto fp : vid2_vis_fids) AO_vid2 += this->face_data(fp.first).AO*AO_alpha + (1.0 - AO_alpha);
@@ -221,7 +219,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_out()
             AO_vid1 /= static_cast<float>(vid1_vis_fids.size());
             AO_vid2 /= static_cast<float>(vid2_vis_fids.size());
 
-            int base_addr = drawlist_out.tri_coords.size()/3;
+            base_addr = drawlist_out.tri_coords.size()/3;
 
             drawlist_out.tris.push_back(base_addr    );
             drawlist_out.tris.push_back(base_addr + 1);
@@ -338,16 +336,18 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_out()
             }
         }
     }
-
+    vec3d vid0,vid1;
+    bool hidden;
+    uint pid;
     for(uint eid=0; eid<this->num_edges(); ++eid)
     {
-        vec3d vid0 = this->edge_vert(eid,0);
-        vec3d vid1 = this->edge_vert(eid,1);
+        vid0 = this->edge_vert(eid,0);
+        vid1 = this->edge_vert(eid,1);
 
         if (this->edge_is_on_srf(eid))
         {
-            bool hidden = true;
-            for(uint pid : this->adj_e2p(eid))
+            hidden = true;
+            for(pid : this->adj_e2p(eid))
             {
                 if(!this->poly_data(pid).flags[HIDDEN])
                 {
@@ -357,7 +357,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_out()
             }
             if(hidden) continue;
 
-            int base_addr = drawlist_out.seg_coords.size()/3;
+            base_addr = drawlist_out.seg_coords.size()/3;
             drawlist_out.segs.push_back(base_addr    );
             drawlist_out.segs.push_back(base_addr + 1);
 
@@ -380,7 +380,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_out()
 
         if (this->edge_data(eid).flags[MARKED])
         {
-            int base_addr = drawlist_marked.seg_coords.size()/3;
+            base_addr = drawlist_marked.seg_coords.size()/3;
             drawlist_marked.segs.push_back(base_addr    );
             drawlist_marked.segs.push_back(base_addr + 1);
 
@@ -403,8 +403,6 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_out()
     }
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_in()
@@ -420,38 +418,41 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_in()
     drawlist_in.seg_colors.clear();
 
     std::unordered_set<uint> edges_to_render;
-
-    for(uint fid=0; fid<this->num_faces(); ++fid)
+    uint fid,pid_beneath,eid,i,vid0,vid1,vid2;
+    bool is_CW;
+    vec3d n;
+    float AO_vid0,AO_vid1,AO_vid2;
+    int base_addr;       
+    for(fid=0; fid<this->num_faces(); ++fid)
     {
         if(this->face_is_on_srf(fid)) continue;
 
-        uint pid_beneath;
         if(!this->face_is_visible(fid, pid_beneath)) continue;
 
-        bool is_CW = this->poly_face_is_CW(pid_beneath, fid);
+        is_CW = this->poly_face_is_CW(pid_beneath, fid);
 
-        vec3d n = this->poly_face_normal(pid_beneath, fid);
+        n = this->poly_face_normal(pid_beneath, fid);
 
-        for(uint eid : this->adj_f2e(fid))
+        for(eid : this->adj_f2e(fid))
         {
             if (this->edge_is_on_srf(eid)) continue; // updateGL_out() will consider it
             edges_to_render.insert(eid);
         }
 
-        for(uint i=0; i<this->face_tessellation(fid).size()/3; ++i)
+        for(i=0; i<this->face_tessellation(fid).size()/3; ++i)
         {
-            uint vid0 = this->face_tessellation(fid).at(3*i+0);
-            uint vid1 = this->face_tessellation(fid).at(3*i+1);
-            uint vid2 = this->face_tessellation(fid).at(3*i+2);
+            vid0 = this->face_tessellation(fid).at(3*i+0);
+            vid1 = this->face_tessellation(fid).at(3*i+1);
+            vid2 = this->face_tessellation(fid).at(3*i+2);
             if (is_CW) std::swap(vid1,vid2); // flip triangle orientation
 
             // average AO with adjacent visible faces having dihedral angle lower than 60 degrees
             auto  vid0_vis_fids = this->vert_adj_visible_faces(vid0, n, 60.0);
             auto  vid1_vis_fids = this->vert_adj_visible_faces(vid1, n, 60.0);
             auto  vid2_vis_fids = this->vert_adj_visible_faces(vid2, n, 60.0);
-            float AO_vid0 = 0.0;
-            float AO_vid1 = 0.0;
-            float AO_vid2 = 0.0;
+            AO_vid0 = 0.0;
+            AO_vid1 = 0.0;
+            AO_vid2 = 0.0;
             for(auto fp : vid0_vis_fids) AO_vid0 += this->face_data(fp.first).AO*AO_alpha + (1.0 - AO_alpha);
             for(auto fp : vid1_vis_fids) AO_vid1 += this->face_data(fp.first).AO*AO_alpha + (1.0 - AO_alpha);
             for(auto fp : vid2_vis_fids) AO_vid2 += this->face_data(fp.first).AO*AO_alpha + (1.0 - AO_alpha);
@@ -459,7 +460,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_in()
             AO_vid1 /= static_cast<float>(vid1_vis_fids.size());
             AO_vid2 /= static_cast<float>(vid2_vis_fids.size());
 
-            int base_addr = drawlist_in.tri_coords.size()/3;
+            base_addr = drawlist_in.tri_coords.size()/3;
 
             drawlist_in.tris.push_back(base_addr    );
             drawlist_in.tris.push_back(base_addr + 1);
@@ -576,15 +577,15 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_in()
             }
         }
     }
-
+    vec3d vid0,vid1;
     for(uint eid : edges_to_render)
     {
-        uint base_addr = drawlist_in.seg_coords.size()/3;
+        base_addr = drawlist_in.seg_coords.size()/3;
         drawlist_in.segs.push_back(base_addr    );
         drawlist_in.segs.push_back(base_addr + 1);
 
-        vec3d vid0 = this->edge_vert(eid,0);
-        vec3d vid1 = this->edge_vert(eid,1);
+        vid0 = this->edge_vert(eid,0);
+        vid1 = this->edge_vert(eid,1);
 
         drawlist_in.seg_coords.push_back(vid0.x());
         drawlist_in.seg_coords.push_back(vid0.y());
@@ -618,8 +619,6 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_in()
     }
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::slice(const SlicerState & s)
@@ -628,8 +627,6 @@ void AbstractDrawablePolyhedralMesh<Mesh>::slice(const SlicerState & s)
     updateGL();
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::slicer_reset()   // either AND or OR
@@ -637,8 +634,6 @@ void AbstractDrawablePolyhedralMesh<Mesh>::slicer_reset()   // either AND or OR
     slicer.reset(*this);
     updateGL();
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class Mesh>
 CINO_INLINE
@@ -656,8 +651,6 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_mesh(const bool b)
     }
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::show_AO_alpha(const float alpha)
@@ -665,8 +658,6 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_AO_alpha(const float alpha)
     AO_alpha = alpha;
     updateGL();
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class Mesh>
 CINO_INLINE
@@ -683,8 +674,6 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_mesh_flat()
     updateGL();
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::show_mesh_smooth()
@@ -699,8 +688,6 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_mesh_smooth()
 
     updateGL();
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class Mesh>
 CINO_INLINE
@@ -717,8 +704,6 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_mesh_points()
     updateGL();
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::show_out_vert_color()
@@ -730,8 +715,6 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_out_vert_color()
     drawlist_out.draw_mode &= ~DRAW_TRI_TEXTURE2D;
     updateGL_out();
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class Mesh>
 CINO_INLINE
@@ -745,16 +728,12 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_in_vert_color()
     updateGL_in();
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::show_out_face_color()
 {
     assert(false && "Per face color visualization not implemented yet!");
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class Mesh>
 CINO_INLINE
@@ -768,8 +747,6 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_out_poly_color()
     updateGL_out();
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::show_out_poly_quality()
@@ -781,8 +758,6 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_out_poly_quality()
     drawlist_out.draw_mode &= ~DRAW_TRI_TEXTURE2D;
     updateGL_out();
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class Mesh>
 CINO_INLINE
@@ -807,8 +782,6 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_out_texture1D(const int tex_type
     updateGL_out();
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::show_out_texture2D(const int tex_type, const double tex_unit_scalar, const char *bitmap)
@@ -831,8 +804,6 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_out_texture2D(const int tex_type
     updateGL_out();
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::show_out_wireframe(const bool b)
@@ -841,20 +812,14 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_out_wireframe(const bool b)
     else   drawlist_out.draw_mode &= ~DRAW_SEGS;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::show_out_wireframe_color(const Color & c)
 {
     for(uint eid=0; eid<this->num_edges(); ++eid)
-    {
         if (this->edge_is_on_srf(eid)) this->edge_data(eid).color = c;
-    }
     updateGL();
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class Mesh>
 CINO_INLINE
@@ -863,20 +828,14 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_out_wireframe_width(const float 
     drawlist_out.seg_width = width;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::show_out_wireframe_transparency(const float alpha)
 {
     for(uint eid=0; eid<this->num_edges(); ++eid)
-    {
         if (this->edge_is_on_srf(eid)) this->edge_data(eid).color.a = alpha;
-    }
     updateGL();
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class Mesh>
 CINO_INLINE
@@ -884,8 +843,6 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_in_face_color()
 {
     assert(false && "Per face color visualization not implemented yet!");
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class Mesh>
 CINO_INLINE
@@ -899,8 +856,6 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_in_poly_color()
     updateGL_in();
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::show_in_poly_quality()
@@ -912,8 +867,6 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_in_poly_quality()
     drawlist_in.draw_mode &= ~DRAW_TRI_TEXTURE2D;
     updateGL_in();
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class Mesh>
 CINO_INLINE
@@ -938,8 +891,6 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_in_texture1D(const int tex_type)
     updateGL_in();
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::show_in_texture2D(const int tex_type, const double tex_unit_scalar, const char *bitmap)
@@ -962,8 +913,6 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_in_texture2D(const int tex_type,
     updateGL_in();
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::show_in_wireframe(const bool b)
@@ -972,20 +921,14 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_in_wireframe(const bool b)
     else   drawlist_in.draw_mode &= ~DRAW_SEGS;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::show_in_wireframe_color(const Color & c)
 {
     for(uint eid=0; eid<this->num_edges(); ++eid)
-    {
         if (!this->edge_is_on_srf(eid)) this->edge_data(eid).color = c;
-    }
     updateGL();
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class Mesh>
 CINO_INLINE
@@ -994,20 +937,14 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_in_wireframe_width(const float w
     drawlist_in.seg_width = width;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::show_in_wireframe_transparency(const float alpha)
 {
     for(uint eid=0; eid<this->num_edges(); ++eid)
-    {
         if (!this->edge_is_on_srf(eid)) this->edge_data(eid).color.a = alpha;
-    }
     updateGL();
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class Mesh>
 CINO_INLINE
@@ -1017,8 +954,6 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_marked_edge(const bool b)
     else   drawlist_marked.draw_mode &= ~DRAW_SEGS;
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::show_marked_edge_color(const Color & c)
@@ -1027,16 +962,12 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_marked_edge_color(const Color & 
     updateGL_marked();
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::show_marked_edge_width(const float width)
 {
     drawlist_marked.seg_width = width;
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class Mesh>
 CINO_INLINE
@@ -1046,8 +977,6 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_marked_edge_transparency(const f
     updateGL_marked();
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::show_marked_face(const bool b)
@@ -1055,8 +984,6 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_marked_face(const bool b)
     if (b) drawlist_marked.draw_mode |=  DRAW_TRIS;
     else   drawlist_marked.draw_mode &= ~DRAW_TRIS;
 }
-
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 template<class Mesh>
 CINO_INLINE
@@ -1066,8 +993,6 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_marked_face_color(const Color & 
     updateGL_marked();
 }
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::show_marked_face_transparency(const float alpha)
@@ -1075,5 +1000,4 @@ void AbstractDrawablePolyhedralMesh<Mesh>::show_marked_face_transparency(const f
     marked_face_color.a = alpha;
     updateGL_marked();
 }
-
 }
