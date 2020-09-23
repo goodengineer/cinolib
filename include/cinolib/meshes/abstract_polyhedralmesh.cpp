@@ -76,10 +76,8 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::init(const std::vector<vec3d>           
     std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
 
     // pre-allocate memory
-    uint nv = verts.size();
-    uint nf = faces.size();
-    uint np = polys.size();
-    uint ne = 1.5*nf;
+    uint nv = verts.size(),nf = faces.size(),np = polys.size(),ne = 1.5*nf;
+   
     this->verts.reserve(nv);
     this->edges.reserve(ne*2);
     this->faces.reserve(nf);
@@ -130,8 +128,7 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::init(const std::vector<vec3d>           
     std::chrono::high_resolution_clock::time_point t0 = std::chrono::high_resolution_clock::now();
 
     // pre-allocate memory
-    uint nv = verts.size();
-    uint np = polys.size();
+    uint nv = verts.size(),np = polys.size();
     this->verts.reserve(nv);
     this->polys.reserve(np);
     this->v2v.reserve(nv);
@@ -176,18 +173,14 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::init(const std::vector<vec3d>           
     {
         std::cout << "set vert labels" << std::endl;
         for(uint vid=0; vid<this->num_verts(); ++vid)
-        {
             this->vert_data(vid).label = vert_labels.at(vid);
-        }
     }
 
     if(poly_labels.size()==this->num_polys())
     {
         std::cout << "set poly labels" << std::endl;
         for(uint pid=0; pid<this->num_polys(); ++pid)
-        {
             this->poly_data(pid).label = poly_labels.at(pid);
-        }
         this->poly_color_wrt_label();
     }
 }
@@ -199,15 +192,16 @@ CINO_INLINE
 double AbstractPolyhedralMesh<M,V,E,F,P>::mesh_srf_area() const
 {
     double area = 0.0;
+    uint i,vid0,vid1,vid2;
     for(uint fid=0; fid<this->num_faces(); ++fid)
     {
         if(this->face_is_on_srf(fid))
         {
-            for(uint i=0; i<this->face_tessellation(fid).size()/3; ++i)
+            for(i=0; i<this->face_tessellation(fid).size()/3; ++i)
             {
-                uint vid0 = this->face_tessellation(fid).at(3*i+0);
-                uint vid1 = this->face_tessellation(fid).at(3*i+1);
-                uint vid2 = this->face_tessellation(fid).at(3*i+2);
+                vid0 = this->face_tessellation(fid).at(3*i+0);
+                vid1 = this->face_tessellation(fid).at(3*i+1);
+                vid2 = this->face_tessellation(fid).at(3*i+2);
                 area += triangle_area(this->vert(vid0), this->vert(vid1), this->vert(vid2));
             }
         }
@@ -224,9 +218,7 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::num_srf_verts() const
 {
     uint count = 0;
     for(uint vid=0; vid<this->num_verts(); ++vid)
-    {
         if(this->vert_is_on_srf(vid)) ++count;
-    }
     return count;
 }
 
@@ -238,9 +230,7 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::num_srf_edges() const
 {
     uint count = 0;
     for(uint eid=0; eid<this->num_edges(); ++eid)
-    {
         if(this->edge_is_on_srf(eid)) ++count;
-    }
     return count;
 }
 
@@ -252,9 +242,7 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::num_srf_faces() const
 {
     uint count = 0;
     for(uint fid=0; fid<this->num_faces(); ++fid)
-    {
         if(this->face_is_on_srf(fid)) ++count;
-    }
     return count;
 }
 
@@ -265,10 +253,8 @@ CINO_INLINE
 uint AbstractPolyhedralMesh<M,V,E,F,P>::num_srf_polys() const
 {
     uint count = 0;
-    for(uint pid=0; pid<this->num_polys(); ++pid)
-    {        
+    for(uint pid=0; pid<this->num_polys(); ++pid)   
         if(this->poly_is_on_surf(pid)) ++count;
-    }
     return count;
 }
 
@@ -290,9 +276,7 @@ std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::get_surface_verts() const
 {
     std::vector<uint> res;
     for(uint vid=0; vid<this->num_verts(); ++vid)
-    {
         if(this->vert_is_on_srf(vid)) res.push_back(vid);
-    }
     return res;
 }
 
@@ -304,9 +288,7 @@ std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::get_surface_edges() const
 {
     std::vector<uint> res;
     for(uint eid=0; eid<this->num_edges(); ++eid)
-    {
         if(this->edge_is_on_srf(eid)) res.push_back(eid);
-    }
     return res;
 }
 
@@ -531,7 +513,7 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 bool AbstractPolyhedralMesh<M,V,E,F,P>::face_is_visible(const uint fid, uint & pid_beneath) const
 {
-    // note: returns also the ID of the poy that makes the face visible
+    // note: returns also the ID of the poly that makes the face visible
     int id=-1;
     for(uint pid : this->adj_f2p(fid))
     {
@@ -715,16 +697,17 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::poly_split_along_new_face(const uint pid
     cluster.insert(seed);
     std::queue<uint> q;
     q.push(seed);
+    uint eid,fid;
     while(!q.empty())
     {
-        uint fid = q.front();
+        fid = q.front();
         q.pop();
 
         for(uint nbr : this->adj_f2f(fid))
         {
             if(!this->poly_contains_face(pid,nbr)) continue;
 
-            uint eid = this->face_shared_edge(fid,nbr);
+            eid = this->face_shared_edge(fid,nbr);
             if(CONTAINS(border,eid)) continue;
 
             if(DOES_NOT_CONTAIN(cluster,nbr))
@@ -934,7 +917,7 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 std::vector<ipair> AbstractPolyhedralMesh<M,V,E,F,P>::vert_adj_visible_faces(const uint vid, const vec3d dir, const double ang_thresh)
 {
-    std::vector<ipair> nbrs; // vector or pairs (visible face, poly benath)
+    std::vector<ipair> nbrs; // vector or pairs (visible face, poly beneath)
     for(uint fid : this->adj_v2f(vid))
     {
         uint pid_beneath;
@@ -1677,11 +1660,12 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::vert_is_manifold(const uint vid) const
         std::queue<uint> q;
         q.push(*boundary.begin());
         visited.insert(*boundary.begin());
+        uint id,nbr;
         while(!q.empty())
         {
-            uint id = q.front();
+            id = q.front();
             q.pop();
-            for(uint nbr : this->adj_e2e(id))
+            for(nbr : this->adj_e2e(id))
             {
                 if(CONTAINS(boundary,nbr) && DOES_NOT_CONTAIN(visited,nbr))
                 {
@@ -1933,11 +1917,11 @@ std::vector<uint> AbstractPolyhedralMesh<M,V,E,F,P>::edge_ordered_poly_ring(cons
     }    
 
     plist.push_back(curr_p);
-
+    int tmp;
     do
     {
         curr_f = poly_face_adj_through_edge(curr_p, curr_f, eid);
-        int tmp = poly_adj_through_face(curr_p, curr_f);
+        tmp = poly_adj_through_face(curr_p, curr_f);
         if (tmp >= 0)
         {
             curr_p = static_cast<uint>(tmp);
@@ -2005,7 +1989,7 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::vert_switch_id(const uint vid0, const ui
 
     for(uint eid : edges_to_update)
     {
-        for(uint i=0; i<2; ++i)
+        for(short i=0; i<2; ++i)
         {
             uint & vid = this->edges.at(2*eid+i);
             if (vid == vid0) vid = vid1; else
@@ -2098,7 +2082,7 @@ void AbstractPolyhedralMesh<M,V,E,F,P>::edge_switch_id(const uint eid0, const ui
 {
     if (eid0 == eid1) return;
 
-    for(uint off=0; off<2; ++off) std::swap(this->edges.at(2*eid0+off), this->edges.at(2*eid1+off));
+    for(short off=0; off<2; ++off) std::swap(this->edges.at(2*eid0+off), this->edges.at(2*eid1+off));
 
     std::swap(this->e2f.at(eid0),     this->e2f.at(eid1));
     std::swap(this->e2p.at(eid0),     this->e2p.at(eid1));
@@ -2314,14 +2298,16 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::face_add(const std::vector<uint> & f)
         this->v2f.at(vid).push_back(fid);
     }
     //
+    int eid,nbr;
+    uint vid0,vid1;
     for(uint i=0; i<f.size(); ++i)
     {
-        uint vid0 = f.at(i);
-        uint vid1 = f.at((i+1)%f.size());
-        int  eid = this->edge_id(vid0, vid1);
+        vid0 = f.at(i);
+        vid1 = f.at((i+1)%f.size());
+        eid = this->edge_id(vid0, vid1);
         assert(eid >= 0);
 
-        for(uint nbr : this->e2f.at(eid))
+        for(nbr : this->e2f.at(eid))
         {
             assert(nbr!=fid);
             if (this->faces_are_adjacent(fid,nbr)) continue;
@@ -2467,14 +2453,16 @@ uint AbstractPolyhedralMesh<M,V,E,F,P>::poly_add(const std::vector<uint> & flist
     this->p2p.push_back(std::vector<uint>());
 
     // update connectivity
+    uint vid0,vid1;
+    int eid;
     for(uint fid : flist)
     {
         std::vector<uint> &f = faces.at(fid);
         for(uint i=0; i<f.size(); ++i)
         {
-            uint vid0 = f.at(i);
-            uint vid1 = f.at((i+1)%f.size());
-            int  eid = this->edge_id(vid0, vid1);
+            vid0 = f.at(i);
+            vid1 = f.at((i+1)%f.size());
+            eid = this->edge_id(vid0, vid1);
             assert(eid >= 0);
 
             if (!this->poly_contains_edge(pid,eid))
@@ -2829,15 +2817,15 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_fix_orientation(const uint pid, con
     std::queue<uint> q;
     q.push(fid);
     visited.at(this->poly_face_offset(pid,fid)) = true;
-
+    uint fid, nbr, off;
     while(!q.empty())
     {
-        uint fid = q.front();
+        fid = q.front();
         q.pop();
 
-        for(uint nbr : this->poly_f2f(pid,fid))
+        for(nbr : this->poly_f2f(pid,fid))
         {
-            uint off = this->poly_face_offset(pid,nbr);
+            off = this->poly_face_offset(pid,nbr);
             if(!visited.at(off))
             {
                 visited.at(off) = true;
@@ -2867,7 +2855,7 @@ template<class M, class V, class E, class F, class P>
 CINO_INLINE
 bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_fix_orientation()
 {
-    uint fid = 0;
+    uint fid = 0,nbr;
     while(fid<this->num_faces() && !this->face_is_on_srf(fid)) ++fid;
     assert(fid<this->num_faces());
     assert(this->face_is_on_srf(fid));
@@ -2880,15 +2868,15 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_fix_orientation()
 
     this->poly_set_flag(MARKED,false);
     this->poly_data(pid).flags[MARKED] = true;
-
+    int fid;
     while(!q.empty())
     {
-        uint pid = q.front();
+        pid = q.front();
         q.pop();
 
-        for(uint nbr : this->adj_p2p(pid))
+        for(nbr : this->adj_p2p(pid))
         {
-            int fid = this->poly_shared_face(pid,nbr);
+            fid = this->poly_shared_face(pid,nbr);
             assert(fid>=0);
 
             if(!this->poly_data(nbr).flags[MARKED])
@@ -3091,7 +3079,7 @@ bool AbstractPolyhedralMesh<M,V,E,F,P>::poly_is_prism(const uint pid, const uint
     assert(this->poly_contains_face(pid,fid));
 
     // a prism base has one incident quad per edge and
-    // an a twin n-gon at the opposite base
+    // a twin n-gon at the opposite base
 
     int nf = this->faces_per_poly(pid);
 
