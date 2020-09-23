@@ -67,12 +67,14 @@ void MeshSlicer<Mesh>::update(Mesh & m, const SlicerState & s)
     float X_thresh = m.bbox().min[0] + m.bbox().delta()[0] * s.X_thresh;
     float Y_thresh = m.bbox().min[1] + m.bbox().delta()[1] * s.Y_thresh;
     float Z_thresh = m.bbox().min[2] + m.bbox().delta()[2] * s.Z_thresh;
-
+    vec3d  c;
+    float  q;
+    int    l;
     for(uint pid=0; pid<m.num_polys(); ++pid)
     {
-        vec3d  c = m.poly_centroid(pid);
-        float  q = m.poly_data(pid).quality;
-        int    l = m.poly_data(pid).label;
+        c = m.poly_centroid(pid);
+        q = m.poly_data(pid).quality;
+        l = m.poly_data(pid).label;
 
         bool pass_X = (s.X_sign == LEQ) ? (c.x() <=   X_thresh) : (c.x() >=   X_thresh);
         bool pass_Y = (s.Y_sign == LEQ) ? (c.y() <=   Y_thresh) : (c.y() >=   Y_thresh);
