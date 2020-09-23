@@ -52,11 +52,8 @@ class AbstractDrawablePolyhedralMesh : public virtual Mesh, public DrawableObjec
 
         MeshSlicer<Mesh> slicer;
         Material         material_;
-        RenderData       drawlist_in;
-        RenderData       drawlist_out;
-        RenderData       drawlist_marked; // rendering info about marked edges (can be extended to handle marked verts/faces/poly too)
-        Color            marked_edge_color;
-        Color            marked_face_color;
+        RenderData       drawlist_in,drawlist_out,drawlist_marked; // rendering info about marked edges (can be extended to handle marked verts/faces/poly too)
+        Color            marked_edge_color,marked_face_color;
         float            AO_alpha;
 
     public:
@@ -65,8 +62,6 @@ class AbstractDrawablePolyhedralMesh : public virtual Mesh, public DrawableObjec
         vec3d      scene_center() const { return this->bb.center();     }
         float      scene_radius() const { return this->bb.diag() * 0.5; }
         ObjectType object_type()  const = 0;
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void vert_set_color(const Color & c) { Mesh::vert_set_color(c); updateGL(); }
         void edge_set_color(const Color & c) { Mesh::edge_set_color(c); updateGL(); }
@@ -77,28 +72,18 @@ class AbstractDrawablePolyhedralMesh : public virtual Mesh, public DrawableObjec
         void face_set_alpha(const float   a) { Mesh::face_set_alpha(a); updateGL(); }
         void poly_set_alpha(const float   a) { Mesh::poly_set_alpha(a); updateGL(); }
 
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         void init_drawable_stuff();
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void updateGL();         // regenerates rendering data for mesh inside/outside and marked elements
         void updateGL_in();      // regenerates rendering data for mesh inside
         void updateGL_out();     // regenerates rendering data for mesh outside
         void updateGL_marked();  // regenerates rendering data for mesh marked elements
 
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         const Material & material() const { return material_; }
               Material & material()       { return material_; }
 
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
         void slice(const SlicerState & s);
         void slicer_reset();
-
-        //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
         void show_mesh(const bool b);
         void show_AO_alpha(const float alpha);
@@ -137,7 +122,6 @@ class AbstractDrawablePolyhedralMesh : public virtual Mesh, public DrawableObjec
         void show_marked_face_color(const Color & c);
         void show_marked_face_transparency(const float alpha);
 };
-
 }
 
 #ifndef  CINO_STATIC_LIB
