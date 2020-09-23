@@ -59,25 +59,23 @@ void Skel::clear()
 CINO_INLINE
 void Skel::operator+=(const Skel & s)
 {
-    int nv = num_vertices();
-    int ns = num_segments();
-    int nb = num_bones();
-
-    for(int sid=0; sid<s.num_segments(); ++sid)
+    int nv = num_vertices(),ns = num_segments(),nb = num_bones(),sid,sid2,vid,nbr;
+    std::vector<int> tmp;
+    for(sid=0; sid<s.num_segments(); ++sid)
     {
         segments.push_back(ns + s.segment_vertex_id(sid,0));
         segments.push_back(ns + s.segment_vertex_id(sid,1));
 
-        std::vector<int> tmp;
-        for(int sid : s.seg2seg[sid]) tmp.push_back(ns + sid);
+        tmp.clear();
+        for(sid2 : s.seg2seg[sid2]) tmp.push_back(ns + sid2);
         seg2seg.push_back(tmp);
 
         seg_bone_ids.push_back(nb + s.seg_bone_ids.at(sid));
     }
-
-    for(int vid=0; vid<s.num_vertices(); ++vid)
+    vec3d pos;
+    for(vid=0; vid<s.num_vertices(); ++vid)
     {
-        vec3d pos = s.vertex(vid);
+        pos = s.vertex(vid);
         coords.push_back(pos.x());
         coords.push_back(pos.y());
         coords.push_back(pos.z());
@@ -85,12 +83,12 @@ void Skel::operator+=(const Skel & s)
         max_spheres.push_back(s.max_spheres.at(vid));
         vtx_bone_ids.push_back(nb + s.vtx_bone_ids.at(vid));
 
-        std::vector<int> tmp;
-        for(int sid : s.vtx2seg[vid]) tmp.push_back(ns + sid);
+        tmp.clear();
+        for(sid : s.vtx2seg[vid]) tmp.push_back(ns + sid);
         vtx2seg.push_back(tmp);
 
         tmp.clear();
-        for(int nbr : s.vtx2vtx[vid]) tmp.push_back(nv + nbr);
+        for(nbr : s.vtx2vtx[vid]) tmp.push_back(nv + nbr);
         vtx2vtx.push_back(tmp);
     }
 
@@ -184,29 +182,30 @@ void Skel::build_adjacency()
 
     vtx2seg.clear();
     vtx2seg.resize(num_vertices());
-    for(int sid=0; sid<num_segments(); ++sid)
+    int vid0,vid1,sid;
+    for(sid=0; sid<num_segments(); ++sid)
     {
         seg s    = segment(sid);
-        int vid0 = s.first;
-        int vid1 = s.second;
+        vid0 = s.first;
+        vid1 = s.second;
         vtx2seg[vid0].push_back(sid);
         vtx2seg[vid1].push_back(sid);
     }
 
     seg2seg.clear();
     seg2seg.resize(num_segments());
-    for(int sid=0; sid<num_segments(); ++sid)
+    for(sid=0; sid<num_segments(); ++sid)
     {
         seg s    = segment(sid);
-        int vid0 = s.first;
-        int vid1 = s.second;
+        vid0 = s.first;
+        vid1 = s.second;
 
         std::vector<int> segs;
         std::vector<int> adj_segs_v0 = adj_vtx2seg(vid0);
         std::vector<int> adj_segs_v1 = adj_vtx2seg(vid1);
         segs.insert(segs.end(), adj_segs_v0.begin(), adj_segs_v0.end());
         segs.insert(segs.end(), adj_segs_v1.begin(), adj_segs_v1.end());
-        for(int i=0; i<(int)segs.size(); ++i)
+        for(std::size_t i=0; i<segs.size(); ++i)
         {
             if (segs[i] == sid) continue;
             seg2seg[sid].push_back(segs[i]);
@@ -231,22 +230,24 @@ void Skel::build_bones()
         if (vertex_is_feature(vid)) q.push(vid);
         set_vertex_bone_id(vid, -1);
     }
-
+    int fp,curr,prev,fresh_id,next;
+    std::vector<int> nbrs;
+    std::vector<int> v_bone;
     while (!q.empty())
     {
-        int fp = q.front();
+        fp = q.front();
         q.pop();
 
-        std::vector<int> nbrs = adj_vtx2vtx(fp);
-        for(int i=0; i<(int)nbrs.size(); ++i)
+        nbrs = adj_vtx2vtx(fp);
+        for(std::size_t i=0; i<nbrs.size(); ++i)
         {
             if (vertex_bone_id(nbrs[i]) != -1) continue;
 
-            int curr     = nbrs[i];
-            int prev     = fp;
-            int fresh_id = vtx_bones.size();
+            curr     = nbrs[i];
+            prev     = fp;
+            fresh_id = vtx_bones.size();
 
-            std::vector<int> v_bone;
+            v_bone.clear();
             v_bone.push_back(fp);
 
             while (vertex_is_bone(curr))
@@ -254,7 +255,7 @@ void Skel::build_bones()
                 set_vertex_bone_id(curr, fresh_id);
                 v_bone.push_back(curr);
 
-                int next = (adj_vtx2vtx(curr,0) == prev) ? adj_vtx2vtx(curr,1) : adj_vtx2vtx(curr,0);
+                next = (adj_vtx2vtx(curr,0) == prev) ? adj_vtx2vtx(curr,1) : adj_vtx2vtx(curr,0);
 
                 prev = curr;
                 curr = next;
@@ -262,13 +263,14 @@ void Skel::build_bones()
             v_bone.push_back(curr);
             vtx_bones.push_back(v_bone);
 
-            std::vector<int> s_bone;
-            for(int i=1; i<(int)v_bone.size(); ++i)
+            std::vector<int> s_bone,segs;
+            int curr,prev;
+            for(std::size_t i=1; i<v_bone.size(); ++i)
             {
-                int curr = v_bone[i];
-                int prev = v_bone[i-1];
-                std::vector<int> segs = adj_vtx2seg(curr);
-                for(int j=0; j<(int)segs.size(); ++j)
+                curr = v_bone[i];
+                prev = v_bone[i-1];
+                segs = adj_vtx2seg(curr);
+                for(std::size_t j=0; j<segs.size(); ++j)
                 {
                     if (segment_contains_vertex(segs[j], prev))
                     {
@@ -277,9 +279,7 @@ void Skel::build_bones()
 
                         // consistently orient segments throughout the bone
                         if (segment_vertex_id(segs[j],0) == curr)
-                        {
                             segment_switch_order(segs[j]);
-                        }
                     }
                 }
             }
@@ -309,10 +309,8 @@ void Skel::remove_vertices(std::vector<int> & to_remove)
     std::sort(to_remove.begin(), to_remove.end());
     std::reverse(to_remove.begin(), to_remove.end());
 
-    for(int i=0; i<(int)to_remove.size(); ++i)
-    {
+    for(std::size_t i=0; i<to_remove.size(); ++i)
         remove_vertex(to_remove[i]);
-    }
 }
 
 CINO_INLINE
@@ -322,11 +320,12 @@ void Skel::remove_vertex(int vid_to_remove)
 
     std::vector<double> tmp_coords;
     std::vector<double> tmp_max_spheres;
+    int vid_ptr;
     for(int vid=0; vid<num_vertices(); ++vid)
     {
         if (vid == vid_to_remove) continue;
 
-        int vid_ptr = vid * 3;
+        vid_ptr = vid * 3;
         CHECK_BOUNDS(coords, vid_ptr+2);
         tmp_coords.push_back(coords[vid_ptr + 0]);
         tmp_coords.push_back(coords[vid_ptr + 1]);
@@ -337,21 +336,18 @@ void Skel::remove_vertex(int vid_to_remove)
 
     std::vector<int> tmp_segments;
     std::vector<int> to_connect;
+    int sid_ptr,v0,v1;
     for (int sid=0; sid<num_segments(); ++sid)
     {
-        int sid_ptr = sid * 2;
+        sid_ptr = sid * 2;
         CHECK_BOUNDS(segments, sid_ptr+1);
-        int v0 = segments[sid_ptr + 0];
-        int v1 = segments[sid_ptr + 1];
+        v0 = segments[sid_ptr + 0];
+        v1 = segments[sid_ptr + 1];
 
         if (v0 == vid_to_remove)
-        {
             to_connect.push_back((v1 < vid_to_remove) ? v1 : v1 - 1);
-        }
         else if (v1 == vid_to_remove)
-        {
             to_connect.push_back((v0 < vid_to_remove) ? v0 : v0 - 1);
-        }
         else
         {
             tmp_segments.push_back((v0 < vid_to_remove) ? v0 : v0 - 1);
@@ -364,9 +360,9 @@ void Skel::remove_vertex(int vid_to_remove)
 
     clear();
 
-    for(int i=0; i<(int)tmp_coords.size();      ++i) coords.push_back(tmp_coords[i]);
-    for(int i=0; i<(int)tmp_segments.size();    ++i) segments.push_back(tmp_segments[i]);
-    for(int i=0; i<(int)tmp_max_spheres.size(); ++i) max_spheres.push_back(tmp_max_spheres[i]);
+    for(std::size_t i=0; i<tmp_coords.size();      ++i) coords.push_back(tmp_coords[i]);
+    for(std::size_t i=0; i<tmp_segments.size();    ++i) segments.push_back(tmp_segments[i]);
+    for(std::size_t i=0; i<tmp_max_spheres.size(); ++i) max_spheres.push_back(tmp_max_spheres[i]);
 
     build_adjacency();
     build_bones();
@@ -489,12 +485,12 @@ CINO_INLINE
 bool Skel::are_bones_adjacent(const int bone_a, const int bone_b) const
 {
     std::vector<int> joints = get_joints();
-
+    int nbr;
     for(int fp : joints)
     {
         bool has_l1 = false;
         bool has_l2 = false;
-        for(int nbr : adj_vtx2vtx(fp))
+        for(nbr : adj_vtx2vtx(fp))
         {
             if (vertex_bone_id(nbr) == bone_a) has_l1 = true;
             if (vertex_bone_id(nbr) == bone_b) has_l2 = true;
