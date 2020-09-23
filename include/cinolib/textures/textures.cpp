@@ -72,10 +72,11 @@ void texture_isolines2D(      Texture & texture,
     delete[] texture.data;
     texture.size = 8;
     texture.data = new uint8_t[texture.size*texture.size*4];
+    uint i;
     for(int32_t r=0; r<texture.size; ++r)
     for(int32_t c=0; c<texture.size; ++c)
     {
-        uint i = 4 * serialize_2D_index(r,c,texture.size);
+        i = 4 * serialize_2D_index(r,c,texture.size);
         texture.data[i  ] = background.r_uchar();
         texture.data[i+1] = background.g_uchar();
         texture.data[i+2] = background.b_uchar();
@@ -83,7 +84,7 @@ void texture_isolines2D(      Texture & texture,
     }
     for(int32_t c=0; c<texture.size; ++c)
     {
-        uint i = 4 * serialize_2D_index(0,c,texture.size);
+        i = 4 * serialize_2D_index(0,c,texture.size);
         texture.data[i  ] = u_isolines.r_uchar();
         texture.data[i+1] = u_isolines.g_uchar();
         texture.data[i+2] = u_isolines.b_uchar();
@@ -91,7 +92,7 @@ void texture_isolines2D(      Texture & texture,
     }
     for(int32_t r=0; r<texture.size; ++r)
     {
-        uint i = 4 * serialize_2D_index(r,0,texture.size);
+        i = 4 * serialize_2D_index(r,0,texture.size);
         texture.data[i  ] = v_isolines.r_uchar();
         texture.data[i+1] = v_isolines.g_uchar();
         texture.data[i+2] = v_isolines.b_uchar();
@@ -112,10 +113,11 @@ void texture_checkerboard(      Texture & texture,
     delete[] texture.data;
     texture.size = 8;
     texture.data = new uint8_t[texture.size*texture.size*4];
+    uint i;
     for(int32_t r=0; r<texture.size; ++r)
     for(int32_t c=0; c<texture.size; ++c)
     {
-        uint i = 4 * serialize_2D_index(r,c,texture.size);
+        i = 4 * serialize_2D_index(r,c,texture.size);
         if (r%2 == c%2)
         {
             texture.data[i  ] = c0.r_uchar();
@@ -147,7 +149,8 @@ void texture_isolines1D(      Texture & texture,
     delete[] texture.data;
     texture.size = n_bands;
     texture.data = new uint8_t[3*texture.size];
-    for(int32_t i=0; i<texture.size; ++i)
+    int32_t i;
+    for(i=0; i<texture.size; ++i)
     {
         if (i%2)
         {
