@@ -44,8 +44,6 @@
 namespace cinolib
 {
 
-//::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
 template<class M, class V, class E, class P>
 CINO_INLINE
 bool AbstractMesh<M,V,E,P>::mesh_is_surface() const
@@ -183,9 +181,7 @@ std::vector<vec3d> AbstractMesh<M,V,E,P>::vector_vert_normals() const
     std::vector<vec3d> normals;
     normals.reserve(num_verts());
     for(uint vid=0; vid<num_verts(); ++vid)
-    {
         normals.push_back(vert_data(vid).normal);
-    }
     return normals;
 }
 
@@ -198,9 +194,7 @@ std::vector<Color> AbstractMesh<M,V,E,P>::vector_vert_colors() const
     std::vector<Color> colors;
     colors.reserve(num_verts());
     for(uint vid=0; vid<num_verts(); ++vid)
-    {
         colors.push_back(vert_data(vid).color);
-    }
     return colors;
 }
 
@@ -213,9 +207,7 @@ std::vector<int> AbstractMesh<M,V,E,P>::vector_vert_labels() const
     std::vector<int> labels;
     labels.reserve(num_verts());
     for(uint vid=0; vid<num_verts(); ++vid)
-    {
         labels.push_back(vert_data(vid).label);
-    }
     return labels;
 }
 
@@ -228,9 +220,7 @@ std::vector<Color> AbstractMesh<M,V,E,P>::vector_edge_colors() const
     std::vector<Color> colors;
     colors.reserve(num_edges());
     for(uint eid=0; eid<num_edges(); ++eid)
-    {
         colors.push_back(edge_data(eid).color);
-    }
     return colors;
 }
 
@@ -243,9 +233,7 @@ std::vector<int> AbstractMesh<M,V,E,P>::vector_edge_labels() const
     std::vector<int> labels;
     labels.reserve(num_edges());
     for(uint eid=0; eid<num_edges(); ++eid)
-    {
         labels.push_back(edge_data(eid).label);
-    }
     return labels;
 }
 
@@ -258,9 +246,7 @@ std::vector<vec3d> AbstractMesh<M,V,E,P>::vector_poly_normals() const
     std::vector<vec3d> normals;
     normals.reserve(num_polys());
     for(uint pid=0; pid<num_polys(); ++pid)
-    {
         normals.push_back(poly_data(pid).normal);
-    }
     return normals;
 }
 
@@ -273,9 +259,7 @@ std::vector<Color> AbstractMesh<M,V,E,P>::vector_poly_colors() const
     std::vector<Color> colors;
     colors.reserve(num_polys());
     for(uint pid=0; pid<num_polys(); ++pid)
-    {
         colors.push_back(poly_data(pid).color);
-    }
     return colors;
 }
 
@@ -288,9 +272,7 @@ std::vector<int> AbstractMesh<M,V,E,P>::vector_poly_labels() const
     std::vector<int> labels;
     labels.reserve(num_polys());
     for(uint pid=0; pid<num_polys(); ++pid)
-    {
         labels.push_back(poly_data(pid).label);
-    }
     return labels;
 }
 
@@ -354,9 +336,7 @@ void AbstractMesh<M,V,E,P>::deserialize_uvw(const std::vector<vec3d> & uvw)
 {
     assert(uvw.size()==num_verts());
     for(uint vid=0; vid<num_verts(); ++vid)
-    {
         vert_data(vid).uvw = uvw.at(vid);
-    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -421,9 +401,7 @@ CINO_INLINE
 void AbstractMesh<M,V,E,P>::swap_xyz_uvw(const bool normals, const bool bbox)
 {
     for(uint vid=0; vid<num_verts(); ++vid)
-    {
         std::swap(vert(vid),vert_data(vid).uvw);
-    }
     if(normals) update_normals();
     if(bbox)    update_bbox();
 }
@@ -445,8 +423,7 @@ CINO_INLINE
 std::vector<uint> AbstractMesh<M,V,E,P>::adj_e2e(const uint eid) const
 {
     std::unordered_set<uint> unique_e_list;
-    uint v0 = this->edge_vert_id(eid,0);
-    uint v1 = this->edge_vert_id(eid,1);
+    uint v0 = this->edge_vert_id(eid,0),v1 = this->edge_vert_id(eid,1);
     for(uint nbr : this->adj_v2e(v0)) if(nbr != eid) unique_e_list.insert(nbr);
     for(uint nbr : this->adj_v2e(v1)) if(nbr != eid) unique_e_list.insert(nbr);
     std::vector<uint> e_list(unique_e_list.begin(), unique_e_list.end());
@@ -459,21 +436,17 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 std::set<uint> AbstractMesh<M,V,E,P>::vert_n_ring(const uint vid, const uint n) const
 {
-    std::set<uint> active_set;
-    std::set<uint> ring;
-
+    std::set<uint> active_set,ring;
+    std::set<uint> next_active_set;
     active_set.insert(vid);
     for(uint i=0; i<n; ++i)
-    {
-        std::set<uint> next_active_set;
-
+    {      
         for(uint curr : active_set)
         for(uint nbr  : adj_v2v(curr))
         {
             if (DOES_NOT_CONTAIN(ring,nbr) && nbr != vid) next_active_set.insert(nbr);
             ring.insert(nbr);
         }
-
         active_set = next_active_set;
     }
     return ring;
@@ -522,9 +495,7 @@ void AbstractMesh<M,V,E,P>::vert_weights_uniform(const uint vid, std::vector<std
     wgts.clear();
     double w = 1.0; // / (double)nbrs.size(); // <= WARNING: makes the matrix non-symmetric!!!!!
     for(uint nbr : adj_v2v(vid))
-    {
         wgts.push_back(std::make_pair(nbr,w));
-    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -581,10 +552,7 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 uint AbstractMesh<M,V,E,P>::vert_shared(const uint eid0, const uint eid1) const
 {
-    uint e00 = edge_vert_id(eid0,0);
-    uint e01 = edge_vert_id(eid0,1);
-    uint e10 = edge_vert_id(eid1,0);
-    uint e11 = edge_vert_id(eid1,1);
+    uint e00 = edge_vert_id(eid0,0),e01 = edge_vert_id(eid0,1),e10 = edge_vert_id(eid1,0),e11 = edge_vert_id(eid1,1);
     if (e00 == e10 || e00 == e11) return e00;
     if (e01 == e10 || e01 == e11) return e01;
     assert(false);
@@ -597,10 +565,12 @@ template<class M, class V, class E, class P>
 CINO_INLINE
 int AbstractMesh<M,V,E,P>::vert_shared_between_polys(const std::vector<uint> & pids) const
 {
+    bool shared;
+    uint i;
     for(uint vid : this->adj_p2v(pids.front()))
     {
-        bool shared = true;
-        for(uint i=1; i<pids.size(); ++i)
+        shared = true;
+        for(i=1; i<pids.size(); ++i)
         {
             if(!this->poly_contains_vert(pids.at(i),vid))
             {
@@ -660,9 +630,7 @@ CINO_INLINE
 void AbstractMesh<M,V,E,P>::vert_set_color(const Color & c)
 {
     for(uint vid=0; vid<num_verts(); ++vid)
-    {
         vert_data(vid).color = c;
-    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -672,9 +640,7 @@ CINO_INLINE
 void AbstractMesh<M,V,E,P>::vert_set_alpha(const float alpha)
 {
     for(uint vid=0; vid<num_verts(); ++vid)
-    {
         vert_data(vid).color.a = alpha;
-    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -715,9 +681,7 @@ int AbstractMesh<M,V,E,P>::edge_id(const uint vid0, const uint vid1) const
     for(uint eid : adj_v2e(vid0))
     {
         if(edge_contains_vert(eid,vid0) && edge_contains_vert(eid,vid1))
-        {
             return eid;
-        }
     }
     return -1;
 }
@@ -853,9 +817,7 @@ CINO_INLINE
 void AbstractMesh<M,V,E,P>::edge_set_color(const Color & c)
 {
     for(uint eid=0; eid<num_edges(); ++eid)
-    {
         edge_data(eid).color = c;
-    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -865,9 +827,7 @@ CINO_INLINE
 void AbstractMesh<M,V,E,P>::edge_set_alpha(const float alpha)
 {
     for(uint eid=0; eid<num_edges(); ++eid)
-    {
         edge_data(eid).color.a = alpha;
-    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -887,9 +847,7 @@ uint AbstractMesh<M,V,E,P>::poly_vert_offset(const uint pid, const uint vid) con
 {
     assert(poly_contains_vert(pid,vid));
     for(uint off=0; off<verts_per_poly(pid); ++off)
-    {
         if(poly_vert_id(pid,off) == vid) return off;
-    }
     assert(false);
     return 0; // warning killer
 }
@@ -914,9 +872,7 @@ vec3d AbstractMesh<M,V,E,P>::poly_sample_at(const uint pid, const double bc[]) c
 {
     vec3d p(0,0,0);
     for(uint off=0; off<verts_per_poly(pid); ++off)
-    {
         p += bc[off] * poly_vert(pid,off);
-    }
     return p;
 }
 
@@ -985,9 +941,7 @@ std::vector<uint> AbstractMesh<M,V,E,P>::poly_v2v(const uint pid, const uint vid
     assert(this->poly_contains_vert(pid,vid));
     std::vector<uint> verts;
     for(uint eid : this->adj_v2e(vid))
-    {
         if(this->poly_contains_edge(pid,eid)) verts.push_back(this->vert_opposite_to(eid,vid));
-    }
     return verts;
 }
 
@@ -1000,9 +954,7 @@ std::vector<uint> AbstractMesh<M,V,E,P>::poly_v2e(const uint pid, const uint vid
     assert(this->poly_contains_vert(pid,vid));
     std::vector<uint> edges;
     for(uint eid : this->adj_v2e(vid))
-    {
         if(this->poly_contains_edge(pid,eid)) edges.push_back(eid);
-    }
     return edges;
 }
 
@@ -1025,9 +977,7 @@ uint AbstractMesh<M,V,E,P>::poly_edge_id(const uint fid, const uint vid0, const 
     assert(poly_contains_vert(fid,vid1));
 
     for(uint eid : adj_p2e(fid))
-    {
         if (edge_contains_vert(eid,vid0) && edge_contains_vert(eid,vid1)) return eid;
-    }
 
     assert(false);
     return 0; // warning killer
@@ -1079,9 +1029,7 @@ CINO_INLINE
 void AbstractMesh<M,V,E,P>::poly_set_color(const Color & c)
 {
     for(uint pid=0; pid<num_polys(); ++pid)
-    {
         poly_data(pid).color = c;
-    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1091,9 +1039,7 @@ CINO_INLINE
 void AbstractMesh<M,V,E,P>::poly_set_alpha(const float alpha)
 {
     for(uint pid=0; pid<num_polys(); ++pid)
-    {
         poly_data(pid).color.a = alpha;
-    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1103,9 +1049,10 @@ CINO_INLINE
 void AbstractMesh<M,V,E,P>::poly_color_wrt_label(const bool sorted, const float s, const float v) // s => saturation, v => value in HSV color space
 {
     std::map<int,uint> l_map;
+    int l;
     for(uint pid=0; pid<this->num_polys(); ++pid)
     {
-        int l = this->poly_data(pid).label;
+        l = this->poly_data(pid).label;
         if(DOES_NOT_CONTAIN(l_map,l))
         {
             uint fresh_label = l_map.size();
@@ -1127,15 +1074,14 @@ CINO_INLINE
 void AbstractMesh<M,V,E,P>::poly_label_wrt_color()
 {
     std::map<Color,int> colormap;
-    for(uint pid=0; pid<this->num_polys(); ++pid)
+    uint pid;
+    for(pid=0; pid<this->num_polys(); ++pid)
     {
         const Color & c = this->poly_data(pid).color;
         if (DOES_NOT_CONTAIN(colormap,c)) colormap[c] = colormap.size();
     }
-    for(uint pid=0; pid<this->num_polys(); ++pid)
-    {
+    for(pid=0; pid<this->num_polys(); ++pid)
         this->poly_data(pid).label = colormap.at(this->poly_data(pid).color);
-    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1192,9 +1138,7 @@ void AbstractMesh<M,V,E,P>::poly_apply_labels(const std::vector<int> & labels)
 {
     assert(labels.size() == this->num_polys());
     for(uint pid=0; pid<num_polys(); ++pid)
-    {
         poly_data(pid).label = labels.at(pid);
-    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1204,9 +1148,7 @@ CINO_INLINE
 void AbstractMesh<M,V,E,P>::poly_apply_label(const int label)
 {
     for(uint pid=0; pid<num_polys(); ++pid)
-    {
         poly_data(pid).label = label;
-    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1226,9 +1168,7 @@ void AbstractMesh<M,V,E,P>::edge_apply_labels(const std::vector<int> & labels)
 {
     assert(labels.size() == this->num_edges());
     for(uint eid=0; eid<num_edges(); ++eid)
-    {
         edge_data(eid).label = labels.at(eid);
-    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1238,9 +1178,7 @@ CINO_INLINE
 void AbstractMesh<M,V,E,P>::edge_apply_label(const int label)
 {
     for(uint eid=0; eid<num_edges(); ++eid)
-    {
         edge_data(eid).label = label;
-    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1251,9 +1189,7 @@ void AbstractMesh<M,V,E,P>::vert_apply_labels(const std::vector<int> & labels)
 {
     assert(labels.size() == this->num_verts());
     for(uint vid=0; vid<num_verts(); ++vid)
-    {
         vert_data(vid).label = labels.at(vid);
-    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1263,9 +1199,7 @@ CINO_INLINE
 void AbstractMesh<M,V,E,P>::vert_apply_label(const int label)
 {
     for(uint vid=0; vid<num_verts(); ++vid)
-    {
         vert_data(vid).label = label;
-    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1316,9 +1250,7 @@ uint AbstractMesh<M,V,E,P>::pick_poly(const vec3d & p) const
 {
     std::vector<std::pair<double,uint>> closest;
     for(uint pid=0; pid<this->num_polys(); ++pid)
-    {
         if(!this->poly_data(pid).flags[HIDDEN]) closest.push_back(std::make_pair(this->poly_centroid(pid).dist(p),pid));
-    }
     std::sort(closest.begin(), closest.end());
     return closest.front().second;
 }
@@ -1330,9 +1262,7 @@ CINO_INLINE
 void AbstractMesh<M,V,E,P>::vert_set_flag(const int flag, const bool b)
 {
     for(uint vid=0; vid<this->num_verts(); ++vid)
-    {
         this->vert_data(vid).flags[flag] = b;
-    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1342,9 +1272,7 @@ CINO_INLINE
 void AbstractMesh<M,V,E,P>::vert_set_flag(const int flag, const bool b, const std::vector<uint> & vids)
 {
     for(uint vid : vids)
-    {
         this->vert_data(vid).flags[flag] = b;
-    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1354,9 +1282,7 @@ CINO_INLINE
 void AbstractMesh<M,V,E,P>::edge_set_flag(const int flag, const bool b)
 {
     for(uint eid=0; eid<this->num_edges(); ++eid)
-    {
         this->edge_data(eid).flags[flag] = b;
-    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1366,9 +1292,7 @@ CINO_INLINE
 void AbstractMesh<M,V,E,P>::edge_set_flag(const int flag, const bool b, const std::vector<uint> & eids)
 {
     for(uint eid : eids)
-    {
         this->edge_data(eid).flags[flag] = b;
-    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1378,9 +1302,7 @@ CINO_INLINE
 void AbstractMesh<M,V,E,P>::poly_set_flag(const int flag, const bool b)
 {
     for(uint pid=0; pid<this->num_polys(); ++pid)
-    {
         this->poly_data(pid).flags[flag] = b;
-    }
 }
 
 //::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1390,8 +1312,6 @@ CINO_INLINE
 void AbstractMesh<M,V,E,P>::poly_set_flag(const int flag, const bool b, const std::vector<uint> & pids)
 {
     for(uint pid : pids)
-    {
         this->poly_data(pid).flags[flag] = b;
-    }
 }
  }
