@@ -97,14 +97,14 @@ void DrawableSkel::draw(const float scene_size) const
 {
     float bone_thickness = scene_size * BONE_SCALAR() * bone_thickness_modifier;
     float sphere_radius  = scene_size * BALL_SCALAR() * sphere_radius_modifier;
-
+    vec3d v;
     if (draw_mode & DRAW_SKEL)
     {
         if (draw_mode & DRAW_MAX_SPHERES)
         {
             for(int vid=0; vid<num_vertices(); ++vid)
             {
-                vec3d v = vertex(vid);
+                v = vertex(vid);
                 glDisable(GL_DEPTH_TEST);
                 sphere<vec3d>(v, max_sphere_radius(vid), std_bone_color);
                 glEnable(GL_DEPTH_TEST);
@@ -121,7 +121,7 @@ void DrawableSkel::draw(const float scene_size) const
                 {
                     int vid = v_bone[i];
 
-                    vec3d v = vertex(vid);
+                    v = vertex(vid);
                     glDisable(GL_DEPTH_TEST);
                     if (draw_mode & DRAW_STD_COLOR)
                     {
@@ -135,12 +135,13 @@ void DrawableSkel::draw(const float scene_size) const
                 }
 
                 std::vector<int> s_bone = segment_bone(bid);
-
-                for(int i=0; i<(int)s_bone.size(); ++i)
+                int sid;
+                vec3d v0,v1;
+                for(std::size_t i=0; i<s_bone.size(); ++i)
                 {
-                    int sid = s_bone[i];
-                    vec3d v0 = segment_vertex(sid, 0);
-                    vec3d v1 = segment_vertex(sid, 1);
+                    sid = s_bone[i];
+                    v0 = segment_vertex(sid, 0);
+                    v1 = segment_vertex(sid, 1);
 
                     glDisable(GL_DEPTH_TEST);
                     if (draw_mode & DRAW_STD_COLOR)
