@@ -82,8 +82,7 @@ void Polyhedralmesh<M,V,E,F,P>::load(const char * filename)
     std::vector<std::vector<uint>> tmp_faces;
     std::vector<std::vector<uint>> tmp_polys;
     std::vector<std::vector<bool>> tmp_polys_face_winding;
-    std::vector<int>               vert_labels;
-    std::vector<int>               poly_labels;
+    std::vector<int>               vert_labels,poly_labels;
 
     std::string str(filename);
     std::string filetype = "." + get_file_extension(str);
