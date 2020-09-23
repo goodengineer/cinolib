@@ -100,7 +100,7 @@ enum
     MARKED,       // general flag for global marking. Can be used to mark visited
                   // elements, creases, mesh borders,...). Marked elements can also
                   // be highlighted at rendering time, with dedicated colors/lines.
-                  // By default, booundary and non manifold elements are marked at
+                  // By default, boundary and non manifold elements are marked at
                   // loading time.
 
     MARKED_LOCAL, // general flag for local marking: useful for local methods that
