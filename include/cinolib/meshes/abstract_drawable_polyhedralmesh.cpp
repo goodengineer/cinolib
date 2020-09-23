@@ -209,9 +209,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_out()
             auto  vid0_vis_fids = this->vert_adj_visible_faces(vid0, n, 60.0);
             auto  vid1_vis_fids = this->vert_adj_visible_faces(vid1, n, 60.0);
             auto  vid2_vis_fids = this->vert_adj_visible_faces(vid2, n, 60.0);
-            AO_vid0 = 0.0;
-            AO_vid1 = 0.0;
-            AO_vid2 = 0.0;
+            AO_vid0 = AO_vid1 = AO_vid2 = 0.0;
             for(auto fp : vid0_vis_fids) AO_vid0 += this->face_data(fp.first).AO*AO_alpha + (1.0 - AO_alpha);
             for(auto fp : vid1_vis_fids) AO_vid1 += this->face_data(fp.first).AO*AO_alpha + (1.0 - AO_alpha);
             for(auto fp : vid2_vis_fids) AO_vid2 += this->face_data(fp.first).AO*AO_alpha + (1.0 - AO_alpha);
@@ -450,9 +448,7 @@ void AbstractDrawablePolyhedralMesh<Mesh>::updateGL_in()
             auto  vid0_vis_fids = this->vert_adj_visible_faces(vid0, n, 60.0);
             auto  vid1_vis_fids = this->vert_adj_visible_faces(vid1, n, 60.0);
             auto  vid2_vis_fids = this->vert_adj_visible_faces(vid2, n, 60.0);
-            AO_vid0 = 0.0;
-            AO_vid1 = 0.0;
-            AO_vid2 = 0.0;
+            AO_vid0 = AO_vid1 = AO_vid2 = 0.0;
             for(auto fp : vid0_vis_fids) AO_vid0 += this->face_data(fp.first).AO*AO_alpha + (1.0 - AO_alpha);
             for(auto fp : vid1_vis_fids) AO_vid1 += this->face_data(fp.first).AO*AO_alpha + (1.0 - AO_alpha);
             for(auto fp : vid2_vis_fids) AO_vid2 += this->face_data(fp.first).AO*AO_alpha + (1.0 - AO_alpha);
@@ -678,14 +674,8 @@ template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::show_mesh_smooth()
 {
-    drawlist_in.draw_mode  |=  DRAW_TRI_SMOOTH;
-    drawlist_in.draw_mode  &= ~DRAW_TRI_FLAT;
-    drawlist_in.draw_mode  &= ~DRAW_TRI_POINTS;
-
-    drawlist_out.draw_mode |=  DRAW_TRI_SMOOTH;
-    drawlist_out.draw_mode &= ~DRAW_TRI_FLAT;
-    drawlist_out.draw_mode &= ~DRAW_TRI_POINTS;
-
+    drawlist_in.draw_mode  |=  (DRAW_TRI_SMOOTH&~DRAW_TRI_FLAT&~DRAW_TRI_POINTS);
+    drawlist_out.draw_mode |=  (DRAW_TRI_SMOOTH&~DRAW_TRI_FLAT&~DRAW_TRI_POINTS);
     updateGL();
 }
 
@@ -693,14 +683,8 @@ template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::show_mesh_points()
 {
-    drawlist_in.draw_mode  |=  DRAW_TRI_POINTS;
-    drawlist_in.draw_mode  &= ~DRAW_TRI_FLAT;
-    drawlist_in.draw_mode  &= ~DRAW_TRI_SMOOTH;
-
-    drawlist_out.draw_mode |=  DRAW_TRI_POINTS;
-    drawlist_out.draw_mode &= ~DRAW_TRI_FLAT;
-    drawlist_out.draw_mode &= ~DRAW_TRI_SMOOTH;
-
+    drawlist_in.draw_mode  |=  (DRAW_TRI_POINTS&~DRAW_TRI_FLAT&~DRAW_TRI_SMOOTH);   
+    drawlist_out.draw_mode |=  (DRAW_TRI_POINTS&~DRAW_TRI_FLAT&~DRAW_TRI_SMOOTH);   
     updateGL();
 }
 
@@ -708,11 +692,7 @@ template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::show_out_vert_color()
 {
-    drawlist_out.draw_mode |=  DRAW_TRI_VERTCOLOR;
-    drawlist_out.draw_mode &= ~DRAW_TRI_FACECOLOR;
-    drawlist_out.draw_mode &= ~DRAW_TRI_QUALITY;
-    drawlist_out.draw_mode &= ~DRAW_TRI_TEXTURE1D;
-    drawlist_out.draw_mode &= ~DRAW_TRI_TEXTURE2D;
+    drawlist_out.draw_mode |=  (DRAW_TRI_VERTCOLOR&~DRAW_TRI_FACECOLOR&~DRAW_TRI_QUALITY&~DRAW_TRI_TEXTURE1D&~DRAW_TRI_TEXTURE2D);    
     updateGL_out();
 }
 
@@ -720,11 +700,7 @@ template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::show_in_vert_color()
 {
-    drawlist_in.draw_mode |=  DRAW_TRI_VERTCOLOR;
-    drawlist_in.draw_mode &= ~DRAW_TRI_FACECOLOR;
-    drawlist_in.draw_mode &= ~DRAW_TRI_QUALITY;
-    drawlist_in.draw_mode &= ~DRAW_TRI_TEXTURE1D;
-    drawlist_in.draw_mode &= ~DRAW_TRI_TEXTURE2D;
+    drawlist_in.draw_mode |=  (DRAW_TRI_VERTCOLOR&~DRAW_TRI_FACECOLOR&~DRAW_TRI_QUALITY&~DRAW_TRI_TEXTURE1D&~DRAW_TRI_TEXTURE2D);    
     updateGL_in();
 }
 
@@ -739,11 +715,7 @@ template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::show_out_poly_color()
 {
-    drawlist_out.draw_mode |=  DRAW_TRI_FACECOLOR;
-    drawlist_out.draw_mode &= ~DRAW_TRI_VERTCOLOR;
-    drawlist_out.draw_mode &= ~DRAW_TRI_QUALITY;
-    drawlist_out.draw_mode &= ~DRAW_TRI_TEXTURE1D;
-    drawlist_out.draw_mode &= ~DRAW_TRI_TEXTURE2D;
+    drawlist_out.draw_mode |=  (DRAW_TRI_FACECOLOR&~DRAW_TRI_VERTCOLOR&~DRAW_TRI_QUALITY&~DRAW_TRI_TEXTURE1D&~DRAW_TRI_TEXTURE2D);   
     updateGL_out();
 }
 
@@ -751,11 +723,7 @@ template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::show_out_poly_quality()
 {
-    drawlist_out.draw_mode |=  DRAW_TRI_QUALITY;
-    drawlist_out.draw_mode &= ~DRAW_TRI_FACECOLOR;
-    drawlist_out.draw_mode &= ~DRAW_TRI_VERTCOLOR;
-    drawlist_out.draw_mode &= ~DRAW_TRI_TEXTURE1D;
-    drawlist_out.draw_mode &= ~DRAW_TRI_TEXTURE2D;
+    drawlist_out.draw_mode |=  (DRAW_TRI_QUALITY&~DRAW_TRI_FACECOLOR&~DRAW_TRI_VERTCOLOR&~DRAW_TRI_TEXTURE1D&~DRAW_TRI_TEXTURE2D); 
     updateGL_out();
 }
 
@@ -763,12 +731,7 @@ template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::show_out_texture1D(const int tex_type)
 {
-    drawlist_out.draw_mode |=  DRAW_TRI_TEXTURE1D;
-    drawlist_out.draw_mode &= ~DRAW_TRI_TEXTURE2D;
-    drawlist_out.draw_mode &= ~DRAW_TRI_VERTCOLOR;
-    drawlist_out.draw_mode &= ~DRAW_TRI_FACECOLOR;
-    drawlist_out.draw_mode &= ~DRAW_TRI_QUALITY;
-
+    drawlist_out.draw_mode |=  (DRAW_TRI_TEXTURE1D&~DRAW_TRI_TEXTURE2D&~DRAW_TRI_VERTCOLOR&~DRAW_TRI_FACECOLOR&~DRAW_TRI_QUALITY);  
     drawlist_out.texture.type = tex_type;
     switch (tex_type)
     {
@@ -786,12 +749,8 @@ template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::show_out_texture2D(const int tex_type, const double tex_unit_scalar, const char *bitmap)
 {
-    drawlist_out.draw_mode |=  DRAW_TRI_TEXTURE2D;
-    drawlist_out.draw_mode &= ~DRAW_TRI_TEXTURE1D;
-    drawlist_out.draw_mode &= ~DRAW_TRI_VERTCOLOR;
-    drawlist_out.draw_mode &= ~DRAW_TRI_FACECOLOR;
-    drawlist_out.draw_mode &= ~DRAW_TRI_QUALITY;
-
+    drawlist_out.draw_mode |=  (DRAW_TRI_TEXTURE2D&~DRAW_TRI_TEXTURE1D&~DRAW_TRI_VERTCOLOR&~DRAW_TRI_FACECOLOR&~DRAW_TRI_QUALITY);
+  
     drawlist_out.texture.type           = tex_type;
     drawlist_out.texture.scaling_factor = tex_unit_scalar;
     switch (tex_type)
@@ -848,11 +807,7 @@ template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::show_in_poly_color()
 {
-    drawlist_in.draw_mode |=  DRAW_TRI_FACECOLOR;
-    drawlist_in.draw_mode &= ~DRAW_TRI_VERTCOLOR;
-    drawlist_in.draw_mode &= ~DRAW_TRI_QUALITY;
-    drawlist_in.draw_mode &= ~DRAW_TRI_TEXTURE1D;
-    drawlist_in.draw_mode &= ~DRAW_TRI_TEXTURE2D;
+    drawlist_in.draw_mode |=  (DRAW_TRI_FACECOLOR&~DRAW_TRI_VERTCOLOR&~DRAW_TRI_QUALITY&~DRAW_TRI_TEXTURE1D&~DRAW_TRI_TEXTURE2D);    
     updateGL_in();
 }
 
@@ -860,11 +815,7 @@ template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::show_in_poly_quality()
 {
-    drawlist_in.draw_mode |=  DRAW_TRI_QUALITY;
-    drawlist_in.draw_mode &= ~DRAW_TRI_FACECOLOR;
-    drawlist_in.draw_mode &= ~DRAW_TRI_VERTCOLOR;
-    drawlist_in.draw_mode &= ~DRAW_TRI_TEXTURE1D;
-    drawlist_in.draw_mode &= ~DRAW_TRI_TEXTURE2D;
+    drawlist_in.draw_mode |=  (DRAW_TRI_QUALITY&~DRAW_TRI_VERTCOLOR&~DRAW_TRI_FACECOLOR&~DRAW_TRI_TEXTURE1D&~DRAW_TRI_TEXTURE2D);   
     updateGL_in();
 }
 
@@ -872,12 +823,7 @@ template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::show_in_texture1D(const int tex_type)
 {
-    drawlist_in.draw_mode |=  DRAW_TRI_TEXTURE1D;
-    drawlist_in.draw_mode &= ~DRAW_TRI_TEXTURE2D;
-    drawlist_in.draw_mode &= ~DRAW_TRI_VERTCOLOR;
-    drawlist_in.draw_mode &= ~DRAW_TRI_FACECOLOR;
-    drawlist_in.draw_mode &= ~DRAW_TRI_QUALITY;
-
+    drawlist_in.draw_mode |=  DRAW_TRI_TEXTURE1D&~DRAW_TRI_TEXTURE2D&~DRAW_TRI_VERTCOLOR&~DRAW_TRI_FACECOLOR&~DRAW_TRI_QUALITY;  
     drawlist_in.texture.type = tex_type;
     switch (tex_type)
     {
@@ -895,12 +841,7 @@ template<class Mesh>
 CINO_INLINE
 void AbstractDrawablePolyhedralMesh<Mesh>::show_in_texture2D(const int tex_type, const double tex_unit_scalar, const char *bitmap)
 {
-    drawlist_in.draw_mode |=  DRAW_TRI_TEXTURE2D;
-    drawlist_in.draw_mode &= ~DRAW_TRI_TEXTURE1D;
-    drawlist_in.draw_mode &= ~DRAW_TRI_VERTCOLOR;
-    drawlist_in.draw_mode &= ~DRAW_TRI_FACECOLOR;
-    drawlist_in.draw_mode &= ~DRAW_TRI_QUALITY;
-
+    drawlist_in.draw_mode |=  (DRAW_TRI_TEXTURE2D&~DRAW_TRI_TEXTURE1D&~DRAW_TRI_VERTCOLOR&~DRAW_TRI_FACECOLOR&~DRAW_TRI_QUALITY);
     drawlist_in.texture.type           = tex_type;
     drawlist_in.texture.scaling_factor = tex_unit_scalar;
     switch (tex_type)
